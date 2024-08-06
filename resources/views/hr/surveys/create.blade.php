@@ -28,7 +28,7 @@
                         <!-- Anket adi -->
                         <div class="col-md-6 col-lg-4 col-xl-3 form-group mb-3">
                             <div class="select_label ui sub header">Anket adı <span class="text-danger">*</span></div>
-                            <input title="" type="survey-name" name="name" required class="form-control"
+                            <input title="" type="survey-name" name="name"  class="form-control" required
                                 placeholder="Anket adını daxil edin">
                             @if($errors->has('name'))
                                 <span class="text-danger">{{ $errors->first('name') }}</span>
@@ -258,48 +258,62 @@
     const submitBtn = document.getElementById('submitBtn');
 
     submitBtn.addEventListener('click', function (e) {
-        e.preventDefault();
         
-
-
-
-
         const inputs = document.querySelectorAll('input[required]');
+        const selects = document.querySelectorAll('select[required]');
+
+        let requiredCondition=true
+    
         
         inputs.forEach(input => {
             if (input.value) {                
                 input.setCustomValidity("");
             } else {
-                
                 input.setCustomValidity("Zəhmət olmasa xananı daxil edin");
+                requiredCondition=false
+            }
+        });
+        selects.forEach(input => {
+            if (input.value) {                
+                input.setCustomValidity("");
+            } else {
+                
+                input.setCustomValidity("Zəhmət olmasa seçim edin");
+                requiredCondition=false
             }
         });
 
+        if (!requiredCondition) {
+            return
+        }
+
+
         const card_List = document.querySelectorAll('.custom-card');
-        let shouldSubmit = true;
 
         card_List.forEach((element) => {
             console.log(element.querySelector('.input_type'));
-            // debugger
+            
             if (element.querySelector('.input_type').value != 'textarea' && element.querySelector('.todo-list').children.length < 2) {
+                e.preventDefault()
+               
                 // eger error msj yoxdursa
                 if (!element.querySelector('.todo-list')?.nextElementSibling?.className?.includes('error_msg')) {
                     element.querySelector('.todo-list').insertAdjacentHTML('afterend', '<span class="text-danger error_msg">Zehmet olmasa cavab daxil edin*</span>');
                 }
                 
-                shouldSubmit = false;
-                return;
+                requiredCondition = false;
             }
+
         });
 
-        if (shouldSubmit) {
-            // console.log(e.currentTarget);
-            
-            document.querySelector('#myForm').submit();
+        if (!requiredCondition) {
+            return
         }
 
-            if ($('.report-users:checked').length === 0) {
-        // $('#err-text').html("Ən azı 1 iştirakçı seçin")
+        if ($('.report-users:checked').length === 0) {
+            // $('#err-text').html("Ən azı 1 iştirakçı seçin")
+            e.preventDefault();
+
             Swal.fire({
                 title: "Xəta!",
                 text: "Ən azı 1 iştirakçı seçin",
@@ -307,52 +321,10 @@
             })
             return;
         }
+            
+        document.querySelector('#myForm').submit();
+
     });
-
-
-
-    // function submitForm(e) {
-
-    //     e.preventDefault();
-    //     if ($('.report-users:checked').length === 0) {
-    //         // $('#err-text').html("Ən azı 1 iştirakçı seçin")
-    //         Swal.fire({
-    //             title: "Xəta!",
-    //             text: "Ən azı 1 iştirakçı seçin",
-    //             icon: "warning"
-    //         })
-    //         e.preventDefault()
-    //         return;
-    //     }
-
-
-
-    //     const card_List = document.querySelectorAll('.custom-card');
-
-    //     let shouldSubmit = true;
-
-    //     card_List.forEach((element) => {
-    //         console.log(element.querySelector('.input_type'));
-
-    //         if (element.querySelector('.input_type').value != 'textarea' && element.querySelector('.todo-list').children.length < 2) {
-    //             // eger error msj yoxdursa
-    //             if (!element.querySelector('.todo-list')?.nextElementSibling?.className?.includes('error_msg')) {
-    //                 element.querySelector('.todo-list').insertAdjacentHTML('afterend', '<span class="text-danger error_msg">Zehmet olmasa cavab daxil edin*</span>');
-    //             }
-    //             shouldSubmit = false;
-    //             return;
-    //         }
-    //     });
-
-    //     if (shouldSubmit) {
-    //         e.currentTarget.submit();
-    //     }
-
-
-    // }
-
-
-
 
     // -------------------------------date time picker--------------------------------
     document.addEventListener('DOMContentLoaded', function () {
