@@ -1,0 +1,116 @@
+
+
+
+.disabled-div {
+    pointer-events: none;  opacity: 0.5;
+}
+
+.custom-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 20px 1px rgba(0, 0, 0, .06), 0 1px 4px rgba(0, 0, 0, .08);
+    border: 0;
+    padding: 1rem 0;
+    margin: 0;
+}
+
+
+.position-left{
+    position: absolute;
+    right: 0 ;
+    top: 0 ;
+    
+
+}
+
+
+
+.btn-right-radius {
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-size: .813rem;
+    line-height: 1.5;
+    border-top-right-radius: .25rem;
+    border-bottom-right-radius: .25rem;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out
+}
+
+
+.form-control-left-radius {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: .25rem;
+    border-bottom-left-radius: .25rem;
+}
+
+.todo-container {
+    width: 100% !important;
+    #todo-header {
+        margin: auto;
+        width: 100%;
+        display: flex !important;
+    }
+    .todo-input {
+        width: 100%;
+
+    }
+    .add-btn {
+        font-size: 20px;
+    }
+ 
+    
+    .todo-list {
+        list-style-type: none;
+        padding: 0;
+        li {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+
+            input[type="checkbox"] {
+                margin-right: 10px;
+                cursor: pointer;
+            }
+            
+            .remove {
+                margin-left: auto;
+                background: none;
+                border: none;
+                color: red;
+                cursor: pointer;
+            }
+        }
+        
+
+    }
+}
+
+
+.z-custom-index {
+    z-index: 2;
+}
+
+#date-time-picker{
+    background-color: #f8f9fa !important;
+}
+
+
+select[aria-readonly="true"] {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  
+
+.line-break-input{
+    font-size: 16px;
+    line-height: 1.5;
+    font-family: 'Lato ';
+}

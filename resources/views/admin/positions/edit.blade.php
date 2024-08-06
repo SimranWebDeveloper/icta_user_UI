@@ -1,0 +1,95 @@
+@extends('admin.layouts.app')
+@section('content')
+
+    <div class="row mb-4">
+        <div class="col-md-12 mb-4">
+
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3>{{ $position->name }}</h3>
+                        <a href="{{route('admin.positions.index')}}">
+                            <button class="btn btn-danger">
+                                <span class="me-2">
+                                    <i class="nav-icon i-Arrow-Back-2"></i>
+                                </span>
+                                Vəzifələr
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{route('admin.positions.update', $position->id)}}">
+                        @csrf
+                        @method('PUT')
+                        <div class="row">
+
+                            <div class="col-md-3 form-group mb-3">
+                                <div class="select_label ui sub header ">Şöbə</div>
+                                <select id="status" name="branches_id"
+                                        class="form-control ui fluid search dropdown create_form_dropdown">
+                                    @foreach($branches as $branch)
+                                        <option value="{{ $branch->id }}" {{ $branch->id == $position->branches_id ? 'selected' : '' }}>{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
+
+                                @if($errors->has('status'))
+                                    <span class="text-danger">{{ $errors->first('status') }}</span>
+                                @endif
+                            </div>
+
+                            <div class="col-md-3 form-group mb-3">
+                                <div class="select_label ui sub header ">Vəzifə adı</div>
+                                <input type="text" name="name" value="{{$position->name}}" id="" class="form-control">
+                                @if($errors->has('name'))
+                                    <span class="text-danger">{{ $errors->first('name') }}</span>
+                                @endif
+                            </div>
+
+                            <div class="col-md-3 form-group mb-3">
+                                <div class="select_label ui sub header ">Ştat</div>
+                                <input type="number" name="count" value="{{$position->count}}" id="" class="form-control">
+                                @if($errors->has('count'))
+                                    <span class="text-danger">{{ $errors->first('count') }}</span>
+                                @endif
+                            </div>
+
+                            <div class="col-md-3 form-group mb-3">
+                                <div class="select_label ui sub header ">Hesabat qəbulu</div>
+                                <select id="report_receiver" name="report_receiver"
+                                        class="form-control ui fluid search dropdown create_form_dropdown">
+                                    <option value="1" {{ $position->report_receiver == '1' ?  'selected' : '' }}>Qəbul edə bilər</option>
+                                    <option value="0" {{ $position->report_receiver == '0' ?  'selected' : '' }}>Qəbul edə bilməz</option>
+                                </select>
+
+                                @if($errors->has('report_receiver'))
+                                    <span class="text-danger">{{ $errors->first('report_receiver') }}</span>
+                                @endif
+                            </div>
+
+                            <div class="col-md-3 form-group mb-3">
+                                <div class="select_label ui sub header ">Status</div>
+                                <select id="status" name="status"
+                                        class="form-control ui fluid search dropdown create_form_dropdown">
+                                    <option value="1" {{ $position->status == '1' ?  'selected' : '' }}>Aktiv</option>
+                                    <option value="0" {{ $position->status == '0' ?  'selected' : '' }}>Deaktiv</option>
+                                </select>
+
+                                @if($errors->has('status'))
+                                    <span class="text-danger">{{ $errors->first('status') }}</span>
+                                @endif
+                            </div>
+
+                            <div class="col-md-12 mt-4">
+                                <button class="btn btn-success btn-lg">Yadda saxlayın</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+@endsection
