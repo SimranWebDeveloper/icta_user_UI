@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Meetings;
+use App\Models\MeetingsUsers;
+use App\Models\SurveysUsers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Announcements;
-use App\Models\Meetings;
 use App\Models\Surveys;
 
 
@@ -16,9 +18,12 @@ class EmployeeController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();   
         $announcements = Announcements::where('status', 1) -> get();
-        $meetings = Meetings::all();
-        $surveys = Surveys::all();
+        $meetings_users = MeetingsUsers::where('users_id', $user->id)->pluck('meetings_id'); 
+        $meetings = Meetings::whereIn('id', $meetings_users)->get();
+        $surveys_users = SurveysUsers::where('users_id', $user->id)->pluck('surveys_id'); 
+        $surveys = Surveys::whereIn('id', $surveys_users)->get();
 
         return view('employee.home', compact('announcements', 'meetings','surveys'));
     }
