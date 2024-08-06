@@ -56,7 +56,8 @@ use App\Http\Controllers\User\{
     EmployeeReportsSubjectsController,
     EmployeeTicketController,
     EmployeInventoriesController,
-    EmployeeMessageController
+    EmployeeMessageController,
+    EmployeeBronsController
 };
 
 use App\Http\Controllers\User\TicketController;
@@ -248,6 +249,8 @@ Route::middleware(['logLastUserActivity'])->group(function () {
         Route::get('/messages', [EmployeeMessageController::class, 'index'])->name('messages.index');
         Route::post('/send-message', [EmployeeMessageController::class, 'sendMessage'])->name('messages.send');
         Route::post('/user-messages', [EmployeeMessageController::class, 'fetchMessages'])->name('messages.fetch');
+        Route::resource('/brons', EmployeeBronsController::class);
+
 
     });
 
