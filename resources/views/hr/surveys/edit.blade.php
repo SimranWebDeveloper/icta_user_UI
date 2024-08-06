@@ -94,7 +94,7 @@
                                             class="text-danger">*</span></div>
 
                                         
-                                        <div class="line-break-input disabled-div " >{{$question->question}}</div>
+                                        <div class="line-break-input disabled-div p-3 rounded border bg-gray-100" >{{$question->question}}</div>
                                         <input type="hidden"  name="question[{{ $question->id }}]" value="{{$question->question}}">
 
                                     @if($errors->has('question'))
@@ -128,7 +128,7 @@
                                     <div class="todo-container" style="width: 100%;">
                                         <div id="todo-header">
 
-                                            <input type="text" id="todo-input-0" 
+                                            <!-- <input type="text" id="todo-input-0" 
                                                 class="todo-input form-control form-control-left-radius disabled-div "
                                                 placeholder="Yeni cavab daxil edin">
 
@@ -136,17 +136,17 @@
                                             <button class="add-btn btn-right-radius btn-success disabled-div" type="button"
                                                 onclick="addTodo(0)">
                                                 <i class="fa-solid fa-plus"></i>
-                                            </button>
+                                            </button> -->
                                         </div>
 
                                         <ul id="todo-list-0" class="todo-list disabled-div">
                                             @foreach ($question->answers as $answer)
                                             <li>                                          
 
-                                                <p class="line-break-input disabled-div  "  style="width: calc(100% - 70px)">{{ $answer->name }}</p>
+                                                <p class="line-break-input disabled-div p-3 rounded border bg-gray-100"  style="width: 100%">{{ $answer->name }}</p>
                                                 <input type="hidden"  name="answer_value[{{ $question->id }}][]" value="{{ $answer->name }}"/>
 
-                                                <button class="remove" onclick="removeSelf(this)" type="button">Delete</button>
+                                                <!-- <button class="remove" onclick="removeSelf(this)" type="button">Delete</button> -->
                                             </li>
                                             @endforeach
                                         </ul>
@@ -299,6 +299,7 @@
             dateFormat: "Y-m-d H:i",
             minDate: "today",
             time_24hr: true,
+            lang: "az",
 
         });
     });
@@ -361,12 +362,17 @@
     function removeQuestion(deletedQuestionId) {
 
         let questionsContainer = document.querySelector('.questions-container')
+        if (indexQuestions.length > 1) {
+            questionsContainer.removeChild(document.getElementById(`c${deletedQuestionId}`));
+    
+            const index = indexQuestions.findIndex((item) => item.id == deletedQuestionId);
+            indexQuestions.splice(index, 1);
+            
+        }
+        else if (indexQuestions.length == 1) {
+            alert('Bu surveyda bir sətirdən azı qalır!');
+        }
 
-
-        questionsContainer.removeChild(document.getElementById(`c${deletedQuestionId}`));
-
-        const index = indexQuestions.findIndex((item) => item.id == deletedQuestionId);
-        indexQuestions.splice(index, 1);
 
         changeStateOfRemoveButton();
     }
