@@ -32,113 +32,20 @@
         <div class="card-header">Anketlər</div>
         <div class="card-body scrollable-content pt-0">
             <div class="row">
+                @foreach($surveys as $survey)
                 <div class="col-6 mt-4">
                     <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
+                        <div class="card-header text-center">{{ $survey->name }}</div>
                         <div class="card-body">
                             <div>
                                 <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
                                 <p class="m-0">
-                                    2024-12-12
+                                    {{ \Carbon\Carbon::parse($survey->expired_at)->format('d-m-Y H:i') }} 
                                 </p>
                             </div>
                             <div class="mt-3">
-                                <p class="important" style="font-weight:bold">Önəmli</p>
-                            </div>
-                            <button class="btn btn-success btn-lg mt-3">
-                                Cavabla
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 mt-4">
-                    <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
-                        <div class="card-body">
-                            <div>
-                                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                <p class="m-0">
-                                    2024-12-12
-                                </p>
-                            </div>
-                            <div class="mt-3">
+                                <p class="important">Önəmli</p>
                                 <p class="normal">Normal</p>
-                            </div>
-                            <button class="btn btn-success btn-lg mt-3">
-                                Cavabla
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 mt-4">
-                    <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
-                        <div class="card-body">
-                            <div>
-                                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                <p class="m-0">
-                                    2024-12-12
-                                </p>
-                            </div>
-                            <div class="mt-3">
-                                <p class="important">Önəmli</p>
-                            </div>
-                            <button class="btn btn-success btn-lg mt-3">
-                                Cavabla
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 mt-4">
-                    <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
-                        <div class="card-body">
-                            <div>
-                                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                <p class="m-0">
-                                    2024-12-12
-                                </p>
-                            </div>
-                            <div class="mt-3">
-                                <p class="important">Önəmli</p>
-                            </div>
-                            <button class="btn btn-success btn-lg mt-3">
-                                Cavabla
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 mt-4">
-                    <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
-                        <div class="card-body">
-                            <div>
-                                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                <p class="m-0">
-                                    2024-12-12
-                                </p>
-                            </div>
-                            <div class="mt-3">
-                                <p class="important">Önəmli</p>
-                            </div>
-                            <button class="btn btn-success btn-lg mt-3">
-                                Cavabla
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 mt-4">
-                    <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
-                        <div class="card-body">
-                            <div>
-                                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                <p class="m-0">
-                                    2024-12-12
-                                </p>
-                            </div>
-                            <div class="mt-3">
-                                <p class="important">Önəmli</p>
                             </div>
                             <button id="loginButton" class="btn btn-success btn-lg mt-3">
                                 Cavabla
@@ -146,6 +53,7 @@
                         </div>
                     </div>
                 </div>
+                @endforeach
             </div>
         </div>
     </div>
