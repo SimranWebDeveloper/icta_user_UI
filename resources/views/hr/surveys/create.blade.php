@@ -21,8 +21,7 @@
             </div>
 
             <div class="card-body">
-                <form id="myForm" method="POST" action="{{route('hr.surveys.store')}}"
-                    onsubmit="return submitForm(event)">
+                <form id="myForm" method="POST" action="{{route('hr.surveys.store')}}">
                     @csrf
                     <!-- general info -->
                     <div class="row mb-3">
@@ -48,7 +47,7 @@
                         <div class="col-md-6 col-lg-4 col-xl-3 form-group mb-3">
                             <!-- ui fluid search dropdown -->
                             <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-                            <select id="status" name="status" required class="form-control form-control-select">
+                            <select id="status" name="status" required class="form-control form-control-select  ">
                                 <option value="" disabled {{ old('status') == '' ? 'selected' : '' }}>Elanın statusunu
                                     seçin</option>
                                 <option value="1" {{ old('status') == '1' ? 'selected' : '' }} class="">Aktiv</option>
@@ -231,13 +230,18 @@
 
                     <!-- submit button -->
                     <div class="mt-4">
-                        <button class="btn btn-success btn-lg">Daxil edin</button>
+                        <button class="btn btn-success btn-lg" id="submitBtn">Daxil edin</button>
                     </div>
                 </form>
             </div>
         </div>
 
     </div>
+
+
+
+
+
 
 
 
@@ -250,40 +254,102 @@
 @section('js')
 <script>
 
-    function submitForm(e) {
+
+    const submitBtn = document.getElementById('submitBtn');
+
+    submitBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        if ($('.report-users:checked').length === 0) {
-            // $('#err-text').html("Ən azı 1 iştirakçı seçin")
-            Swal.fire({
-                title: "Xəta!",
-                text: "Ən azı 1 iştirakçı seçin",
-                icon: "warning"
-            })
-            e.preventDefault()
-            return;
-        }
+        
+
+
+
+
+        const inputs = document.querySelectorAll('input[required]');
+        
+        inputs.forEach(input => {
+            if (input.value) {                
+                input.setCustomValidity("");
+            } else {
+                
+                input.setCustomValidity("Zəhmət olmasa xananı daxil edin");
+            }
+        });
 
         const card_List = document.querySelectorAll('.custom-card');
-
         let shouldSubmit = true;
 
         card_List.forEach((element) => {
             console.log(element.querySelector('.input_type'));
-
+            // debugger
             if (element.querySelector('.input_type').value != 'textarea' && element.querySelector('.todo-list').children.length < 2) {
                 // eger error msj yoxdursa
                 if (!element.querySelector('.todo-list')?.nextElementSibling?.className?.includes('error_msg')) {
                     element.querySelector('.todo-list').insertAdjacentHTML('afterend', '<span class="text-danger error_msg">Zehmet olmasa cavab daxil edin*</span>');
                 }
+                
                 shouldSubmit = false;
                 return;
             }
         });
 
         if (shouldSubmit) {
-            e.currentTarget.submit();
+            // console.log(e.currentTarget);
+            
+            document.querySelector('#myForm').submit();
         }
-    }
+
+            if ($('.report-users:checked').length === 0) {
+        // $('#err-text').html("Ən azı 1 iştirakçı seçin")
+            Swal.fire({
+                title: "Xəta!",
+                text: "Ən azı 1 iştirakçı seçin",
+                icon: "warning"
+            })
+            return;
+        }
+    });
+
+
+
+    // function submitForm(e) {
+
+    //     e.preventDefault();
+    //     if ($('.report-users:checked').length === 0) {
+    //         // $('#err-text').html("Ən azı 1 iştirakçı seçin")
+    //         Swal.fire({
+    //             title: "Xəta!",
+    //             text: "Ən azı 1 iştirakçı seçin",
+    //             icon: "warning"
+    //         })
+    //         e.preventDefault()
+    //         return;
+    //     }
+
+
+
+    //     const card_List = document.querySelectorAll('.custom-card');
+
+    //     let shouldSubmit = true;
+
+    //     card_List.forEach((element) => {
+    //         console.log(element.querySelector('.input_type'));
+
+    //         if (element.querySelector('.input_type').value != 'textarea' && element.querySelector('.todo-list').children.length < 2) {
+    //             // eger error msj yoxdursa
+    //             if (!element.querySelector('.todo-list')?.nextElementSibling?.className?.includes('error_msg')) {
+    //                 element.querySelector('.todo-list').insertAdjacentHTML('afterend', '<span class="text-danger error_msg">Zehmet olmasa cavab daxil edin*</span>');
+    //             }
+    //             shouldSubmit = false;
+    //             return;
+    //         }
+    //     });
+
+    //     if (shouldSubmit) {
+    //         e.currentTarget.submit();
+    //     }
+
+
+    // }
 
 
 
@@ -297,6 +363,7 @@
             dateFormat: "Y-m-d H:i",
             minDate: "today",
             time_24hr: true,
+            lang: "az",
         });
     });
 
@@ -380,11 +447,11 @@
         }
         const lastQuestionId = indexQuestions[indexQuestions.length - 1].id;
 
-        let newQuestion = `
+        let newQuestion = `           
                 <div class="row  custom-card  position-relative ">
-
+                    
                         <button type="button"  class="position-left btn btn-danger z-custom-index" onclick="removeQuestion(${lastQuestionId})" >X</button>
-
+                    
                     <div class="col-md-8 form-group mb-3">
                         <div class="select_label ui sub header"><span></span> Sual <span class="text-danger">*</span></div>
                         <input type="text" name="question[]" required id="" class="form-control" placeholder="Sual daxil edin">
@@ -393,8 +460,8 @@
                         @endif
                     </div>
 
-
-
+                    
+                    
                     <div class="col-md-4 form-group mb-3 " >
                         <div class="select_label ui sub header ">Sualın növü <span class="text-danger">*</span></div>
                       <select id="input_type-${lastQuestionId}" required onchange="chanceQuestionType(${lastQuestionId})" style="height: 48px;" name="input_type[]" class="input_type form-control ui fluid search dropdown create_form_dropdown">
@@ -403,8 +470,8 @@
                         <option value="textarea" {{ old('input_type') == '3' ? 'selected' : '' }}>Mətn</option>
                     </select>
 
-
-
+              
+                        
                         @if($errors->has('input_type'))
                             <span class="text-danger">{{ $errors->first('input_type') }}</span>
                         @endif
@@ -412,11 +479,11 @@
 
                     <div class="col-md-12 form-group mb-3" id="todo-content-${lastQuestionId}" >
                         <div class="select_label ui sub header ">Cavab və ya cavablar <span class="text-danger">*</span></div>
-                        <div class="todo-container" style="width: 100%;">
+                        <div class="todo-container" style="width: 100%;">        
                             <div id="todo-header">
-
+                                
                                 <input type="text"   id="todo-input-${lastQuestionId}" class="todo-input form-control form-control-left-radius  " name="answer_value[]"  placeholder="Add a new task"  >
-
+                                
 
                                 <button class="add-btn btn-right-radius btn-success" type="button" onclick="addTodo(${lastQuestionId})">
                                     <i class="fa-solid fa-plus"></i>
@@ -426,9 +493,9 @@
                             </ul>
                             </div>
                             </div>
-
-                            </div>
-
+                            
+                            </div>  
+                            
                             `;
 
         newElement.innerHTML = newQuestion

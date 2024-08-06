@@ -2,7 +2,7 @@
 
 
 .disabled-div {
-    pointer-events: none;  opacity: 0.5;
+    pointer-events: none;
 }
 
 .custom-card {
@@ -105,12 +105,13 @@
 
 select[aria-readonly="true"] {
     pointer-events: none;
-    opacity: 0.5;
+    /* opacity: 0.5; */
   }
   
 
 .line-break-input{
     font-size: 16px;
     line-height: 1.5;
-    font-family: 'Lato ';
 }
+
+
