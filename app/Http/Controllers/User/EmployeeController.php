@@ -6,18 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Announcements;
+use App\Models\Meetings;
+use App\Models\Surveys;
+
+
 
 class EmployeeController extends Controller
 {
     public function index()
     {
-        //elanlar
-        //anketler where expired_at > now()
-        //iclas tedbirler
+        $announcements = Announcements::where('status', 1) -> get();
+        $meetings = Meetings::all();
+        $surveys = Surveys::all();
 
-        // iclas tedbir - accept reject
-        //  ankete cavab
-        return view('employee.home');
+        return view('employee.home', compact('announcements', 'meetings','surveys'));
     }
 
     public function profile()
