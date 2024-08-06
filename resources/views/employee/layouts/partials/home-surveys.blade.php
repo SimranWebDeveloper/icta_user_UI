@@ -60,26 +60,21 @@
 
 
 @section('js')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   $(document).ready(function () {
-      // Attach click event handler to dynamically created buttons
       $(document).on('click', '#loginButton', function () {
           const survey = $(this).data('survey');
-          console.log(survey); // Debug: Log survey data
-
-          // Generate HTML for the survey modal
+          console.log(survey); 
           Swal.fire({
-              title: survey.name || 'Survey', // Use survey name or default to 'Survey'
+              title: survey.name || 'Survey', 
               html: generateSurveyHtml(survey),
               showCancelButton: true,
               confirmButtonText: 'Submit',
               preConfirm: () => {
                   const form = document.getElementById('surveyForm');
                   if (form) {
-                      console.log('Form is being submitted'); // Debug: Log form submission
-                      // form.submit(); // Uncomment this line if you want to submit the form
+                      console.log('Form is being submitted');
+                      form.submit(); 
                   }
               }
           });
@@ -88,7 +83,7 @@
 
   function generateSurveyHtml(survey) {
       if (!survey || !survey.surveys_questions || !Array.isArray(survey.surveys_questions)) {
-          return '<p>Hələki Heç Bir Sual Yoxdur.</p>'; // Handle missing data
+          return '<p>Hələki Heç Bir Sual Yoxdur.</p>'; 
       }
 
       let questionsHtml = '';
