@@ -13,7 +13,7 @@ class SurveysUsers extends Model
     protected $fillable = [
         'surveys_id',
         'users_id',
-        'participation_status',
+        'is_answered',
     ];
 
    

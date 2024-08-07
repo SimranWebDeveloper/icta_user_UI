@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('meetings_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('users_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->integer('participation_status')->default(1);
+            $table->integer('participation_status')->default(null);
             $table->timestamps();
         });
     }

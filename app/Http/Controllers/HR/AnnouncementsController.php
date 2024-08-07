@@ -57,9 +57,18 @@ class AnnouncementsController extends Controller
     {
         $announcement = Announcements::findOrFail($id);        
         $data = $request->all();
+    
+        if ($request->input('delete_image') == '1') {
+            if ($announcement->image && \File::exists(public_path('assets/images/announcements/' . $announcement->image))) {
+                \File::delete(public_path('assets/images/announcements/' . $announcement->image));
+            }
+    
+            $data['image'] = null; 
+        }
+    
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $image_name = $image->getClientOriginalname();
+            $image_name = $image->getClientOriginalName();
             $image->move(public_path('assets/images/announcements'), $image_name);
     
             if ($announcement->image && \File::exists(public_path('assets/images/announcements/' . $announcement->image))) {
@@ -67,13 +76,15 @@ class AnnouncementsController extends Controller
             }
     
             $data['image'] = $image_name;
-
         } else {
-            $data['image'] = $announcement->image;
+            if ($request->input('delete_image') != '1') {
+                $data['image'] = $announcement->image;
+            }
         }
+    
         $announcement->update($data);
-
-        return redirect()->route('hr.announcements.index')->with(['success'=>'Elan müvəffəqiyyətlə yeniləndi']);
+    
+        return redirect()->route('hr.announcements.index')->with(['success' => 'Elan müvəffəqiyyətlə yeniləndi']);
     }
 
     
