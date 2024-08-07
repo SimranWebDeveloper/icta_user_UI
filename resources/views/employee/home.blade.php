@@ -63,13 +63,7 @@
         overflow-y: auto;
     }
 
-    #meeting {
-        transition: .4s;
-    }
-
-    #meeting:hover {
-        scale: 1.05;
-    }
+    
 
     .carousel-inner img {
         width: 100%;
@@ -135,49 +129,5 @@
 
 
 
-
-@endsection
-@section('js')
-<!-- <script>
-    $(document).ready(function () {
-        $('#loginButton').on('click', function () {
-            Swal.fire({
-                title: 'Login Form',
-                html:
-                    '<form id="loginForm">' +
-                    '<div class="form-group">' +
-                    '<label for="email">Email address</label>' +
-                    '<input type="email" class="form-control" id="email" name="email" placeholder="Enter email">' +
-                    '</div>' +
-                    '<div class="form-group">' +
-                    '<label for="password">Password</label>' +
-                    '<input type="password" class="form-control" id="password" name="password" placeholder="Password">' +
-                    '</div>' +
-                    '<button type="submit" class="btn btn-primary">Submit</button>' +
-                    '</form>',
-                showConfirmButton: false,
-                didOpen: () => {
-                    $('#loginForm').on('submit', function (e) {
-                        e.preventDefault();
-                        const email = $('#email').val();
-                        const password = $('#password').val();
-                        if (!email || !password) {
-                            Swal.showValidationMessage('Please enter both email and password');
-                        } else {
-                            // Perform login action here
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Logged in successfully!',
-                                showConfirmButton: true
-                            });
-                        }
-                    });
-                }
-            });
-        });
-    });
-</script> -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @endsection
