@@ -1,6 +1,7 @@
 @extends('hr.layouts.app')
 @section('content')
 <link rel="stylesheet" href="/css/surveys/surveys_cu.css">
+
 <div class="row mb-4">
     <div class="col-12 mb-4">
 
@@ -26,7 +27,7 @@
                     <!-- general info -->
                     <div class="row mb-3">
                         <!-- Anket adi -->
-                        <div class="col-md-6 col-lg-4 col-xl-3 form-group mb-3">
+                        <div class="col-12 form-group mb-3">
                             <div class="select_label ui sub header">Anket adı <span class="text-danger">*</span></div>
                             <input title="" type="survey-name" name="name"  class="form-control" required
                                 placeholder="Anket adını daxil edin">
@@ -69,6 +70,19 @@
                             </select>
                             @if($errors->has('is_anonym'))
                                 <span class="text-danger">{{ $errors->first('is_anonym') }}</span>
+                            @endif
+                        </div>
+
+                        <!-- Elanin priority -->
+                        <div class="col-md-6 col-lg-4 col-xl-3 form-group mb-3">
+                            <label for="subtitle" class="form-label">Vaciblik <span class="text-danger">*</span></label>
+                            <select name="priority" required id="priority" title="" class="form-control ">
+                                <option value="" selected disabled>Elanın Görünməsini seçin</option>
+                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Normal</option>
+                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Önəmli</option>
+                            </select>
+                            @if($errors->has('priority'))
+                                <span class="text-danger">{{ $errors->first('priority') }}</span>
                             @endif
                         </div>
 
@@ -237,15 +251,6 @@
         </div>
 
     </div>
-
-
-
-
-
-
-
-
-
 </div>
 
 
@@ -352,10 +357,17 @@
 
         if (questionType.value === 'textarea') {
             list.innerHTML = '';
-            list?.nextElementSibling?.remove();
+            const li = document.createElement('li');
+            li.innerHTML = `
+                        <input type="hidden" name='answer_value[${cardId}][]' class="form-answer form-control" value="bos"/>
+                    `;
+
+            list.appendChild(li);
             todoContent.classList.add('disabled-div');
-            input.value = '';
+            // input.value = '';
             input.removeAttribute('required');
+            console.log(12);
+            
         } else {
             todoContent.classList.remove('disabled-div');
         }
@@ -426,7 +438,7 @@
                     
                     <div class="col-md-8 form-group mb-3">
                         <div class="select_label ui sub header"><span></span> Sual <span class="text-danger">*</span></div>
-                        <input type="text" name="question[]" required id="" class="form-control" placeholder="Sual daxil edin">
+                        <input type="text" name="question[${lastQuestionId}][]"  required id="" class="form-control" placeholder="Sual daxil edin">
                         @if($errors->has('question'))
                             <span class="text-danger">{{ $errors->first('question') }}</span>
                         @endif
@@ -436,7 +448,7 @@
                     
                     <div class="col-md-4 form-group mb-3 " >
                         <div class="select_label ui sub header ">Sualın növü <span class="text-danger">*</span></div>
-                      <select id="input_type-${lastQuestionId}" required onchange="chanceQuestionType(${lastQuestionId})" style="height: 48px;" name="input_type[]" class="input_type form-control ui fluid search dropdown create_form_dropdown">
+                      <select id="input_type-${lastQuestionId}" required onchange="chanceQuestionType(${lastQuestionId})" style="height: 48px;" name="input_type[${lastQuestionId}][]" class="input_type form-control ui fluid search dropdown create_form_dropdown">
                         <option value="checkbox" {{ old('input_type') == 'checkbox' ? 'selected' : '' }}>Çox variantlı</option>
                         <option value="radio" {{ old('input_type') == '2' ? 'selected' : '' }}>Tək variantlı</option>
                         <option value="textarea" {{ old('input_type') == '3' ? 'selected' : '' }}>Mətn</option>
@@ -454,7 +466,7 @@
                         <div class="todo-container" style="width: 100%;">        
                             <div id="todo-header">
                                 
-                                <input type="text"   id="todo-input-${lastQuestionId}" class="todo-input form-control form-control-left-radius  " name="answer_value[]"  placeholder="Add a new task"  >
+                                <input type="text"   id="todo-input-${lastQuestionId}" class="todo-input form-control form-control-left-radius"  placeholder="Add a new task"  >
                                 
 
                                 <button class="add-btn btn-right-radius btn-success" type="button" onclick="addTodo(${lastQuestionId})">
