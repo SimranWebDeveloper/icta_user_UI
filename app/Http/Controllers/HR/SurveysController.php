@@ -38,6 +38,7 @@ class SurveysController extends Controller
         "expired_at" => $request->expired_at,
         "status" => $request->status,
         "is_anonym" => $request->is_anonym,
+        "priority" => $request->priority,   
         // "target" => NULL    bu prop değişti, tablo oldu
     ]);
 
