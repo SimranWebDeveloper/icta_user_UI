@@ -25,7 +25,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form id="myForm" method="POST" action="{{route('hr.surveys.store',$data->id)}}">
+                    <form id="myForm" method="POST" action="{{route('hr.surveys.update',$data->id)}}">
                         @csrf
                         @method("PUT")
                         <!-- general info -->
@@ -82,8 +82,8 @@
                                 <label for="subtitle" class="form-label">Vaciblik <span class="text-danger">*</span></label>
                                 <select name="priority" required id="priority" title="" class="form-control ">
                                     <option value="" selected disabled>Elanın Görünməsini seçin</option>
-                                    <option value="0" {{ old('priority') == '0' ? 'selected' : '' }}>Normal</option>
-                                    <option value="1" {{ old('priority') == '1' ? 'selected' : '' }}>Önəmli</option>
+                                    <option value="0" {{ $data->priority == '0' ? 'selected' : '' }}>Normal</option>
+                                    <option value="1" {{ $data->priority == '1' ? 'selected' : '' }}>Önəmli</option>
                                 </select>
                                 @if($errors->has('priority'))
                                     <span class="text-danger">{{ $errors->first('priority') }}</span>
@@ -169,7 +169,7 @@
 
                         <!-- new question btn -->
                         <div class="mt-4">
-                            <button type="button" id="add-question-btn" class="btn btn-outline-success">Yeni Sual Əlavə
+                            <button type="button" id="add-question-btn" onclick="createQuestion()" class="btn btn-outline-success">Yeni Sual Əlavə
                                 et</button>
                         </div>
 
@@ -398,10 +398,9 @@
         setId();
     });
 
-   
 
 
-    // delete
+    // delete function
     function removeQuestion(deletedQuestionId) {
 
         let questionsContainer = document.querySelector('.questions-container')
@@ -416,95 +415,179 @@
         else if (indexQuestions.length == 1) {
             const index = indexQuestions.findIndex((item) => item.id == deletedQuestionId);
             indexQuestions.splice(index, 1);
-            addQuestion()
+            // call create function
+            createQuestion();
+            
         }
 
     }
 
-    // onemli 1 normal 0
+ 
 
 
-    // create
-    document.getElementById('add-question-btn').addEventListener('click', function () {
 
-let questionsContainer = document.querySelector('.questions-container')
-let newElement = document.createElement("div");
-newElement.classList.add("col-lg-6", "my-3");
+    // create function
+     
+    function createQuestion () {
 
-if (indexQuestions.length == 0) {
+                    let questionsContainer = document.querySelector('.questions-container')
+                    let newElement = document.createElement("div");
+                    newElement.classList.add("col-lg-6", "my-3");
 
-    indexQuestions.push({
-        id: 0
-    });
-    newElement.id = "c0";
+        if (indexQuestions.length == 0) {
+
+            indexQuestions.push({
+                id: 0
+            });
+            newElement.id = "c0";
+        }
+        else {
+
+            indexQuestions.push({
+                id: indexQuestions[indexQuestions.length - 1].id + 1
+            });
+            newElement.id = "c" + indexQuestions[indexQuestions.length - 1].id;
+        }
+        const lastQuestionId = indexQuestions[indexQuestions.length - 1].id;
+
+        let newQuestion = `           
+    <div class="row  custom-card  position-relative ">
+        
+            <button type="button"  class="position-left btn btn-danger z-custom-index" onclick="removeQuestion(${lastQuestionId})" >X</button>
+        
+        <div class="col-md-8 form-group mb-3">
+            <div class="select_label ui sub header"><span></span> Sual <span class="text-danger">*</span></div>
+            <input type="text" name="question[]" required id="" class="form-control" placeholder="Sual daxil edin">
+            @if($errors->has('question'))
+                <span class="text-danger">{{ $errors->first('question') }}</span>
+            @endif
+        </div>
+
+        
+        
+        <div class="col-md-4 form-group mb-3 " >
+            <div class="select_label ui sub header ">Sualın növü <span class="text-danger">*</span></div>
+            <select id="input_type-${lastQuestionId}" required onchange="chanceQuestionType(${lastQuestionId})" style="height: 48px;" name="input_type[]" class="input_type form-control ui fluid search dropdown create_form_dropdown">
+            <option value="checkbox" {{ old('input_type') == 'checkbox' ? 'selected' : '' }}>Çox variantlı</option>
+            <option value="radio" {{ old('input_type') == '2' ? 'selected' : '' }}>Tək variantlı</option>
+            <option value="textarea" {{ old('input_type') == '3' ? 'selected' : '' }}>Mətn</option>
+        </select>
+
+    
+            
+            @if($errors->has('input_type'))
+                <span class="text-danger">{{ $errors->first('input_type') }}</span>
+            @endif
+        </div>
+
+        <div class="col-md-12 form-group mb-3" id="todo-content-${lastQuestionId}" >
+            <div class="select_label ui sub header ">Cavab və ya cavablar <span class="text-danger">*</span></div>
+            <div class="todo-container" style="width: 100%;">        
+                <div id="todo-header">
+                    
+                    <input type="text"   id="todo-input-${lastQuestionId}" class="todo-input form-control form-control-left-radius  " name="answer_value[]"  placeholder="Add a new task"  >
+                    
+
+                    <button class="add-btn btn-right-radius btn-success" type="button" onclick="addTodo(${lastQuestionId})">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
+                <ul id="todo-list-${lastQuestionId}" class="todo-list">
+                </ul>
+                </div>
+                </div>
+                
+                </div>  
+                
+                `;
+
+                newElement.innerHTML = newQuestion
+
+                questionsContainer.appendChild(newElement);
+
+                changeStateOfRemoveButton();
 }
-else {
 
-    indexQuestions.push({
-        id: indexQuestions[indexQuestions.length - 1].id + 1
-    });
-    newElement.id = "c" + indexQuestions[indexQuestions.length - 1].id;
-}
-const lastQuestionId = indexQuestions[indexQuestions.length - 1].id;
+//     document.getElementById('add-question-btn').addEventListener('click', function () {
 
-let newQuestion = `           
-        <div class="row  custom-card  position-relative ">
+// let questionsContainer = document.querySelector('.questions-container')
+// let newElement = document.createElement("div");
+// newElement.classList.add("col-lg-6", "my-3");
+
+// if (indexQuestions.length == 0) {
+
+//     indexQuestions.push({
+//         id: 0
+//     });
+//     newElement.id = "c0";
+// }
+// else {
+
+//     indexQuestions.push({
+//         id: indexQuestions[indexQuestions.length - 1].id + 1
+//     });
+//     newElement.id = "c" + indexQuestions[indexQuestions.length - 1].id;
+// }
+// const lastQuestionId = indexQuestions[indexQuestions.length - 1].id;
+
+// let newQuestion = `           
+//         <div class="row  custom-card  position-relative ">
             
-                <button type="button"  class="position-left btn btn-danger z-custom-index" onclick="removeQuestion(${lastQuestionId})" >X</button>
+//                 <button type="button"  class="position-left btn btn-danger z-custom-index" onclick="removeQuestion(${lastQuestionId})" >X</button>
             
-            <div class="col-md-8 form-group mb-3">
-                <div class="select_label ui sub header"><span></span> Sual <span class="text-danger">*</span></div>
-                <input type="text" name="question[]" required id="" class="form-control" placeholder="Sual daxil edin">
-                @if($errors->has('question'))
-                    <span class="text-danger">{{ $errors->first('question') }}</span>
-                @endif
-            </div>
+//             <div class="col-md-8 form-group mb-3">
+//                 <div class="select_label ui sub header"><span></span> Sual <span class="text-danger">*</span></div>
+//                 <input type="text" name="question[]" required id="" class="form-control" placeholder="Sual daxil edin">
+//                 @if($errors->has('question'))
+//                     <span class="text-danger">{{ $errors->first('question') }}</span>
+//                 @endif
+//             </div>
 
             
             
-            <div class="col-md-4 form-group mb-3 " >
-                <div class="select_label ui sub header ">Sualın növü <span class="text-danger">*</span></div>
-              <select id="input_type-${lastQuestionId}" required onchange="chanceQuestionType(${lastQuestionId})" style="height: 48px;" name="input_type[]" class="input_type form-control ui fluid search dropdown create_form_dropdown">
-                <option value="checkbox" {{ old('input_type') == 'checkbox' ? 'selected' : '' }}>Çox variantlı</option>
-                <option value="radio" {{ old('input_type') == '2' ? 'selected' : '' }}>Tək variantlı</option>
-                <option value="textarea" {{ old('input_type') == '3' ? 'selected' : '' }}>Mətn</option>
-            </select>
+//             <div class="col-md-4 form-group mb-3 " >
+//                 <div class="select_label ui sub header ">Sualın növü <span class="text-danger">*</span></div>
+//               <select id="input_type-${lastQuestionId}" required onchange="chanceQuestionType(${lastQuestionId})" style="height: 48px;" name="input_type[]" class="input_type form-control ui fluid search dropdown create_form_dropdown">
+//                 <option value="checkbox" {{ old('input_type') == 'checkbox' ? 'selected' : '' }}>Çox variantlı</option>
+//                 <option value="radio" {{ old('input_type') == '2' ? 'selected' : '' }}>Tək variantlı</option>
+//                 <option value="textarea" {{ old('input_type') == '3' ? 'selected' : '' }}>Mətn</option>
+//             </select>
 
       
                 
-                @if($errors->has('input_type'))
-                    <span class="text-danger">{{ $errors->first('input_type') }}</span>
-                @endif
-            </div>
+//                 @if($errors->has('input_type'))
+//                     <span class="text-danger">{{ $errors->first('input_type') }}</span>
+//                 @endif
+//             </div>
 
-            <div class="col-md-12 form-group mb-3" id="todo-content-${lastQuestionId}" >
-                <div class="select_label ui sub header ">Cavab və ya cavablar <span class="text-danger">*</span></div>
-                <div class="todo-container" style="width: 100%;">        
-                    <div id="todo-header">
+//             <div class="col-md-12 form-group mb-3" id="todo-content-${lastQuestionId}" >
+//                 <div class="select_label ui sub header ">Cavab və ya cavablar <span class="text-danger">*</span></div>
+//                 <div class="todo-container" style="width: 100%;">        
+//                     <div id="todo-header">
                         
-                        <input type="text"   id="todo-input-${lastQuestionId}" class="todo-input form-control form-control-left-radius  " name="answer_value[]"  placeholder="Add a new task"  >
+//                         <input type="text"   id="todo-input-${lastQuestionId}" class="todo-input form-control form-control-left-radius  " name="answer_value[]"  placeholder="Add a new task"  >
                         
 
-                        <button class="add-btn btn-right-radius btn-success" type="button" onclick="addTodo(${lastQuestionId})">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-                    <ul id="todo-list-${lastQuestionId}" class="todo-list">
-                    </ul>
-                    </div>
-                    </div>
+//                         <button class="add-btn btn-right-radius btn-success" type="button" onclick="addTodo(${lastQuestionId})">
+//                             <i class="fa-solid fa-plus"></i>
+//                         </button>
+//                     </div>
+//                     <ul id="todo-list-${lastQuestionId}" class="todo-list">
+//                     </ul>
+//                     </div>
+//                     </div>
                     
-                    </div>  
+//                     </div>  
                     
-                    `;
+//                     `;
 
-newElement.innerHTML = newQuestion
+// newElement.innerHTML = newQuestion
 
-questionsContainer.appendChild(newElement);
+// questionsContainer.appendChild(newElement);
 
-changeStateOfRemoveButton();
-}
-);
+// changeStateOfRemoveButton();
+// }
+// );
 
 
     // --------------------------------todo Form---------------------------------
@@ -564,6 +647,7 @@ changeStateOfRemoveButton();
         const isChecked = $(this).is(':checked');
         $('.report-users[data-branch-id="' + branchId + '"]').prop('checked', isChecked);
     });
+
 
 </script>
 @endsection
