@@ -1,7 +1,16 @@
 $(document).ready(function () {
     $(document).on('click', '#meetings', function () {
+        const meeting = $(this).data('meeting');
+        let meetingTitle;
+        
+        if (meeting.type === 0) {
+            meetingTitle = 'İclas';
+        } else if (meeting.type === 1) {
+            meetingTitle = 'Tədbir';
+        }
+
         Swal.fire({
-            title: 'İclas',
+            title: meetingTitle,
             html:
                 ` <div class="row mb-4 w-100">
                 <div class="col-md-12 mb-4">
@@ -10,7 +19,6 @@ $(document).ready(function () {
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
                                     <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">
-                                        <span class="text-lowercase">iclas</span>
                                     </h3>
                                 </div>
                             </div>
@@ -24,7 +32,7 @@ $(document).ready(function () {
                                         </div>
                                         <div class="card-body">
                                             <ul class="list-group">
-                                                <li class="list-group-item">movzu</li>
+                                                <li class="list-group-item"> ${meeting.subject} </li>
                                             </ul>
                                         </div>
                                     </div>
@@ -36,7 +44,7 @@ $(document).ready(function () {
                                         </div>
                                         <div class="card-body">
                                             <ul class="list-group">
-                                                <li class="list-group-item">otaq nomresi</li>
+                                                <li class="list-group-item">${meeting.rooms.name}</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -48,7 +56,7 @@ $(document).ready(function () {
                                         </div>
                                         <div class="card-body">
                                             <ul class="list-group">
-                                                <li class="list-group-item">tarix</li>
+                                                <li class="list-group-item">${meeting.start_date_time}</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -60,7 +68,7 @@ $(document).ready(function () {
                                         </div>
                                         <div class="card-body">
                                             <ul class="list-group">
-                                                <li class="list-group-item">muddet</li>
+                                                <li class="list-group-item">${meeting.duration} dəq</li>
                                             </ul>
                                         </div>
                                     </div>
