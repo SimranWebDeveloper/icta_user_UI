@@ -387,8 +387,8 @@ if (questionType.value === 'textarea') {
 
     list.appendChild(li);
     todoContent.classList.add('disabled-div');
-    // input.value = '';
     input.removeAttribute('required');
+    input.value = '';
     
 } else {
     todoContent.classList.remove('disabled-div');

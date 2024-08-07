@@ -100,7 +100,7 @@
                                 <div class="col-md-8 form-group mb-3">
                                     <div class="select_label ui sub header"><span></span> Sual <span
                                             class="text-danger">*</span></div>
-                                    <input type="text" name="question[]" required id="" class="form-control"
+                                    <input type="text" name="question[0][]" required id="" class="form-control"
                                         placeholder="Sual daxil edin">
                                     @if($errors->has('question'))
                                         <span class="text-danger">{{ $errors->first('question') }}</span>
@@ -112,7 +112,7 @@
                                     <div class="select_label ui sub header ">Sualın növü <span
                                             class="text-danger">*</span></div>
                                     <select id="input_type-0" onchange="chanceQuestionType(0)" style="height: 48px;"
-                                        name="input_type[]" class="input_type form-control ui fluid search dropdown ">
+                                        name="input_type[][]" class="input_type form-control ui fluid search dropdown ">
                                         <option value="checkbox" {{ old('input_type') == 'checkbox' ? 'selected' : '' }}>
                                             Çox variantlı</option>
                                         <option value="radio" {{ old('input_type') == 'radio' ? 'selected' : '' }}>Tək
@@ -353,8 +353,8 @@
 
             list.appendChild(li);
             todoContent.classList.add('disabled-div');
-            // input.value = '';
             input.removeAttribute('required');
+            input.value = '';
             
         } else {
             todoContent.classList.remove('disabled-div');
