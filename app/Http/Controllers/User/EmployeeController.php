@@ -21,12 +21,10 @@ class EmployeeController extends Controller
         $user = Auth::user();   
         $announcements = Announcements::where('status', 1) -> get();
         $meetings_users = MeetingsUsers::where('users_id', $user->id)->pluck('meetings_id'); 
-        $meetings = Meetings::whereIn('id', $meetings_users)->get();
+        $meetings = Meetings::whereIn('id', $meetings_users)->where('status', 1)->get();
         $surveys_users = SurveysUsers::where('users_id', $user->id)->pluck('surveys_id'); 
-        $surveys = Surveys::whereIn('id', $surveys_users)
-        ->with('surveys_questions.answers')
-        ->get();       
-        return view('employee.home', compact('announcements', 'meetings','surveys'));
+        $surveys = Surveys::whereIn('id', $surveys_users)->where('status', 1)->with('surveys_questions.answers')->get();
+            return view('employee.home', compact('announcements', 'meetings','surveys'));
     }
 
     public function profile()
