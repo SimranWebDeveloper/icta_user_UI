@@ -21,3 +21,8 @@
         <!-- fotter end -->
     </div>
 @endsection
+
+@section('js')
+    <script src="{{ asset('js/employee/survey.js') }}"></script>
+    <script src="{{ asset('js/employee/meetings.js') }}"></script>
+@endsection
