@@ -14,7 +14,7 @@
             <div class="row">
                 @foreach($meetings as $meeting)
                     <div class="col-6 mt-4">
-                        <div id="meetings" class="card" style="cursor:pointer;">
+                        <div id="meetings" class="card" style="cursor:pointer;" data-meeting='@json($meeting)'>
                             <div class="card-header text-center">{{ $meeting->subject }}</div>
                             <div class="card-body">
                                 <p>{{ $meeting->rooms->name }}</p>

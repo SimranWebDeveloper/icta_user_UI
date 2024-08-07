@@ -312,7 +312,6 @@ Route::prefix('hr')->name('hr.')->middleware(['auth', 'check_role:hr'])->group(f
     Route::resource('/meetings', MeetingsController::class);
     Route::resource('/announcements', AnnouncementsController::class);
     Route::resource('/surveys', SurveysController::class);
-    Route::post('/surveys', [SurveysController::class , 'store'])->name('surveys.store');
 });
 
 Route::post('/check-user-status', [LoginController::class, 'checkUserStatus'])->name('check.user.status');

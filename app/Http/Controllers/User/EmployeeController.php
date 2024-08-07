@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Announcements;
 use App\Models\Surveys;
+use App\Models\UsersAnswers;
+
 
 
 
@@ -21,7 +23,7 @@ class EmployeeController extends Controller
         $user = Auth::user();   
         $announcements = Announcements::where('status', 1) -> get();
         $meetings_users = MeetingsUsers::where('users_id', $user->id)->pluck('meetings_id'); 
-        $meetings = Meetings::whereIn('id', $meetings_users)->where('status', 1)->get();
+        $meetings = Meetings::whereIn('id', $meetings_users)->where('status', 1)->with('rooms')->get();
         $surveys_users = SurveysUsers::where('users_id', $user->id)->pluck('surveys_id'); 
         $surveys = Surveys::whereIn('id', $surveys_users)->where('status', 1)->with('surveys_questions.answers')->get();
             return view('employee.home', compact('announcements', 'meetings','surveys'));
@@ -63,5 +65,21 @@ class EmployeeController extends Controller
 
         return redirect()->route('employee.profile')
             ->with('success', 'Məlumatlar müvəffəqiyyətlə dəyişdirildi.');
+    }
+
+    public function submitSurvey(Request $request)
+    {
+        $userId = auth()->user()->id; 
+
+        foreach ($request['questions'] as $question) {
+            UsersAnswers::create([
+                'users_id' => $userId,
+                'surveys_id' => $request['survey_id'],
+                'surveys_questions_id' => $question['question_id'],
+                'answer' => $question['answer'],
+            ]);
+        }
+
+        return view('employee.home');
     }
 }
