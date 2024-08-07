@@ -42,7 +42,6 @@
                             <input type="text" id="date-time-picker" name="expired_at" required title=""
                                 class="form-control" placeholder="Silinmə tarixini daxil edin" />
 
-
                         </div>
                         <!-- Elanin statusu -->
                         <div class="col-md-6 col-lg-4 col-xl-3 form-group mb-3">
@@ -109,7 +108,6 @@
                                 </div>
 
 
-
                                 <div class="col-md-4 form-group mb-3 ">
                                     <div class="select_label ui sub header ">Sualın növü <span
                                             class="text-danger">*</span></div>
@@ -122,7 +120,6 @@
                                         <option value="textarea" {{ old('input_type') == 'textarea' ? 'selected' : '' }}>
                                             Mətn</option>
                                     </select>
-
 
 
                                     @if($errors->has('input_type'))
@@ -140,7 +137,6 @@
                                                 class="todo-input form-control form-control-left-radius  "
                                                 placeholder="Add a new task">
 
-
                                             <button class="add-btn btn-right-radius btn-success" type="button"
                                                 onclick="addTodo(0)">
                                                 <i class="fa-solid fa-plus"></i>
@@ -155,7 +151,6 @@
 
                         </div>
 
-
                     </div>
 
                     <!-- new question btn -->
@@ -163,7 +158,6 @@
                         <button type="button" id="add-question-btn" class="btn btn-outline-success">Yeni Sual Əlavə
                             et</button>
                     </div>
-
 
 
                     <!-- Workers -->
@@ -241,6 +235,7 @@
                             </div>
                         </div>
                     </div>
+
                     <!-- submit button -->
                     <div class="mt-4">
                         <button class="btn btn-success btn-lg" id="submitBtn">Daxil edin</button>
@@ -252,12 +247,10 @@
     </div>
 </div>
 
-
 @endsection
 
 @section('js')
 <script>
-
 
     const submitBtn = document.getElementById('submitBtn');
 
@@ -290,7 +283,6 @@
         if (!requiredCondition) {
             return
         }
-
 
         const card_List = document.querySelectorAll('.custom-card');
 
@@ -343,7 +335,6 @@
         });
     });
 
-
     // ------------------------------ When chance question type -----------------------------
 
     function chanceQuestionType(cardId) {
@@ -352,7 +343,6 @@
         const list = document.getElementById(`todo-list-${cardId}`);
         const todoContent = document.getElementById(`todo-content-${cardId}`);
         const input = document.getElementById(`todo-input-${cardId}`);
-
 
         if (questionType.value === 'textarea') {
             list.innerHTML = '';
@@ -365,7 +355,6 @@
             todoContent.classList.add('disabled-div');
             // input.value = '';
             input.removeAttribute('required');
-            console.log(12);
             
         } else {
             todoContent.classList.remove('disabled-div');
@@ -375,7 +364,6 @@
 
     // ------------------------------CRUD Question-----------------------------
     const indexQuestions = [{ id: 0 }];
-
 
     // check removeButton state
     function changeStateOfRemoveButton() {
@@ -395,12 +383,10 @@
 
         let questionsContainer = document.querySelector('.questions-container')
 
-
         questionsContainer.removeChild(document.getElementById(`c${deletedQuestionId}`));
 
         const index = indexQuestions.findIndex((item) => item.id == deletedQuestionId);
         indexQuestions.splice(index, 1);
-
 
 
         changeStateOfRemoveButton();
@@ -443,6 +429,7 @@
                         @endif
                     </div>
 
+                    
                     
                     <div class="col-md-4 form-group mb-3 " >
                         <div class="select_label ui sub header ">Sualın növü <span class="text-danger">*</span></div>
@@ -491,44 +478,40 @@
     // --------------------------------todo Form---------------------------------
     function addTodo(cardId) {
 
-        const todoContent = document.getElementById(`todo-content-${cardId}`);
-        const list = document.getElementById(`todo-list-${cardId}`);
-        const questionType = document.getElementById(`input_type-${cardId}`);
-        const input = document.getElementById(`todo-input-${cardId}`);
+const todoContent = document.getElementById(`todo-content-${cardId}`);
+const list = document.getElementById(`todo-list-${cardId}`);
+const questionType = document.getElementById(`input_type-${cardId}`);
+const input = document.getElementById(`todo-input-${cardId}`);
 
-        const text = input.value.trim();
+const text = input.value.trim();
 
-        if (text === '') return;
+if (text === '') return;
 
-        if (questionType.value === 'textarea') {
+if (questionType.value === 'textarea') {
 
-            todoContent.style.display = 'none';
+    todoContent.style.display = 'none';
 
-        }
-        else {
+}
+else {
 
-            const li = document.createElement('li');
-            li.innerHTML = `
-                        <input type="text" name='answer_value[${cardId}][]' class="form-answer form-control" value="${text}"/>
-                        <button class="remove" onclick="removeSelf(this)" type="button">Delete</button>
-                    `;
+    const li = document.createElement('li');
+    li.innerHTML = `
+                <input type="text" name='answer_value[${cardId}][]' class="form-answer form-control" value="${text}"/>
+                <button class="remove" onclick="removeSelf(this)" type="button">Delete</button>
+            `;
 
-            list.appendChild(li);
-            input.value = '';
-
-
-
-        }
-
-        list?.nextElementSibling?.remove()
-    }
+    list.appendChild(li);
+    input.value = '';
 
 
-    function removeSelf(e) {
-        e.parentElement.remove();
-    }
+}
 
+list?.nextElementSibling?.remove()
+}
 
+function removeSelf(e) {
+e.parentElement.remove();
+}
     $('#form').on('submit', function (e) {
         if ($('.report-users:checked').length === 0) {
             $('#err-text').html("Ən azı 1 iştirakçı seçin")
@@ -572,8 +555,7 @@
 
 
 
-
 </script>
 
-
 @endsection
+
