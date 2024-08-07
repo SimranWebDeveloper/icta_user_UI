@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->boolean('is_anonym')->default(false);
             $table->integer('status')->default(1);
+            $table->integer('priority');
             $table->dateTime('expired_at');
             $table->softDeletes();
             $table->timestamps();
