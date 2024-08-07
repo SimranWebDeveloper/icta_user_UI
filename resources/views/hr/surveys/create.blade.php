@@ -241,7 +241,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- submit button -->
                     <div class="mt-4">
                         <button class="btn btn-success btn-lg" id="submitBtn">Daxil edin</button>
@@ -444,7 +443,6 @@
                         @endif
                     </div>
 
-                    
                     
                     <div class="col-md-4 form-group mb-3 " >
                         <div class="select_label ui sub header ">Sualın növü <span class="text-danger">*</span></div>
