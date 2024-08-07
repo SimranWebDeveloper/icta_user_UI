@@ -2,7 +2,9 @@
   .swal2-popup {
       width: 80%;
   }
-
+  .swal2-html-container {
+      overflow-x: hidden !important;
+  }  
   .name-date-wrapper {
       display: flex;
       align-items: center;
@@ -43,13 +45,13 @@
                               </p>
                           </div>
                           <div class="mt-3">
-                            @if ($survey->priority == 1)<p class="important">Önəmli</p>
-                            @else <p class="normal">Normal</p>
+                            @if ($survey->priority == 1)
+                              <p class="important">Önəmli</p>
+                            @else
+                              <p class="normal">Normal</p>
                             @endif
-                              
-                              
                           </div>
-                          <button id="loginButton" class="btn btn-success btn-lg mt-3" data-survey='@json($survey)'>
+                          <button class="btn btn-success btn-lg mt-3 surveyButton" data-survey='@json($survey)'>
                               Cavabla
                           </button>
                       </div>
@@ -60,5 +62,3 @@
       </div>
   </div>
 </div>
-
-
