@@ -150,7 +150,7 @@
                                                             <li>                                          
 
                                                                 <p class="line-break-input disabled-div p-3 rounded border bg-gray-100"  style="width: 100%">{{ $answer->name }}</p>
-                                                                <input type="hidden"  name="answer_value[{{ $question->id }}][]" value="${{ $answer->name }}"/>
+                                                                <input type="hidden"  name="answer_value[{{ $question->id }}][]" value="{{ $answer->name }}"/>
 
                                                                 <!-- <button class="remove" onclick="removeSelf(this)" type="button">Delete</button> -->
                                                             </li>
