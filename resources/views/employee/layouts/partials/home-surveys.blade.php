@@ -43,8 +43,11 @@
                               </p>
                           </div>
                           <div class="mt-3">
-                              <p class="important">Önəmli</p>
-                              <p class="normal">Normal</p>
+                            @if ($survey->priority == 1)<p class="important">Önəmli</p>
+                            @else <p class="normal">Normal</p>
+                            @endif
+                              
+                              
                           </div>
                           <button id="loginButton" class="btn btn-success btn-lg mt-3" data-survey='@json($survey)'>
                               Cavabla
