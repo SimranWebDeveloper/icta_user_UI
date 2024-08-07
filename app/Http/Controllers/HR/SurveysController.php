@@ -26,7 +26,7 @@ class SurveysController extends Controller
     {
         $departments = Departments::withCount('branches')->withCount('users')->where('status', 1)->get();
         $branches = Branches::withCount('users')->where('status', 1)->get();
-        $users = User::where('type', 'employee')->get();
+        $users = User::all();
 
         return view('hr.surveys.create', compact('departments', 'branches', 'users'));
     }
@@ -97,7 +97,7 @@ class SurveysController extends Controller
         $data = Surveys::with('surveys_questions.answers')->findOrFail($id);
         $departments = Departments::withCount(['branches', 'users'])->where('status', 1)->get();
         $branches = Branches::withCount('users')->where('status', 1)->get();
-        $users = User::where('type', 'employee')->get();
+        $users = User::all();
     
         $surveys_users = SurveysUsers::where('surveys_id', $data->id)->pluck('users_id')->toArray();
         $user_departments = User::whereIn('id', $surveys_users)->pluck('departments_id') ->toArray();

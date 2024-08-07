@@ -26,9 +26,8 @@ class MeetingsController extends Controller
     
     $departments = Departments::withCount('branches')->withCount('users')->where('status', 1)->get();
     $branches = Branches::withCount('users')->where('status', 1)->get();
-    $users = User::where('type', 'employee')->get();
+    $users = User::all();
 
-    $users = User::where('type', 'employee')->get();
     $rooms = Rooms::all(); 
 
     return view('hr.meetings.create', compact('departments', 'branches', 'users', 'rooms'));
@@ -75,7 +74,7 @@ public function store(Request $request)
     
         $departments = Departments::withCount(['branches', 'users'])->where('status', 1)->get();
         $branches = Branches::withCount('users')->where('status', 1)->get();
-        $users = User::where('type', 'employee')->get();
+        $users =  User::all();
         $rooms = Rooms::all();
     
         $meeting_users = MeetingsUsers::where('meetings_id', $meeting->id)->pluck('users_id')->toArray();
