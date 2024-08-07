@@ -1,154 +1,65 @@
 <style>
-    .swal2-popup {
-        width: 80%;
-    }
+  .swal2-popup {
+    width: 80%;
+  }
 
-    .name-date-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-    }   
-    .name-date-wrapper h3,h4{
-            margin: 0 !important;
-            padding: 0 !important;
-        }
+  .swal2-html-container {
+    overflow-x: hidden !important;
+  }
 
-    .answers {
-        gap: 1rem;
-        text-align: center;
-        align-items: center;
-    }
+  .name-date-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
 
-    .answers label {
-        width: 100%;
+  .name-date-wrapper h3,
+  h4 {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 
-    }
+  .answers {
+    gap: 1rem;
+    text-align: center;
+    align-items: center;
+  }
+
+  .answers label {
+    width: 100%;
+
+  }
 </style>
 <link rel="stylesheet" href="/css/surveys/surveys_cu.css">
 
 <div class="col-lg-4 col-md-6">
-    <div class="card">
-        <div class="card-header">Anketlər</div>
-        <div class="card-body scrollable-content pt-0">
-            <div class="row">
-                <div class="col-6 mt-4">
-                    <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
-                        <div class="card-body">
-                            <div>
-                                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                <p class="m-0">
-                                    2024-12-12
-                                </p>
-                            </div>
-                            <div class="mt-3">
-                                <p class="important" style="font-weight:bold">Önəmli</p>
-                            </div>
-                            <button class="btn btn-success btn-lg mt-3">
-                                Cavabla
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 mt-4">
-                    <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
-                        <div class="card-body">
-                            <div>
-                                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                <p class="m-0">
-                                    2024-12-12
-                                </p>
-                            </div>
-                            <div class="mt-3">
-                                <p class="normal">Normal</p>
-                            </div>
-                            <button class="btn btn-success btn-lg mt-3">
-                                Cavabla
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 mt-4">
-                    <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
-                        <div class="card-body">
-                            <div>
-                                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                <p class="m-0">
-                                    2024-12-12
-                                </p>
-                            </div>
-                            <div class="mt-3">
-                                <p class="important">Önəmli</p>
-                            </div>
-                            <button class="btn btn-success btn-lg mt-3">
-                                Cavabla
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 mt-4">
-                    <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
-                        <div class="card-body">
-                            <div>
-                                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                <p class="m-0">
-                                    2024-12-12
-                                </p>
-                            </div>
-                            <div class="mt-3">
-                                <p class="important">Önəmli</p>
-                            </div>
-                            <button class="btn btn-success btn-lg mt-3">
-                                Cavabla
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 mt-4">
-                    <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
-                        <div class="card-body">
-                            <div>
-                                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                <p class="m-0">
-                                    2024-12-12
-                                </p>
-                            </div>
-                            <div class="mt-3">
-                                <p class="important">Önəmli</p>
-                            </div>
-                            <button class="btn btn-success btn-lg mt-3">
-                                Cavabla
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 mt-4">
-                    <div class="card">
-                        <div class="card-header text-center">Anket adı</div>
-                        <div class="card-body">
-                            <div>
-                                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                <p class="m-0">
-                                    2024-12-12
-                                </p>
-                            </div>
-                            <div class="mt-3">
-                                <p class="important">Önəmli</p>
-                            </div>
-                            <button id="loginButton" class="btn btn-success btn-lg mt-3">
-                                Cavabla
-                            </button>
-                        </div>
-                    </div>
-                </div>
+  <div class="card">
+    <div class="card-header">Anketlər</div>
+    <div class="card-body scrollable-content pt-0">
+      <div class="row">
+        <div class="col-6 mt-4">
+          <div class="card">
+            <div class="card-header text-center">Anket adı</div>
+            <div class="card-body">
+              <div>
+                <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
+                <p class="m-0">
+                  2024-12-12
+                </p>
+              </div>
+              <div class="mt-3">
+                <p class="important">Önəmli</p>
+              </div>
+              <button id="loginButton" class="btn btn-success btn-lg mt-3">
+                Cavabla
+              </button>
             </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 
@@ -156,11 +67,11 @@
 
 @section('js')
 <script>
-    $(document).ready(function () {
-        $('#loginButton').on('click', function () {
-            Swal.fire({
-                title: 'Yeni Anket',
-                html: `
+  $(document).ready(function () {
+    $('#loginButton').on('click', function () {
+      Swal.fire({
+        title: 'Yeni Anket',
+        html: `
            <div class="pt-4 custom-container bg-white">
       <div class="row">
         <div class="col-12">
@@ -192,7 +103,8 @@
                             type="radio"
                             name="flexRadioDefault"
                             id="flexRadioDefault1"
-                          />
+                            value=""
+                            />
                           <label class="w-100" for="">yaxsi </label>
                         </div>
                         <!-- ------- -->
@@ -203,7 +115,8 @@
                             type="radio"
                             name="flexRadioDefault"
                             id="flexRadioDefault1"
-                          />
+                            value=""
+                            />
                           <label class="" for=""
                             >Lorem ipsum dolor.</label
                           >
@@ -214,7 +127,8 @@
                             type="radio"
                             name="flexRadioDefault"
                             id="flexRadioDefault1"
-                          />
+                            value=""
+                            />
                           <label class="w-100" for="">Pis</label>
                         </div>
                       </div>
@@ -231,8 +145,8 @@
                           <input
                             class="form-check-input"
                             type="checkbox"
-                            value=""
                             id="flexCheckDefault"
+                            value=""
                           />
                           <label class="w-100" for="">Yaxsi</label>
                         </div>
@@ -240,8 +154,8 @@
                           <input
                             class="form-check-input"
                             type="checkbox"
-                            value=""
                             id="flexCheckDefault"
+                            value=""
                           />
                           <label class="w-100" for="">Orta</label>
                         </div>
@@ -249,8 +163,8 @@
                           <input
                             class="form-check-input"
                             type="checkbox"
-                            value=""
                             id="flexCheckDefault"
+                            value=""
                           />
                           <label class="w-100" for="">Pis</label>
                         </div>
@@ -269,6 +183,7 @@
                             rows="7"
                             cols="10"
                             class="form-control"
+                            value=""
                           ></textarea>
                         </div>
                       </div>
@@ -282,15 +197,15 @@
       </div>
     </div>
                 `,
-                showCancelButton: true,
-                confirmButtonText: 'Submit',
-                preConfirm: () => {
-                    // Perform the form submission here
-                    const form = document.getElementById('myForm');
-                    form.submit();
-                }
-            });
-        });
+        showCancelButton: true,
+        confirmButtonText: 'Submit',
+        preConfirm: () => {
+          // Perform the form submission here
+          const form = document.getElementById('myForm');
+          form.submit();
+        }
+      });
     });
+  });
 </script>
 @endsection
