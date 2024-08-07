@@ -15,7 +15,7 @@ function display_user_types()
         ],
         'hr' => [
             'name' => 'İnsan resursları',
-            'route' => NULL
+            'route' => route('hr.home')
         ],
         'accountant' => [
             'name' => 'Mühasibatlıq',
