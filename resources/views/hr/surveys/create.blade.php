@@ -1,6 +1,7 @@
 @extends('hr.layouts.app')
 @section('content')
 <link rel="stylesheet" href="/css/surveys/surveys_cu.css">
+
 <div class="row mb-4">
     <div class="col-12 mb-4">
 
@@ -26,7 +27,7 @@
                     <!-- general info -->
                     <div class="row mb-3">
                         <!-- Anket adi -->
-                        <div class="col-md-6 col-lg-4 col-xl-3 form-group mb-3">
+                        <div class="col-12 form-group mb-3">
                             <div class="select_label ui sub header">Anket adı <span class="text-danger">*</span></div>
                             <input title="" type="survey-name" name="name"  class="form-control" required
                                 placeholder="Anket adını daxil edin">
@@ -69,6 +70,19 @@
                             </select>
                             @if($errors->has('is_anonym'))
                                 <span class="text-danger">{{ $errors->first('is_anonym') }}</span>
+                            @endif
+                        </div>
+
+                        <!-- Elanin priority -->
+                        <div class="col-md-6 col-lg-4 col-xl-3 form-group mb-3">
+                            <label for="subtitle" class="form-label">Vaciblik <span class="text-danger">*</span></label>
+                            <select name="priority" required id="priority" title="" class="form-control ">
+                                <option value="" selected disabled>Elanın Görünməsini seçin</option>
+                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Normal</option>
+                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Önəmli</option>
+                            </select>
+                            @if($errors->has('priority'))
+                                <span class="text-danger">{{ $errors->first('priority') }}</span>
                             @endif
                         </div>
 
@@ -237,15 +251,6 @@
         </div>
 
     </div>
-
-
-
-
-
-
-
-
-
 </div>
 
 
