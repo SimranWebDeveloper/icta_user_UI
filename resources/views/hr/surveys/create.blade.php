@@ -357,10 +357,17 @@
 
         if (questionType.value === 'textarea') {
             list.innerHTML = '';
-            list?.nextElementSibling?.remove();
+            const li = document.createElement('li');
+            li.innerHTML = `
+                        <input type="hidden" name='answer_value[${cardId}][]' class="form-answer form-control" value="bos"/>
+                    `;
+
+            list.appendChild(li);
             todoContent.classList.add('disabled-div');
-            input.value = '';
+            // input.value = '';
             input.removeAttribute('required');
+            console.log(12);
+            
         } else {
             todoContent.classList.remove('disabled-div');
         }
@@ -459,7 +466,7 @@
                         <div class="todo-container" style="width: 100%;">        
                             <div id="todo-header">
                                 
-                                <input type="text"   id="todo-input-${lastQuestionId}" class="todo-input form-control form-control-left-radius  " name="answer_value[]"  placeholder="Add a new task"  >
+                                <input type="text"   id="todo-input-${lastQuestionId}" class="todo-input form-control form-control-left-radius"  placeholder="Add a new task"  >
                                 
 
                                 <button class="add-btn btn-right-radius btn-success" type="button" onclick="addTodo(${lastQuestionId})">

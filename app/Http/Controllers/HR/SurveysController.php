@@ -33,6 +33,7 @@ class SurveysController extends Controller
     
     public function store(Request $request)
 {
+    dd($request->all());
     $data = Surveys::create([
         "name" => $request->name,
         "expired_at" => $request->expired_at,

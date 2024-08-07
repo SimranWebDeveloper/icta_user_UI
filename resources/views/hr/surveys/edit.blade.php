@@ -145,7 +145,9 @@
                                                     <div id="todo-header">
                                                     </div>
                                                         <ul id="todo-list-0" class="todo-list disabled-div">
+                                                        <p>{{ $question->answers }}</p>
                                                             @foreach ($question->answers as $answer)
+                                                            
                                                             <li>                                          
 
                                                                 <p class="line-break-input disabled-div p-3 rounded border bg-gray-100"  style="width: 100%">{{ $answer->name }}</p>
@@ -176,45 +178,45 @@
 
 
                         <!-- Workers -->
-                        @csrf
-                        <div class="mt-4">
+                         <div class="row">
+                        <div class="col-md-12 mt-2">
                             <div class="accordion mt-2" id="accordionRightIcon">
                                 <div class="card">
                                     <div class="card-header header-elements-inline">
                                         <h6 class="card-title ul-collapse__icon--size ul-collapse__right-icon mb-0">
                                             <a data-toggle="collapse" class="text-default collapsed"
                                                 href="#accordion-item-icons-3" aria-expanded="false">
-                                                <span><i class="i-Big-Data ul-accordion__font"> </i></span>
+                                                <span><i class="i-Big-Data ul-accordion__font"></i></span>
                                                 İştirakçılar <span class="text-danger">*</span>
                                             </a>
                                         </h6>
                                     </div>
-                                    <div id="accordion-item-icons-3" class="collapse" data-parent="#accordionRightIcon"
-                                        style="">
+                                    <div id="accordion-item-icons-3" class="collapse" data-parent="#accordionRightIcon">
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-4">
                                                     <h3>Departament</h3>
-                                                    @foreach($departments as $department)
+                                                    @foreach ($departments as $department)
                                                         <label class="checkbox checkbox-primary">
-                                                            <input type="checkbox" class="report-departments"
-                                                                name="w_departments_id[]" value="{{ $department->id }}">
+                                                            <input type="checkbox" class="report-departments" {{ in_array($department->id, $user_departments) ? 'checked' : '' }} name="w_departments_id[]"
+                                                                value="{{ $department->id }}">
                                                             <span><strong>{{ $department->name }}</strong> (Şöbə:
                                                                 {{ $department->branches_count }}, İşçi:
-                                                                {{ $department->users_count }})</span>
-                                                            <span class="checkmark"></span>
+                                                                {{ $department->users_count }})</span> <span
+                                                                class="checkmark"></span>
                                                         </label>
                                                     @endforeach
                                                 </div>
                                                 <div class="col-8">
                                                     <h3>Şöbə</h3>
                                                     <div class="row">
-                                                        @foreach($branches as $branch)
+                                                        @foreach ($branches as $branch)
                                                             <div class="col-4">
                                                                 <label class="checkbox checkbox-primary">
                                                                     <input type="checkbox" class="report-branches"
                                                                         data-department-id="{{ !is_null($branch->departments) ? $branch->departments->id : '' }}"
-                                                                        name="w_branch_id[]" value="{{ $branch->id }}">
+                                                                        {{ in_array($branch->id, $user_branches) ? 'checked' : '' }} name="w_branch_id[]"
+                                                                        value="{{ $branch->id }}">
                                                                     <span><strong>{{ $branch->name }}</strong> (İşçi:
                                                                         {{ $branch->users_count }})</span>
                                                                     <span class="checkmark"></span>
@@ -229,14 +231,17 @@
                                                 <div class="col-12 mt-2">
                                                     <h3>İşçilər</h3>
                                                     <div class="row">
-                                                        @foreach($users as $user)
+                                                        @foreach ($users as $user)
                                                             <div class="col-4 mt-4">
                                                                 <label class="checkbox checkbox-primary">
                                                                     <input type="checkbox"
                                                                         data-branch-id="{{ !is_null($user->branches) ? $user->branches->id : '' }}"
                                                                         data-department-id="{{ !is_null($user->departments) ? $user->departments->id : '' }}"
-                                                                        class="report-users" name="w_user_id[]"
-                                                                        value="{{ $user->id }}">
+                                                                        class="report-users" {{ in_array($user->id, $surveys_users) ? 'checked' : '' }}
+                                                                        name="w_user_id[]" value="{{ $user->id }}">
+                                                                        
+                                                                   
+
                                                                     <span>{{ $user->name }}</span>
                                                                     <span class="checkmark"></span>
                                                                 </label>
@@ -249,6 +254,7 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         </div>
 
                         <!-- submit button -->
@@ -507,87 +513,6 @@
 
                 changeStateOfRemoveButton();
 }
-
-//     document.getElementById('add-question-btn').addEventListener('click', function () {
-
-// let questionsContainer = document.querySelector('.questions-container')
-// let newElement = document.createElement("div");
-// newElement.classList.add("col-lg-6", "my-3");
-
-// if (indexQuestions.length == 0) {
-
-//     indexQuestions.push({
-//         id: 0
-//     });
-//     newElement.id = "c0";
-// }
-// else {
-
-//     indexQuestions.push({
-//         id: indexQuestions[indexQuestions.length - 1].id + 1
-//     });
-//     newElement.id = "c" + indexQuestions[indexQuestions.length - 1].id;
-// }
-// const lastQuestionId = indexQuestions[indexQuestions.length - 1].id;
-
-// let newQuestion = `           
-//         <div class="row  custom-card  position-relative ">
-            
-//                 <button type="button"  class="position-left btn btn-danger z-custom-index" onclick="removeQuestion(${lastQuestionId})" >X</button>
-            
-//             <div class="col-md-8 form-group mb-3">
-//                 <div class="select_label ui sub header"><span></span> Sual <span class="text-danger">*</span></div>
-//                 <input type="text" name="question[]" required id="" class="form-control" placeholder="Sual daxil edin">
-//                 @if($errors->has('question'))
-//                     <span class="text-danger">{{ $errors->first('question') }}</span>
-//                 @endif
-//             </div>
-
-            
-            
-//             <div class="col-md-4 form-group mb-3 " >
-//                 <div class="select_label ui sub header ">Sualın növü <span class="text-danger">*</span></div>
-//               <select id="input_type-${lastQuestionId}" required onchange="chanceQuestionType(${lastQuestionId})" style="height: 48px;" name="input_type[]" class="input_type form-control ui fluid search dropdown create_form_dropdown">
-//                 <option value="checkbox" {{ old('input_type') == 'checkbox' ? 'selected' : '' }}>Çox variantlı</option>
-//                 <option value="radio" {{ old('input_type') == '2' ? 'selected' : '' }}>Tək variantlı</option>
-//                 <option value="textarea" {{ old('input_type') == '3' ? 'selected' : '' }}>Mətn</option>
-//             </select>
-
-      
-                
-//                 @if($errors->has('input_type'))
-//                     <span class="text-danger">{{ $errors->first('input_type') }}</span>
-//                 @endif
-//             </div>
-
-//             <div class="col-md-12 form-group mb-3" id="todo-content-${lastQuestionId}" >
-//                 <div class="select_label ui sub header ">Cavab və ya cavablar <span class="text-danger">*</span></div>
-//                 <div class="todo-container" style="width: 100%;">        
-//                     <div id="todo-header">
-                        
-//                         <input type="text"   id="todo-input-${lastQuestionId}" class="todo-input form-control form-control-left-radius  " name="answer_value[]"  placeholder="Add a new task"  >
-                        
-
-//                         <button class="add-btn btn-right-radius btn-success" type="button" onclick="addTodo(${lastQuestionId})">
-//                             <i class="fa-solid fa-plus"></i>
-//                         </button>
-//                     </div>
-//                     <ul id="todo-list-${lastQuestionId}" class="todo-list">
-//                     </ul>
-//                     </div>
-//                     </div>
-                    
-//                     </div>  
-                    
-//                     `;
-
-// newElement.innerHTML = newQuestion
-
-// questionsContainer.appendChild(newElement);
-
-// changeStateOfRemoveButton();
-// }
-// );
 
 
     // --------------------------------todo Form---------------------------------
