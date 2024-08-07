@@ -18,7 +18,9 @@ class Surveys extends Model
         'name',
         'is_anonym',
         'expired_at',
-        'status'        
+        'status',
+        'priority',
+                
     ];
 
     public function surveys_questions()

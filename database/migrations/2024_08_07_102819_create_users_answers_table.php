@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('meetings_users', function (Blueprint $table) {
+        Schema::create('users_answers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('meetings_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('users_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->integer('participation_status')->default(null);
+            $table->foreignId('surveys_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('surveys_questions_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->text('answer');
+
+
             $table->timestamps();
         });
     }
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('meetings_users');
+        Schema::dropIfExists('users_answers');
     }
 };
