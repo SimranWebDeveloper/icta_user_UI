@@ -145,7 +145,7 @@
                                                     <div id="todo-header">
                                                     </div>
                                                         <ul id="todo-list-0" class="todo-list disabled-div">
-                                                        <p>{{ $question->answers }}</p>
+                                                        <!-- <p>{{ $question->answers }}</p> -->
                                                             @foreach ($question->answers as $answer)
                                                             
                                                             <li>                                          

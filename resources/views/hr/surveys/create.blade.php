@@ -438,7 +438,7 @@
                     
                     <div class="col-md-8 form-group mb-3">
                         <div class="select_label ui sub header"><span></span> Sual <span class="text-danger">*</span></div>
-                        <input type="text" name="question[]" required id="" class="form-control" placeholder="Sual daxil edin">
+                        <input type="text" name="question[${lastQuestionId}][]"  required id="" class="form-control" placeholder="Sual daxil edin">
                         @if($errors->has('question'))
                             <span class="text-danger">{{ $errors->first('question') }}</span>
                         @endif
@@ -448,7 +448,7 @@
                     
                     <div class="col-md-4 form-group mb-3 " >
                         <div class="select_label ui sub header ">Sualın növü <span class="text-danger">*</span></div>
-                      <select id="input_type-${lastQuestionId}" required onchange="chanceQuestionType(${lastQuestionId})" style="height: 48px;" name="input_type[]" class="input_type form-control ui fluid search dropdown create_form_dropdown">
+                      <select id="input_type-${lastQuestionId}" required onchange="chanceQuestionType(${lastQuestionId})" style="height: 48px;" name="input_type[${lastQuestionId}][]" class="input_type form-control ui fluid search dropdown create_form_dropdown">
                         <option value="checkbox" {{ old('input_type') == 'checkbox' ? 'selected' : '' }}>Çox variantlı</option>
                         <option value="radio" {{ old('input_type') == '2' ? 'selected' : '' }}>Tək variantlı</option>
                         <option value="textarea" {{ old('input_type') == '3' ? 'selected' : '' }}>Mətn</option>
