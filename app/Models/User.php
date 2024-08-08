@@ -155,4 +155,13 @@ class User extends Authenticatable
         return $this->hasMany(Comments::class);
     }
 
+    public function user_answers()
+    {
+        return $this->hasMany(UsersAnswers::class, 'users_id');
+    }
+
+    public function surveys()
+    {
+        return $this->hasMany(Surveys::class);
+    }
 }

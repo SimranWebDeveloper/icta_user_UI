@@ -22,4 +22,8 @@ class SurveysUsers extends Model
     {
         return $this->belongsTo(User::class, 'users_id');
     }
+
+    public function surveys(){
+        return $this->belongsTo(Surveys::class);
+    }
 }

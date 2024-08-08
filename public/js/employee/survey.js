@@ -1,11 +1,17 @@
 $(document).ready(function () {
     const surveys = window.surveyData;
-
+    const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+    const metaContent = document.querySelector('meta[name="csrf-token"]').content
+    
+    console.log(baseUrl);
+    
     if (surveys && surveys.length > 0) {
         surveys.forEach(survey => {
             if (survey.priority === 1) {
                 // Trigger the popup on page load for high priority surveys
                 showSurveyPopup(survey, false);
+                console.log(survey);
+                
             }
         });
     } else {
@@ -33,22 +39,26 @@ $(document).ready(function () {
                 const inputs = form.querySelectorAll('input, textarea');
 
                 inputs.forEach(input => {
-                    if ((input.type === 'radio' || input.type === 'checkbox') && !input.checked) {
-                        const name = input.name;
-                        const options = document.querySelectorAll(`[name="${name}"]`);
-                        const isChecked = Array.from(options).some(option => option.checked);
 
-                        if (!isChecked) {
+                    if(input.type !== 'hidden'){
+                        if ((input.type === 'radio' || input.type === 'checkbox') && !input.checked) {
+                            const name = input.name;
+                            const options = document.querySelectorAll(`[name="${name}"]`);
+                            const isChecked = Array.from(options).some(option => option.checked);
+                            
+    
+                            if (!isChecked) {
+                                allAnswered = false;
+                                showError(input);
+                            } else {
+                                removeError(input);
+                            }
+                        } else if (input.type === 'textarea' && !input.value.trim()) {
                             allAnswered = false;
                             showError(input);
                         } else {
                             removeError(input);
                         }
-                    } else if (input.type === 'textarea' && !input.value.trim()) {
-                        allAnswered = false;
-                        showError(input);
-                    } else {
-                        removeError(input);
                     }
                 });
 
@@ -75,6 +85,7 @@ $(document).ready(function () {
     }
 
     function removeError(input) {
+        
         const parent = input.closest('.card-body');
         const errorText = parent.querySelector('.error-text');
         if (errorText) {
@@ -94,7 +105,7 @@ $(document).ready(function () {
                 question.answers.forEach(option => {
                     optionsHtml += `
                       <div class="answers d-flex form-check">
-                          <input class="form-check-input" type="radio" name="question_${index}" id="option_${index}_${option.id}" required />
+                          <input class="form-check-input" type="radio" value="${option.name}" name="question[${question.id}] id="option_${index}_${option.id}" required />
                           <label class="w-100" for="option_${index}_${option.id}">${option.name}</label>
                       </div>
                   `;
@@ -103,7 +114,7 @@ $(document).ready(function () {
                 question.answers.forEach(option => {
                     optionsHtml += `
                       <div class="answers d-flex form-check">
-                          <input class="form-check-input" type="checkbox" name="question_${index}[]" id="option_${index}_${option.id}" />
+                          <input class="form-check-input" type="checkbox" value="${option.name}" name="question[${question.id}][]" id="option_${index}_${option.id}" />
                           <label class="w-100" for="option_${index}_${option.id}">${option.name}</label>
                       </div>
                   `;
@@ -111,7 +122,7 @@ $(document).ready(function () {
             } else if (question.input_type === 'textarea') {
                 optionsHtml = `
                   <div>
-                      <textarea rows="7" cols="10" class="form-control" name="question_${index}" required></textarea>
+                      <textarea rows="7" cols="10" class="form-control" name="question[${question.id}]" required></textarea>
                   </div>
               `;
             }
@@ -131,11 +142,14 @@ $(document).ready(function () {
           `;
         });
 
+
+
         return `
           <div class="pt-4 custom-container bg-white">
               <div class="row">
                   <div class="col-12">
-                      <form id="surveyForm">
+                      <form id="surveyForm" action='${baseUrl}/employee/surveys/store' method="POST">
+                        <input name="_token" value="${csrfToken}" type="hidden">
                           <div class="card">
                               <div class="card-header">
                                   <div class="d-flex justify-content-between align-items-center">

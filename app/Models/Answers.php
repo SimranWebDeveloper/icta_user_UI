@@ -22,4 +22,5 @@ class Answers extends Model
     {
         return $this->belongsTo(SurveysQuestions::class);
     }
+
 }
