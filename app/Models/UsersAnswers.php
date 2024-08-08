@@ -17,4 +17,9 @@ class UsersAnswers extends Model
         'surveys_questions_id',
         'answer',
     ];
+
+    public function users()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
