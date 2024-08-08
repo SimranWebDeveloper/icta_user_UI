@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\HR;
+
 use App\Models\Meetings;
 use App\Models\Departments;
 use App\Models\User;
@@ -15,7 +16,7 @@ use Illuminate\Http\Request;
 
 class MeetingsController extends Controller
 {
-   
+
     public function index()
     {
         $meetings = Meetings::with('rooms')->get();
@@ -23,27 +24,111 @@ class MeetingsController extends Controller
     }
 
     public function create()
-{
-    
-    $departments = Departments::withCount('branches')->withCount('users')->where('status', 1)->get();
-    $branches = Branches::withCount('users')->where('status', 1)->get();
-    $users = User::all();
+    {
 
-    $rooms = Rooms::all(); 
+        $departments = Departments::withCount('branches')->withCount('users')->where('status', 1)->get();
+        $branches = Branches::withCount('users')->where('status', 1)->get();
+        $users = User::all();
 
-    return view('hr.meetings.create', compact('departments', 'branches', 'users', 'rooms'));
-}
+        $rooms = Rooms::all();
 
-public function store(Request $request)
+        return view('hr.meetings.create', compact('departments', 'branches', 'users', 'rooms'));
+    }
+
+    public function store(Request $request)
     {
         $data = $request->all();
         $startDateTime = Carbon::parse($data['start_date_time']);
-        $duration = $data['duration']; // Длительность в минутах
+        $duration = $data['duration'];
         $endDateTime = $startDateTime->copy()->addMinutes($duration);
-        $roomId = $data['rooms_id']; // ID комнаты из запроса
+        $roomId = $data['rooms_id'];
 
-        // Проверка на пересечение встреч в той же комнате
+        $overlappingMeeting = Meetings::where('rooms_id', $roomId) ->where('status', 1)
+            ->where(function ($query) use ($startDateTime, $endDateTime) {
+                $query->whereBetween('start_date_time', [$startDateTime, $endDateTime])
+                    ->orWhereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
+                    ->orWhere(function ($subQuery) use ($startDateTime, $endDateTime) {
+                        $subQuery->where('start_date_time', '<', $startDateTime)
+                            ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$endDateTime]);
+                    });
+            })
+            ->exists();
+
+        if ($overlappingMeeting) {
+            return redirect()->back()->with('error', 'Göstərilən vaxtda bu otaq artıq doludur.');
+        }
+
+        $meeting = Meetings::create($data);
+
+        if ($request->has('w_user_id')) {
+            foreach ($request->input('w_user_id') as $userId) {
+                if (
+                    !MeetingsUsers::where('meetings_id', $meeting->id)
+                        ->where('users_id', $userId)
+                        ->exists()
+                ) {
+                    MeetingsUsers::create([
+                        'meetings_id' => $meeting->id,
+                        'users_id' => $userId,
+                    ]);
+                }
+            }
+        }
+
+        $text = $request->input('type') == 0 ? 'Görüş uğurla yaradıldı' : 'Tədbir uğurla yaradıldı';
+        return redirect()->route('hr.meetings.index')->with('success', $text);
+    }
+
+    public function show(string $id)
+    {
+        $meeting = Meetings::findOrFail($id);
+
+        $participants = MeetingsUsers::where('meetings_id', $meeting->id)
+            ->join('users', 'meetings_users.users_id', '=', 'users.id')
+            ->select('users.*')
+            ->get();
+        $departments = Departments::pluck('name', 'id');
+        $branches = Branches::pluck('name', 'id');
+        return view('hr.meetings.show', compact('meeting', 'participants', 'departments', 'branches'));
+    }
+
+    public function edit(string $id)
+    {
+        $meeting = Meetings::findOrFail($id);
+
+        $departments = Departments::withCount(['branches', 'users'])->where('status', 1)->get();
+        $branches = Branches::withCount('users')->where('status', 1)->get();
+        $users = User::all();
+        $rooms = Rooms::all();
+
+        $meeting_users = MeetingsUsers::where('meetings_id', $meeting->id)->pluck('users_id')->toArray();
+        $user_departments = User::whereIn('id', $meeting_users)->pluck('departments_id')->toArray();
+        $user_branches = User::whereIn('id', $meeting_users)->pluck('branches_id')->toArray();
+
+        return view('hr.meetings.edit', compact('meeting', 'departments', 'branches', 'users', 'user_departments', 'user_branches', 'meeting_users', 'rooms'));
+    }
+
+    public function update(Request $request, string $id)
+{
+    $meeting = Meetings::findOrFail($id);
+
+    $data = $request->all();
+    $startDateTime = Carbon::parse($data['start_date_time']);
+    $duration = $data['duration'];
+    $endDateTime = $startDateTime->copy()->addMinutes($duration);
+    $roomId = $data['rooms_id'];
+    $newStatus = $data['status'];
+
+    // Determine if the meeting status is being changed to active
+    $statusChangedToActive = $meeting->status == 0 && $newStatus == 1;
+    $statusChangedFromActive = $meeting->status == 1 && $newStatus == 0;
+
+    // Check for overlapping meetings if the status is being changed to active
+    if ($statusChangedToActive || $statusChangedFromActive) {
+        // Check for overlapping active meetings
         $overlappingMeeting = Meetings::where('rooms_id', $roomId)
+            ->where('status', 1) // Check only active meetings
+            ->where('id', '!=', $id) // Exclude the current meeting
             ->where(function ($query) use ($startDateTime, $endDateTime) {
                 $query->where(function ($subQuery) use ($startDateTime, $endDateTime) {
                     $subQuery->where('start_date_time', '<', $endDateTime)
@@ -53,111 +138,32 @@ public function store(Request $request)
             ->exists();
 
         if ($overlappingMeeting) {
-            return redirect()->back()->with('error', 'В указанное время эта комната уже занята.');
+            return redirect()->back()->withErrors('Göstərilən vaxtda bu otaq artıq doludur.');
         }
-
-        // Создание новой встречи
-        $meeting = Meetings::create($data);
-
-        // Привязка пользователей к встрече
-        if ($request->has('w_user_id')) {
-            foreach ($request->input('w_user_id') as $userId) {
-                if (!MeetingsUsers::where('meetings_id', $meeting->id)
-                    ->where('users_id', $userId)
-                    ->exists()) {
-                    MeetingsUsers::create([
-                        'meetings_id' => $meeting->id,
-                        'users_id' => $userId,
-                    ]);
-                }
-            }
-        }
-
-        $text = $request->input('type') == 0 ? 'Встреча успешно создана' : 'Событие успешно создано';
-        return redirect()->route('hr.meetings.index')->with('success', $text);
     }
 
+    // Update the meeting with the new data
+    $meeting->update($data);
 
+    // Remove existing users associated with this meeting
+    MeetingsUsers::where('meetings_id', $meeting->id)->delete();
 
-
-
-
-
-   
-    public function show(string $id)
-    {
-        $meeting = Meetings::findOrFail($id);
-
-        $participants = MeetingsUsers::where('meetings_id', $meeting->id)
-        ->join('users', 'meetings_users.users_id', '=', 'users.id')
-        ->select('users.*')
-        ->get();
-        $departments = Departments::pluck('name', 'id');
-        $branches = Branches::pluck('name', 'id');
-         return view('hr.meetings.show', compact('meeting', 'participants', 'departments', 'branches'));
-    }
-
-    
-    public function edit(string $id)
-    {
-        $meeting = Meetings::findOrFail($id);
-    
-        $departments = Departments::withCount(['branches', 'users'])->where('status', 1)->get();
-        $branches = Branches::withCount('users')->where('status', 1)->get();
-        $users =  User::all();
-        $rooms = Rooms::all();
-    
-        $meeting_users = MeetingsUsers::where('meetings_id', $meeting->id)->pluck('users_id')->toArray();
-        $user_departments = User::whereIn('id', $meeting_users) ->pluck('departments_id')->toArray();
-        $user_branches = User::whereIn('id', $meeting_users)->pluck('branches_id')->toArray();
-    
-        return view('hr.meetings.edit', compact('meeting', 'departments', 'branches', 'users', 'user_departments', 'user_branches', 'meeting_users', 'rooms'));
-    }
-   
-    public function update(Request $request, string $id)
-    {
-        $meeting = Meetings::findOrFail($id);
-    
-        $data = $request->all();
-        $startDateTime = Carbon::parse($data['start_date_time']);
-        $duration = $data['duration']; // Assuming duration is in minutes
-        $endDateTime = $startDateTime->copy()->addMinutes($duration);
-        $roomId = $data['rooms_id']; // Assuming room_id is provided in the request
-    
-        // Check if the room is available during the given time
-        $conflictingMeeting = Meetings::where('rooms_id', $roomId)
-            ->where('id', '!=', $id) // Exclude current meeting
-            ->where(function($query) use ($startDateTime, $endDateTime) {
-                $query->whereBetween('start_date_time', [$startDateTime, $endDateTime])
-                      ->orWhereBetween('end_date_time', [$startDateTime, $endDateTime])
-                      ->orWhere(function ($query) use ($startDateTime, $endDateTime) {
-                          $query->where('start_date_time', '<=', $startDateTime)
-                                ->where('end_date_time', '>=', $endDateTime);
-                      });
-            })
-            ->exists();
-    
-        if ($conflictingMeeting) {
-            return redirect()->back()->withErrors('Selected room is already booked for the given time.');
+    // Add new users if provided
+    if ($request->has('w_user_id')) {
+        foreach ($request->input('w_user_id') as $userId) {
+            MeetingsUsers::create([
+                'meetings_id' => $meeting->id,
+                'users_id' => $userId,
+            ]);
         }
-    
-        $meeting->update($data);
-        MeetingsUsers::where('meetings_id', $meeting->id)->delete();
-    
-        if ($request->has('w_user_id')) {
-            foreach ($request->input('w_user_id') as $userId) {
-                MeetingsUsers::create([
-                    'meetings_id' => $meeting->id,
-                    'users_id' => $userId,
-                ]);
-            }
-        }
-        $text = $data['type'] == 0 ? 'İclas məlumatları müvəffəqiyyətlə dəyişdirildi' : 'Tədbir məlumatları müvəffəqiyyətlə dəyişdirildi';
-        return redirect()->route('hr.meetings.index')->with('success', $text);
     }
-    
-    
-public function destroy(string $id)
+
+    // Prepare success message
+    $text = $data['type'] == 0 ? 'İclas məlumatları müvəffəqiyyətlə dəyişdirildi' : 'Tədbir məlumatları müvəffəqiyyətlə dəyişdirildi';
+    return redirect()->route('hr.meetings.index')->with('success', $text);
+}
+
+    public function destroy(string $id)
     {
         try {
             $meeting = Meetings::findOrFail($id);
@@ -175,6 +181,6 @@ public function destroy(string $id)
                 'message' => 'Melumat silinərkən bir xəta baş verdi: ' . $e->getMessage()
             ]);
         }
-}
+    }
 
 }
