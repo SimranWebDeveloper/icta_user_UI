@@ -12,7 +12,27 @@
         color: #666;
         text-align: center;
     }
-   
+
+    #carouselExampleControls {
+        width: 100%;
+    }
+
+    .carousel-item {
+        width: 100%;
+    }
+
+    .carousel-item img {
+        width: 100%;
+        height: 365px;
+        object-fit: cover;
+    }
+
+    .announcementContent {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
 </style>
 
 <div class="col-lg-4 col-12 mt-4 mt-lg-0">
@@ -22,36 +42,36 @@
             @if($announcements->isEmpty())
                 <p class="no-announcement">Hal-hazırda aktiv elan yoxdur</p>
             @else
-                <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
-                    <div class="carousel-inner">
-                    @foreach($announcements as $index => $announcement)
-                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }} announcement-item data-announcement='@json($announcement)'"
-                                data-announcement='@json($announcement)'
-                                style="cursor:pointer;">
-                                @php
-                                    $image = $announcement->image 
-                                        ? asset('assets/images/announcements/' . $announcement->image) 
-                                        : 'https://static.thenounproject.com/png/1211233-200.png';
-                                @endphp
-                                <img class="d-block w-100" style="border-radius:5px;" src="{{ $image }}" alt="Slide {{ $index + 1 }}">
-                                <div class="carousel-caption d-md-block p-3"
-                                    style="border-radius:15px; background-color: rgba(125, 159, 246, 0.5);">
-                                    <h3 class="text-white">{{ $announcement->title }}</h3>
-                                    <p class="text-white">{{ $announcement->content }}</p>
-                                </div>
-                            </div>
-                        @endforeach
+                    <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            @foreach($announcements as $index => $announcement)
+                                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }} announcement-item data-announcement='@json($announcement)'"
+                                                data-announcement='@json($announcement)' style="cursor:pointer;">
+                                                @php
+                                                    $image = $announcement->image
+                                                        ? asset('assets/images/announcements/' . $announcement->image)
+                                                        : 'https://static.thenounproject.com/png/1211233-200.png';
+                                                @endphp
+                                                <img class="d-block w-100" style="border-radius:5px;" src="{{ $image }}"
+                                                    alt="Slide {{ $index + 1 }}">
+                                                <div class="carousel-caption d-md-block p-3"
+                                                    style="border-radius:15px; background-color: rgba(125, 159, 246, 0.5);">
+                                                    <h3 class="text-white announcementContent">{{ $announcement->title }}</h3>
+                                                    <p class="text-white announcementContent">{{ $announcement->content }}</p>
+                                                </div>
+                                            </div>
+                            @endforeach
 
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
                     </div>
-                    <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </div>
             @endif
         </div>
     </div>
