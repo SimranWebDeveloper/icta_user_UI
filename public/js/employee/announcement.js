@@ -1,14 +1,13 @@
 $(document).ready(function () {
-    $(document).on('click', '.announcement-item', function () {
-        const announcement = $(this).data('announcement');
-        const imageUrl = announcement.image 
+    $(document).on("click", ".announcement-item", function () {
+        const announcement = $(this).data("announcement");
+        const imageUrl = announcement.image
             ? `/assets/images/announcements/${announcement.image}`
-            : 'https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg';
+            : "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg";
 
         Swal.fire({
-            title: 'Elan Detalları',
-            html:
-                `<div class="card-body">
+            title: "Elan Detalları",
+            html: `<div class="card-body">
                     <div class="row announcement">
                         <div class="col-md-6 col-sm-12">
                             <div class="card image">
@@ -16,7 +15,7 @@ $(document).ready(function () {
                                     <h3>Şəkil</h3>
                                 </div>
                                 <div class="card-body d-flex justify-content-center h-50">
-                                    <img class="not-found-img w-50" src="${imageUrl}" alt="Image not available">
+                                    <img class="not-found-img" src="${imageUrl}" alt="Image not available">
                                 </div>
                             </div>
                         </div>
@@ -65,7 +64,7 @@ $(document).ready(function () {
                                         <h3>Məzmun</h3>
                                     </div>
                                     <div class="card-body">
-                                        <div class="textarea">
+                                        <div class="textarea" style="height:250px; overflow-y:scroll;text-align:start">
                                             ${announcement.content}
                                         </div>
                                     </div>
@@ -74,7 +73,7 @@ $(document).ready(function () {
                         </div>
                     </div>
                 </div>`,
-            showConfirmButton: true
+            showConfirmButton: true,
         });
     });
 });
