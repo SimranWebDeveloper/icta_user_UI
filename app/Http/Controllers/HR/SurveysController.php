@@ -30,50 +30,58 @@ class SurveysController extends Controller
 
         return view('hr.surveys.create', compact('departments', 'branches', 'users'));
     }
-    
+
     public function store(Request $request)
 {
-    $data = Surveys::create([
+    $survey = Surveys::create([
         "name" => $request->name,
         "expired_at" => $request->expired_at,
         "status" => $request->status,
         "is_anonym" => $request->is_anonym,
-        "priority" => $request->priority,   
-        // "target" => NULL    bu prop değişti, tablo oldu
+        "priority" => $request->priority,
     ]);
 
     if ($request->has('w_user_id')) {
         foreach ($request->input('w_user_id') as $userId) {
-            if (!SurveysUsers::where('surveys_id', $data->id)
+            if (!SurveysUsers::where('surveys_id', $survey->id)
                                ->where('users_id', $userId)
                                ->exists()) {
                 SurveysUsers::create([
-                    'surveys_id' => $data->id,
+                    'surveys_id' => $survey->id,
                     'users_id' => $userId,
                 ]);
             }
         }
     }
 
-    foreach ($request->question as $question_key => $test) {
-        $questionn = SurveysQuestions::create([
-            'surveys_id' => $data->id,
-            'question' => $test,
-            'input_type' => $request->input_type[$question_key] ?? null 
-        ]);
+    foreach ($request->question as $question_key => $question_value) {
+        $question_text = is_array($question_value) ? $question_value[0] : $question_value;
+        $input_type = isset($request->input_type[$question_key]) ? (is_array($request->input_type[$question_key]) ? $request->input_type[$question_key][0] : $request->input_type[$question_key]) : null;
 
-        if (!empty($request->answer_value[$question_key])) { 
-            foreach ($request->answer_value[$question_key] as $answer_key => $answer) {
-                $answerr = Answers::create([
-                    'surveys_questions_id' => $questionn->id,
-                    'name' => $answer,
-                ]);
+        if (isset($question_text) && !empty($question_text)) {
+            $question = SurveysQuestions::create([
+                'surveys_id' => $survey->id,
+                'question' => $question_text,
+                'input_type' => $input_type,
+            ]);
+
+            if (!empty($request->answer_value[$question_key])) {
+                foreach ($request->answer_value[$question_key] as $answer_text) {
+                    if (isset($answer_text) && !empty($answer_text)) {
+                        Answers::create([
+                            'surveys_questions_id' => $question->id,
+                            'name' => $answer_text,
+                        ]);
+                    }
+                }
             }
         }
     }
 
     return redirect()->route('hr.surveys.index')->with(['success' => 'Anket müvəffəqiyyətlə yaradıldı']);
 }
+
+
    
     public function show(string $id) 
     {
@@ -116,6 +124,7 @@ class SurveysController extends Controller
         'expired_at' => $request->expired_at,
         'status' => $request->status,
         'is_anonym' => $request->is_anonym,
+        'priority' => $request->priority,
     ]);
 
     $questions_id = $survey->surveys_questions()->pluck('id')->toArray();
@@ -127,19 +136,26 @@ class SurveysController extends Controller
 
     $survey->surveys_questions()->delete();
 
-    foreach ($request->question as $question_key => $question_text) {
-        $newQuestion = SurveysQuestions::create([
-            'surveys_id' => $survey->id,
-            'question' => $question_text,
-            'input_type' => $request->input_type[$question_key] ?? null 
-        ]);
+    foreach ($request->question as $question_key => $question_value) {
+        $question_text = is_array($question_value) ? $question_value[0] : $question_value;
+        $input_type = isset($request->input_type[$question_key]) ? (is_array($request->input_type[$question_key]) ? $request->input_type[$question_key][0] : $request->input_type[$question_key]) : null;
 
-        if (!empty($request->answer_value[$question_key])) {
-            foreach ($request->answer_value[$question_key] as $answer_text) {
-                Answers::create([
-                    'surveys_questions_id' => $newQuestion->id,
-                    'name' => $answer_text,
-                ]);
+        if (isset($question_text) && !empty($question_text)) {
+            $question = SurveysQuestions::create([
+                'surveys_id' => $survey->id,
+                'question' => $question_text,
+                'input_type' => $input_type,
+            ]);
+
+            if (!empty($request->answer_value[$question_key])) {
+                foreach ($request->answer_value[$question_key] as $answer_text) {
+                    if (isset($answer_text) && !empty($answer_text)) {
+                        Answers::create([
+                            'surveys_questions_id' => $question->id,
+                            'name' => $answer_text,
+                        ]);
+                    }
+                }
             }
         }
     }

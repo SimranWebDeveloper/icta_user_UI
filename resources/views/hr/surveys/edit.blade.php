@@ -81,7 +81,7 @@
                             <div class="col-md-6 col-lg-4 col-xl-3 form-group mb-3">
                                 <label for="subtitle" class="form-label">Vaciblik <span class="text-danger">*</span></label>
                                 <select name="priority" required id="priority" title="" class="form-control ">
-                                    <option value="" selected disabled>Elanın Görünməsini seçin</option>
+                                    <option value="" selected disabled>Elanın vacibliyini seçin</option>
                                     <option value="0" {{ $data->priority == '0' ? 'selected' : '' }}>Normal</option>
                                     <option value="1" {{ $data->priority == '1' ? 'selected' : '' }}>Önəmli</option>
                                 </select>
@@ -150,7 +150,7 @@
                                                             <li>                                          
 
                                                                 <p class="line-break-input disabled-div p-3 rounded border bg-gray-100"  style="width: 100%">{{ $answer->name }}</p>
-                                                                <input type="hidden"  name="answer_value[{{ $question->id }}][]" value="${{ $answer->name }}"/>
+                                                                <input type="hidden"  name="answer_value[{{ $question->id }}][]" value="{{ $answer->name }}"/>
 
                                                                 <!-- <button class="remove" onclick="removeSelf(this)" type="button">Delete</button> -->
                                                             </li>
@@ -382,13 +382,13 @@ if (questionType.value === 'textarea') {
     list.innerHTML = '';
     const li = document.createElement('li');
     li.innerHTML = `
-                <input type="hidden" name='answer_value[${cardId}][]' class="form-answer form-control" value="bos"/>
+                <input type="hidden" name='answer_value[${cardId}][]' class="form-answer form-control" value="boş"/>
             `;
 
     list.appendChild(li);
     todoContent.classList.add('disabled-div');
-    // input.value = '';
     input.removeAttribute('required');
+    input.value = '';
     
 } else {
     todoContent.classList.remove('disabled-div');
