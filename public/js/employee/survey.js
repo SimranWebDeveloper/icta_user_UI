@@ -1,17 +1,13 @@
 $(document).ready(function () {
     const surveys = window.surveyData;
-    const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
-    const metaContent = document.querySelector('meta[name="csrf-token"]').content
-    
-    console.log(baseUrl);
-    
+    const surveyStoreUrl = window.surveyStoreUrl; // URL-i dəyişkəndən əldə edin
+    const csrfToken = window.csrfToken; // CSRF tokeni dəyişkəndən əldə edin
+
     if (surveys && surveys.length > 0) {
         surveys.forEach(survey => {
             if (survey.priority === 1) {
                 // Trigger the popup on page load for high priority surveys
                 showSurveyPopup(survey, false);
-                console.log(survey);
-                
             }
         });
     } else {
@@ -39,14 +35,12 @@ $(document).ready(function () {
                 const inputs = form.querySelectorAll('input, textarea');
 
                 inputs.forEach(input => {
-
-                    if(input.type !== 'hidden'){
+                    if (input.type !== 'hidden') {
                         if ((input.type === 'radio' || input.type === 'checkbox') && !input.checked) {
                             const name = input.name;
                             const options = document.querySelectorAll(`[name="${name}"]`);
                             const isChecked = Array.from(options).some(option => option.checked);
-                            
-    
+
                             if (!isChecked) {
                                 allAnswered = false;
                                 showError(input);
@@ -85,7 +79,6 @@ $(document).ready(function () {
     }
 
     function removeError(input) {
-        
         const parent = input.closest('.card-body');
         const errorText = parent.querySelector('.error-text');
         if (errorText) {
@@ -105,7 +98,7 @@ $(document).ready(function () {
                 question.answers.forEach(option => {
                     optionsHtml += `
                       <div class="answers d-flex form-check">
-                          <input class="form-check-input" type="radio" value="${option.name}" name="question[${question.id}] id="option_${index}_${option.id}" required />
+                          <input class="form-check-input" type="radio" value="${option.name}" name="question[${question.id}]" id="option_${index}_${option.id}" required />
                           <label class="w-100" for="option_${index}_${option.id}">${option.name}</label>
                       </div>
                   `;
@@ -142,13 +135,11 @@ $(document).ready(function () {
           `;
         });
 
-
-
         return `
           <div class="pt-4 custom-container bg-white">
               <div class="row">
                   <div class="col-12">
-                      <form id="surveyForm" action='${baseUrl}/employee/surveys/store' method="POST">
+                      <form id="surveyForm" action="${surveyStoreUrl}" method="POST">
                         <input name="_token" value="${csrfToken}" type="hidden">
                           <div class="card">
                               <div class="card-header">
