@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Branches;
 use App\Models\MeetingsUsers;
 use App\Models\Rooms;
+use Carbon\Carbon;
 
 
 use App\Http\Controllers\Controller;
@@ -34,25 +35,54 @@ class MeetingsController extends Controller
 }
 
 public function store(Request $request)
-{
-    $data = $request->all();
-    $meeting = Meetings::create($data);
+    {
+        $data = $request->all();
+        $startDateTime = Carbon::parse($data['start_date_time']);
+        $duration = $data['duration']; // Длительность в минутах
+        $endDateTime = $startDateTime->copy()->addMinutes($duration);
+        $roomId = $data['rooms_id']; // ID комнаты из запроса
 
-    if ($request->has('w_user_id')) {
-        foreach ($request->input('w_user_id') as $userId) {
-            if (!MeetingsUsers::where('meetings_id', $meeting->id)
-                               ->where('users_id', $userId)
-                               ->exists()) {
-                MeetingsUsers::create([
-                    'meetings_id' => $meeting->id,
-                    'users_id' => $userId,
-                ]);
+        // Проверка на пересечение встреч в той же комнате
+        $overlappingMeeting = Meetings::where('rooms_id', $roomId)
+            ->where(function ($query) use ($startDateTime, $endDateTime) {
+                $query->where(function ($subQuery) use ($startDateTime, $endDateTime) {
+                    $subQuery->where('start_date_time', '<', $endDateTime)
+                             ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$startDateTime]);
+                });
+            })
+            ->exists();
+
+        if ($overlappingMeeting) {
+            return redirect()->back()->with('error', 'В указанное время эта комната уже занята.');
+        }
+
+        // Создание новой встречи
+        $meeting = Meetings::create($data);
+
+        // Привязка пользователей к встрече
+        if ($request->has('w_user_id')) {
+            foreach ($request->input('w_user_id') as $userId) {
+                if (!MeetingsUsers::where('meetings_id', $meeting->id)
+                    ->where('users_id', $userId)
+                    ->exists()) {
+                    MeetingsUsers::create([
+                        'meetings_id' => $meeting->id,
+                        'users_id' => $userId,
+                    ]);
+                }
             }
         }
+
+        $text = $request->input('type') == 0 ? 'Встреча успешно создана' : 'Событие успешно создано';
+        return redirect()->route('hr.meetings.index')->with('success', $text);
     }
-    $text = $request->input('type') == 0 ? 'İclas müvəffəqiyyətlə yaradıldı' : 'Tədbir müvəffəqiyyətlə yaradıldı';
-    return redirect()->route('hr.meetings.index')->with('success', $text);
-}
+
+
+
+
+
+
+
    
     public function show(string $id)
     {
@@ -84,25 +114,48 @@ public function store(Request $request)
         return view('hr.meetings.edit', compact('meeting', 'departments', 'branches', 'users', 'user_departments', 'user_branches', 'meeting_users', 'rooms'));
     }
    
-public function update(Request $request, string $id)
-{
-    $meeting = Meetings::findOrFail($id);
-
-    $data = $request->all();
-    $meeting->update($data);
-    MeetingsUsers::where('meetings_id', $meeting->id)->delete();
-
-    if ($request->has('w_user_id')) {
-        foreach ($request->input('w_user_id') as $userId) {
-            MeetingsUsers::create([
-                'meetings_id' => $meeting->id,
-                'users_id' => $userId,
-            ]);
+    public function update(Request $request, string $id)
+    {
+        $meeting = Meetings::findOrFail($id);
+    
+        $data = $request->all();
+        $startDateTime = Carbon::parse($data['start_date_time']);
+        $duration = $data['duration']; // Assuming duration is in minutes
+        $endDateTime = $startDateTime->copy()->addMinutes($duration);
+        $roomId = $data['rooms_id']; // Assuming room_id is provided in the request
+    
+        // Check if the room is available during the given time
+        $conflictingMeeting = Meetings::where('rooms_id', $roomId)
+            ->where('id', '!=', $id) // Exclude current meeting
+            ->where(function($query) use ($startDateTime, $endDateTime) {
+                $query->whereBetween('start_date_time', [$startDateTime, $endDateTime])
+                      ->orWhereBetween('end_date_time', [$startDateTime, $endDateTime])
+                      ->orWhere(function ($query) use ($startDateTime, $endDateTime) {
+                          $query->where('start_date_time', '<=', $startDateTime)
+                                ->where('end_date_time', '>=', $endDateTime);
+                      });
+            })
+            ->exists();
+    
+        if ($conflictingMeeting) {
+            return redirect()->back()->withErrors('Selected room is already booked for the given time.');
         }
+    
+        $meeting->update($data);
+        MeetingsUsers::where('meetings_id', $meeting->id)->delete();
+    
+        if ($request->has('w_user_id')) {
+            foreach ($request->input('w_user_id') as $userId) {
+                MeetingsUsers::create([
+                    'meetings_id' => $meeting->id,
+                    'users_id' => $userId,
+                ]);
+            }
+        }
+        $text = $data['type'] == 0 ? 'İclas məlumatları müvəffəqiyyətlə dəyişdirildi' : 'Tədbir məlumatları müvəffəqiyyətlə dəyişdirildi';
+        return redirect()->route('hr.meetings.index')->with('success', $text);
     }
-    $text = $data['type'] == 0 ? 'İclas məlumatları müvəffəqiyyətlə dəyişdirildi' : 'Tədbir məlumatları müvəffəqiyyətlə dəyişdirildi';
-    return redirect()->route('hr.meetings.index')->with('success', $text);
-}
+    
     
 public function destroy(string $id)
     {
