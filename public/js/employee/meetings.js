@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $(document).on('click', '#meetings', function () {
+    $(document).on('click', '#meetingButton', function () {
         const meeting = $(this).data('meeting');
         let meetingTitle;
         
