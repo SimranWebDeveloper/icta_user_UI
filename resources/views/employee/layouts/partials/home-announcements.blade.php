@@ -27,7 +27,7 @@
                 <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner">
                         @foreach($announcements as $index => $announcement)
-                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }} announcement-item"
+                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }} announcement-item data-announcement='@json($announcement)'"
                                 data-announcement='@json($announcement)'
                                 style="cursor:pointer;">
                                 @php
