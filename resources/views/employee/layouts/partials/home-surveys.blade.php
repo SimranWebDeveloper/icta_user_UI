@@ -72,3 +72,14 @@
         </div>
     </div>
 </div>
+
+
+<script>
+
+    function showNecessarySurvey() {
+        window.surveyData = @json($surveys);
+    }
+
+    window.addEventListener("DOMContentLoaded", showNecessarySurvey());
+    
+</script>
