@@ -119,16 +119,13 @@ class MeetingsController extends Controller
     $roomId = $data['rooms_id'];
     $newStatus = $data['status'];
 
-    // Determine if the meeting status is being changed to active
     $statusChangedToActive = $meeting->status == 0 && $newStatus == 1;
     $statusChangedFromActive = $meeting->status == 1 && $newStatus == 0;
 
-    // Check for overlapping meetings if the status is being changed to active
     if ($statusChangedToActive || $statusChangedFromActive) {
-        // Check for overlapping active meetings
         $overlappingMeeting = Meetings::where('rooms_id', $roomId)
-            ->where('status', 1) // Check only active meetings
-            ->where('id', '!=', $id) // Exclude the current meeting
+            ->where('status', 1) 
+            ->where('id', '!=', $id) 
             ->where(function ($query) use ($startDateTime, $endDateTime) {
                 $query->where(function ($subQuery) use ($startDateTime, $endDateTime) {
                     $subQuery->where('start_date_time', '<', $endDateTime)
@@ -142,13 +139,10 @@ class MeetingsController extends Controller
         }
     }
 
-    // Update the meeting with the new data
     $meeting->update($data);
 
-    // Remove existing users associated with this meeting
     MeetingsUsers::where('meetings_id', $meeting->id)->delete();
 
-    // Add new users if provided
     if ($request->has('w_user_id')) {
         foreach ($request->input('w_user_id') as $userId) {
             MeetingsUsers::create([
@@ -158,7 +152,6 @@ class MeetingsController extends Controller
         }
     }
 
-    // Prepare success message
     $text = $data['type'] == 0 ? 'İclas məlumatları müvəffəqiyyətlə dəyişdirildi' : 'Tədbir məlumatları müvəffəqiyyətlə dəyişdirildi';
     return redirect()->route('hr.meetings.index')->with('success', $text);
 }
