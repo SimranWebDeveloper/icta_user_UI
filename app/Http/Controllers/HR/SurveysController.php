@@ -124,6 +124,7 @@ class SurveysController extends Controller
         'expired_at' => $request->expired_at,
         'status' => $request->status,
         'is_anonym' => $request->is_anonym,
+        'priority' => $request->priority,
     ]);
 
     $questions_id = $survey->surveys_questions()->pluck('id')->toArray();

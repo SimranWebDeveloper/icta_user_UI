@@ -76,7 +76,7 @@
                         <div class="col-md-6 col-lg-4 col-xl-3 form-group mb-3">
                             <label for="subtitle" class="form-label">Vaciblik <span class="text-danger">*</span></label>
                             <select name="priority" required id="priority" title="" class="form-control ">
-                                <option value="" selected disabled>Elanın Görünməsini seçin</option>
+                                <option value="" selected disabled>Elanın vacibliyini seçin</option>
                                 <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Normal</option>
                                 <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Önəmli</option>
                             </select>
@@ -348,7 +348,7 @@
             list.innerHTML = '';
             const li = document.createElement('li');
             li.innerHTML = `
-                        <input type="hidden" name='answer_value[${cardId}][]' class="form-answer form-control" value="bos"/>
+                        <input type="hidden" name='answer_value[${cardId}][]' class="form-answer form-control" value="boş"/>
                     `;
 
             list.appendChild(li);
