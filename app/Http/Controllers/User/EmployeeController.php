@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Meetings;
 use App\Models\MeetingsUsers;
+use App\Models\SurveysQuestions;
 use App\Models\SurveysUsers;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Announcements;
 use App\Models\Surveys;
 use App\Models\UsersAnswers;
+use Illuminate\Support\Arr;
+
 
 
 
@@ -24,9 +27,12 @@ class EmployeeController extends Controller
         $announcements = Announcements::where('status', 1) -> get();
         $meetings_users = MeetingsUsers::where('users_id', $user->id)->pluck('meetings_id'); 
         $meetings = Meetings::whereIn('id', $meetings_users)->where('status', 1)->with('rooms')->get();
-        $surveys_users = SurveysUsers::where('users_id', $user->id)->pluck('surveys_id'); 
-        $surveys = Surveys::whereIn('id', $surveys_users)->where('status', 1)->with('surveys_questions.answers')->get();
-            return view('employee.home', compact('announcements', 'meetings','surveys'));
+        // $surveys_users = SurveysUsers::where('users_id', $user->id)->pluck('surveys_id'); 
+        $surveys_users = SurveysUsers::with('surveys')->where('users_id', $user->id)->get();
+
+        $surveys = Surveys::whereIn('id', Arr::flatten($surveys_users))->where('status', 1)->with('surveys_questions.answers')->get();
+
+        return view('employee.home', compact('announcements', 'meetings','surveys', 'surveys_users'));
     }
 
     public function profile()
@@ -71,15 +77,38 @@ class EmployeeController extends Controller
     {
         $userId = auth()->user()->id; 
 
-        foreach ($request['questions'] as $question) {
-            UsersAnswers::create([
-                'users_id' => $userId,
-                'surveys_id' => $request['survey_id'],
-                'surveys_questions_id' => $question['question_id'],
-                'answer' => $question['answer'],
-            ]);
+        foreach ($request->question as $question_key => $question) {
+            if(is_array($question)) {
+                foreach($question as $answer)
+                {
+                    $userAnswer = UsersAnswers::create([
+                        'users_id' => $userId,
+                        'surveys_id' => SurveysQuestions::find($question_key)->surveys->id,
+                        'surveys_questions_id' => $question_key,
+                        'answer' => $answer,
+                    ]);
+
+                    SurveysUsers::where('surveys_id',$userAnswer->surveys_id)->where('users_id',$userId)->update([
+                        'is_answered' => 1
+                    ]);
+
+                }
+            }
+            else {
+                $userAnswer = UsersAnswers::create([
+                    'users_id' => $userId,
+                    'surveys_id' => SurveysQuestions::find($question_key)->surveys->id,
+                    'surveys_questions_id' => $question_key,
+                    'answer' => $question,
+                ]);
+
+                SurveysUsers::where('surveys_id',$userAnswer->surveys_id)->where('users_id',$userId)->update([
+                    'is_answered' => 1
+                ]);
+            }
+            
         }
 
-        return view('employee.home');
+        return redirect()->route('employee.home')->with('success', 'Anket müvəffəqiyyətlə cavablandırıldı');
     }
 }

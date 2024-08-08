@@ -43,27 +43,37 @@
         <div class="card-header">Anketlər</div>
         <div class="card-body scrollable-content pt-0">
             <div class="row">
-                @foreach($surveys as $survey)
+                @foreach($surveys_users as $survey)
                     <div class="col-6 mt-4">
                         <div class="card">
-                            <div class="card-header text-center name">{{ $survey->name }}</div>
+                            <div class="card-header text-center name">{{ $survey->surveys->name }}</div>
                             <div class="card-body">
                                 <div>
                                     <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
                                     <p class="m-0">
-                                        {{ \Carbon\Carbon::parse($survey->expired_at)->format('d-m-Y H:i') }}
+                                        {{ \Carbon\Carbon::parse($survey->surveys->expired_at)->format('d-m-Y H:i') }}
                                     </p>
                                 </div>
                                 <div class="mt-3">
-                                    @if ($survey->priority == 1)
+                                    @if ($survey->surveys->priority == 1)
                                         <p class="important">Önəmli</p>
                                     @else
                                         <p class="normal">Normal</p>
                                     @endif
                                 </div>
+
+                                @if ($survey->is_answered == 1)
+                                <button class="btn btn-success btn-md mt-3 surveyButton" data-survey='@json($survey)'>
+                                    Cavablandirilib
+                                </button>
+                                @else
                                 <button class="btn btn-success btn-md mt-3 surveyButton" data-survey='@json($survey)'>
                                     Cavabla
                                 </button>
+                                @endif
+
+                                
+                                
                             </div>
                         </div>
                     </div>
@@ -71,10 +81,24 @@
             </div>
         </div>
     </div>
+
+    <form action="">
+
+    @csrf
+    <button type="submit">Submit</button>
+    </form>
+
+    <form action="">
+
+@csrf
+<button type="submit">Submit2</button>
+</form>
 </div>
 
 
 <script>
+
+    const csrfToken = '{{ csrf_token() }}';
 
     function showNecessarySurvey() {
         window.surveyData = @json($surveys);
