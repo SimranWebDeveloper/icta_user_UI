@@ -12,9 +12,7 @@
         color: #666;
         text-align: center;
     }
-    .carousel-caption{
-        margin: 20px;
-    }
+   
 </style>
 
 <div class="col-lg-4 col-12 mt-4 mt-lg-0">
@@ -26,8 +24,8 @@
             @else
                 <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner">
-                        @foreach($announcements as $index => $announcement)
-                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }} announcement-item"
+                    @foreach($announcements as $index => $announcement)
+                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }} announcement-item data-announcement='@json($announcement)'"
                                 data-announcement='@json($announcement)'
                                 style="cursor:pointer;">
                                 @php
@@ -43,6 +41,7 @@
                                 </div>
                             </div>
                         @endforeach
+
                     </div>
                     <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
