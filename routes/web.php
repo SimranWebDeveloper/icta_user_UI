@@ -250,7 +250,8 @@ Route::middleware(['logLastUserActivity'])->group(function () {
         Route::post('/send-message', [EmployeeMessageController::class, 'sendMessage'])->name('messages.send');
         Route::post('/user-messages', [EmployeeMessageController::class, 'fetchMessages'])->name('messages.fetch');
         Route::resource('/brons', EmployeeBronsController::class);
-        Route::post('surveys/store', [EmployeeController::class,'submitSurvey'])->name('');
+        Route::post('submit-survey', [EmployeeController::class, 'submitSurvey'])->name('employee-submitSurvey');
+
 
     });
 
