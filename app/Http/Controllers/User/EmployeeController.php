@@ -22,18 +22,34 @@ use Illuminate\Support\Arr;
 class EmployeeController extends Controller
 {
     public function index()
-    {
-        $user = Auth::user();   
-        $announcements = Announcements::where('status', 1) -> get();
-        $meetings_users = MeetingsUsers::where('users_id', $user->id)->pluck('meetings_id'); 
-        $meetings = Meetings::whereIn('id', $meetings_users)->where('status', 1)->with('rooms')->get();
-        // $surveys_users = SurveysUsers::where('users_id', $user->id)->pluck('surveys_id'); 
-        $surveys_users = SurveysUsers::with('surveys')->where('users_id', $user->id)->get();
+{
+    $user = Auth::user();
 
-        $surveys = Surveys::whereIn('id', Arr::flatten($surveys_users))->where('status', 1)->with('surveys_questions.answers')->get();
+    // Retrieve announcements
+    $announcements = Announcements::where('status', 1)->get();
 
-        return view('employee.home', compact('announcements', 'meetings','surveys', 'surveys_users'));
-    }
+    // Retrieve meetings for the user
+    $meetings_users = MeetingsUsers::where('users_id', $user->id)->pluck('meetings_id');
+    $meetings = Meetings::whereIn('id', $meetings_users)->where('status', 1)->with('rooms')->get();
+
+    // Retrieve surveys and related data
+    $surveys_users = SurveysUsers::with('surveys')->where('users_id', $user->id)->get();
+    $surveyIds = Arr::flatten($surveys_users->pluck('surveys.id'));
+    $surveys = Surveys::whereIn('id', $surveyIds)->where('status', 1)->with('surveys_questions.answers')->get();
+
+    // Retrieve user answers
+    $userAnswers = UsersAnswers::where('users_id', $user->id)
+                                ->whereIn('surveys_id', $surveyIds)
+                                ->get()
+                                ->groupBy('surveys_id')
+                                ->mapWithKeys(function ($answers, $surveyId) {
+                                    return [$surveyId => $answers->keyBy('surveys_questions_id')];
+                                });
+
+    return view('employee.home', compact('announcements', 'meetings', 'surveys', 'surveys_users', 'userAnswers'));
+}
+
+
 
     public function profile()
     {
@@ -41,7 +57,7 @@ class EmployeeController extends Controller
         return view('employee.profile', compact('user'));
     }
 
-    public function update_profile (Request $request, $id)
+    public function update_profile(Request $request, $id)
     {
         $data = $request->all();
         $user = User::find($id);
@@ -61,7 +77,7 @@ class EmployeeController extends Controller
         $user->b_day = $request->b_day;
         $user->email = $request->email;
 
-        if($request->hasFile('avatar')) {
+        if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar');
             $filename = time() . '.' . $avatar->getClientOriginalExtension();
             $avatar->move('assets/images/avatars', $filename);
@@ -75,12 +91,12 @@ class EmployeeController extends Controller
 
     public function submitSurvey(Request $request)
     {
-        $userId = auth()->user()->id; 
+       
+        $userId = auth()->user()->id;
 
         foreach ($request->question as $question_key => $question) {
-            if(is_array($question)) {
-                foreach($question as $answer)
-                {
+            if (is_array($question)) {
+                foreach ($question as $answer) {
                     $userAnswer = UsersAnswers::create([
                         'users_id' => $userId,
                         'surveys_id' => SurveysQuestions::find($question_key)->surveys->id,
@@ -88,13 +104,12 @@ class EmployeeController extends Controller
                         'answer' => $answer,
                     ]);
 
-                    SurveysUsers::where('surveys_id',$userAnswer->surveys_id)->where('users_id',$userId)->update([
+                    SurveysUsers::where('surveys_id', $userAnswer->surveys_id)->where('users_id', $userId)->update([
                         'is_answered' => 1
                     ]);
 
                 }
-            }
-            else {
+            } else {
                 $userAnswer = UsersAnswers::create([
                     'users_id' => $userId,
                     'surveys_id' => SurveysQuestions::find($question_key)->surveys->id,
@@ -102,11 +117,11 @@ class EmployeeController extends Controller
                     'answer' => $question,
                 ]);
 
-                SurveysUsers::where('surveys_id',$userAnswer->surveys_id)->where('users_id',$userId)->update([
+                SurveysUsers::where('surveys_id', $userAnswer->surveys_id)->where('users_id', $userId)->update([
                     'is_answered' => 1
                 ]);
             }
-            
+
         }
 
         return redirect()->route('employee.home')->with('success', 'Anket müvəffəqiyyətlə cavablandırıldı');
