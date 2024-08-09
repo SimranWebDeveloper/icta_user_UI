@@ -55,8 +55,8 @@
         @endif
         <li class="nav-item " data-item="">
             <a class="nav-item-hold" href="{{route('employee.brons.index')}}">
-                <i class="fa-thin fa-floppy-disk nav-icon" style="color: #000000;"></i>
-                <span class="nav-text">Otaq bronu</span>
+                <i class="fa-thin fa-clipboard-list-check nav-icon" style="color: #000000;"></i> <span
+                    class="nav-text">Otaq bronu</span>
             </a>
             <div class="triangle"></div>
         </li>
