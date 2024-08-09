@@ -19,9 +19,28 @@ class MeetingsController extends Controller
 
     public function index()
     {
-        $meetings = Meetings::with('rooms')->get();
+        $meetings = Meetings::with('rooms')->whereIn('type', [0, 1])->get();
+        $now = Carbon::now();
+    
+        foreach ($meetings as $meeting) {
+            // Приводим время встречи к локальному часовому поясу
+            $startDateTime = Carbon::parse($meeting->start_date_time)->subHours(4); // Добавляем 4 часа
+            $duration = $meeting->duration;
+            $endDateTime = $startDateTime->copy()->addMinutes($duration);
+    
+            // Дебаг, чтобы убедиться, что время корректное
+          
+    
+            // Если текущее время больше или равно времени окончания встречи, обновляем статус на 0
+            if ($endDateTime->lessThanOrEqualTo($now)) {
+                $meeting->update(['status' => 0]);
+            }
+        }
+    
         return view('hr.meetings.index', compact('meetings'));
     }
+    
+    
 
     public function create()
     {
