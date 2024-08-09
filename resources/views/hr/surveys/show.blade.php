@@ -10,6 +10,10 @@
 
     }
 
+    .employeeAnswerModal .swal2-popup {
+        width: 80%;
+    }
+
     #list-item {
         list-style: none;
     }
@@ -176,7 +180,9 @@
 
                                             <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-xl-0">
                                                 @foreach($users as $index => $user)
-                                                    <h5 class="mt-1 mb-1 mt-xl-0 mb-xl-0">{{ $user->name }}</h5>
+                                                    <h5 style="cursor: pointer" class="mt-1 mb-1 mt-xl-0 mb-xl-0"
+                                                        id="employeeAnswer">{{ $user->name }}
+                                                    </h5>
                                                     {{ $index < count($users) - 1 ? ', ' : '' }}
                                                 @endforeach
                                             </div>
@@ -246,6 +252,183 @@
                 }
             })
         })
+
+
+
+
+
+        $("#employeeAnswer").on("click", function () {
+
+            Swal.fire({
+                title: 'Istifadeci cavablari',
+                html: ` <div class="row mb-4 w-100">
+                <div class="col-md-12">
+                     <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <ul class="m-0 p-0">
+                                        <li id="list-item">
+                                            @if ($survey->status == 0)
+                                                <button class="btn btn-danger text-white">
+                                                    Deaktiv
+                                                </button>
+                                            @elseif ($survey->status == 1)
+                                                <button class="btn btn-success text-white">
+                                                    Aktiv
+                                                </button>
+                                            @elseif ($survey->status == 2)
+                                                <button class="btn btn-warning text-white">
+                                                    Gözləmə
+                                                </button>
+                                            @endif
+                                        </li>
+                                    </ul>
+                                    <h3 class="ml-3 mt-0 mb-0 mr-0">{{ $survey->name }}</h3>
+                                </div>
+                                <a href="{{route('hr.surveys.index')}}">
+                                    <button class="btn btn-danger">
+                                        <span class="me-2">
+                                            <i class="nav-icon i-Arrow-Back-2"></i>
+                                        </span>
+                                        Anketler
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @foreach($survey->surveys_questions as $question)
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="card mb-4">
+                                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                                <h3 class="m-0">{{ $loop->iteration }}.</h3>
+                                                <h3 class="m-0">{{ $question->question }}</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                @if($question->input_type == 'checkbox')
+                                                    <ul class="list-group-custom">
+                                                        @foreach($question->answers as $answer)
+                                                            <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                                                <div class="checkbox-wrapper d-flex">
+                                                                    <!-- <input type="checkbox" disabled> -->
+                                                                    <!-- <i class="fa-light fa-square-check "                           style="color: #000000;"></i> -->
+                                                                    <!-- <i class="fa-duotone fa-solid fa-square-check text-50"></i> -->
+                                                                    <i class="fa-thin fa-square-check"
+                                                                        style='font-size: 40px; color:#C7C8CC'></i>
+                                                                    <!-- <i class="fa-thin fa-square-check text-50" style="color: #000000;"></i> -->
+                                                                </div>
+                                                                <div class="label-wrapper w-100 text-center"
+                                                                    style="border-radius: 2.25rem;">
+                                                                    <label class="d-flex justify-content-center align-items-center">
+                                                                        {{ $answer->name }}
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @elseif($question->input_type == 'radio')
+                                                    <ul class="list-group-custom">
+                                                        @foreach($question->answers as $answer)
+                                                            <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                                                <div class="checkbox-wrapper d-flex">
+                                                                    <i class="fa-sharp fa-thin fa-circle-dot"
+                                                                        style='font-size: 40px; color:#C7C8CC'></i>
+                                                                    <!-- <i class="fa-sharp-duotone fa-solid fa-circle-dot text-50"></i> -->
+                                                                    <!-- <input type="radio" disabled name="question_{{ $question->id }}"> -->
+                                                                </div>
+                                                                <div class="label-wrapper w-100 text-center"
+                                                                    style="border-radius: 2.25rem;">
+                                                                    <label class="d-flex justify-content-center align-items-center">
+                                                                        {{ $answer->name }}
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @elseif($question->input_type == 'textarea')
+                                                    <div class="form-floating">
+                                                        <textarea rows="7" cols="10" class="form-control" disabled></textarea>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3>İştirakçılar</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            @php
+                                                $groupedParticipants = $users->groupBy(function ($user) {
+                                                    return $user->departments_id . '-' . $user->branches_id;
+                                                });
+                                            @endphp
+
+                                            @foreach($groupedParticipants as $group => $users)
+                                                <div class="d-xl-flex mt-3 align-items-start">
+                                                    <h3 class="col-xl-2 m-0">
+                                                        {{ $departments[$users->first()->departments_id] ?? 'Bilinməyən departament' }}
+                                                    </h3>
+
+                                                    <h4 class="col-xl-2 mb-0 mt-2 mt-xl-0">
+                                                        {{ $branches[$users->first()->branches_id] ?? 'Bilinməyən şöbə' }}
+                                                    </h4>
+
+                                                    <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-xl-0">
+                                                        @foreach($users as $index => $user)
+                                                            <h5 style="cursor: pointer" class="mt-1 mb-1 mt-xl-0 mb-xl-0" id="employeeAnswer">{{ $user->name }}
+                                                            </h5>
+                                                            {{ $index < count($users) - 1 ? ', ' : '' }}
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                                @if (!$loop->last)
+                                                    <hr class="hr" />
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <a href="{{route('hr.surveys.edit', $survey->id)}}">
+                                <button class="btn btn-info btn-lg">
+                                    <span class="me-2 ">
+                                        <i class="nav-icon i-Pen-2 font-weight-bold"></i>
+                                    </span>
+                                    Düzəliş et
+                                </button>
+                            </a>
+                            <a href="#" class="delete-item" data-id="{{ $survey->id }}">
+                                <button class="btn btn-danger btn-lg">
+                                    <span class="me-2">
+                                        <ion-icon name="trash-outline"></ion-icon>
+                                    </span>
+                                    Sil
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div> `,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'swal2-popup', // Ensures that only this modal has the specific width
+                    container: 'employeeAnswerModal' // Custom class to differentiate this modal
+                }
+            });
+
+        });
+
+
     })
 </script>
 @endsection
