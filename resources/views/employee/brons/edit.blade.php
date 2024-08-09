@@ -5,7 +5,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h3 class="m-0">
                        <span class="text-capitalize">
-                       Bron                       </span>
+                        {{$meeting->subject}}                       </span>
                         redaktə et
                     </h3>
                     <a href="{{ route('employee.brons.index') }}">
@@ -28,13 +28,13 @@
                     </ul>
                 </div>
             @endif
-                <form method="POST" id="form" action="{{ route('employee.brons.update', 1) }}">
+                <form method="POST" id="form" action="{{ route('employee.brons.update', $meeting->id) }}">
                     @csrf
                     @method('PUT')
                     <div class="row">
                         <div class="col-md-6 form-group mb-3">
                             <div class="select_label ui sub header">Mövzu</div>
-                            <input required type="text" name="subject" value=""
+                            <input required type="text" name="subject" value="{{ old('subject', $meeting->subject) }}"
                                 class="form-control">
                             @error('subject')
                                 <span class="text-danger">{{ $message }}</span>
@@ -53,9 +53,11 @@
                         <div class="col-md-6 form-group mb-3">
                             <div class="select_label ui sub header">Otaq nömrəsi</div>
                             <select required id="room" name="rooms_id" class="form-control ui fluid">
-                                    <option value="" selected>
-                                        otaq 1
-                                    </option>  
+                                @foreach ($rooms as $room)
+                                <option value="{{ $room->id }}" {{ old('rooms_id', $meeting->rooms_id) == $room->id ? 'selected' : '' }}>
+                                    {{ $room->name }}
+                                </option>
+                            @endforeach
                             </select>
                             @error('rooms_id')
                                 <span class="text-danger">{{ $message }}</span>
@@ -65,8 +67,8 @@
                             <div class="select_label ui sub header">Tarix <span class="text-danger">*</span></div>
                             <input type="text" id="date-time-picker" name="start_date_time" required
                                 class="form-control" style="background: #f8f9fa;" placeholder="Başlama tarixini seçin"
-                                min=""
-                                value="">
+                                min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
+                                value="{{ $meeting->start_date_time }}">
                             @error('start_date_time')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -75,7 +77,7 @@
                             <div class="select_label ui sub header">Müddət (dəq)</div>
                             <select id="duration" required name="duration" class="form-control ui fluid">
                                 @foreach ([15, 30, 60, 90] as $duration)
-                                    <option value="{{ $duration }}" selected>
+                                    <option value="{{ $duration }}" {{ old('duration', $meeting->duration) == $duration ? 'selected' : '' }}>
                                         {{ $duration }}
                                     </option>
                                 @endforeach
@@ -88,7 +90,7 @@
                         <div class="col-md-12 form-group mb-3">
                             <div class="select_label ui sub header">Məzmun</div>
                             <textarea rows="6" name="content" required
-                                class="form-control">salam</textarea>
+                                class="form-control">{{ old('content', $meeting->content) }}</textarea>
                             @error('content')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -111,27 +113,33 @@
                                     <div class="row">
                                         <div class="col-4">
                                             <h3>Departament</h3>
-                                            <label class="checkbox checkbox-primary">
-                                                <input type="checkbox" class="report-departments"
-                                                    name="w_departments_id[]" value="1">
-                                                <span><strong>İT</strong> (Şöbə:
-                                                    3, İşçi:
-                                                    10)</span>
-                                                <span class="checkmark"></span>
-                                            </label>
+                                            @foreach ($departments as $department)
+                                                <label class="checkbox checkbox-primary">
+                                                    <input type="checkbox" class="report-departments" {{ in_array($department->id, $user_departments) ? 'checked' : '' }} name="w_departments_id[]"
+                                                        value="{{ $department->id }}">
+                                                    <span><strong>{{ $department->name }}</strong> (Şöbə:
+                                                        {{ $department->branches_count }}, İşçi:
+                                                        {{ $department->users_count }})</span> <span
+                                                        class="checkmark"></span>
+                                                </label>
+                                            @endforeach
                                         </div>
                                         <div class="col-8">
                                             <h3>Şöbə</h3>
                                             <div class="row">
-                                                <div class="col-4">
-                                                    <label class="checkbox checkbox-primary">
-                                                        <input type="checkbox" class="report-branches"
-                                                            data-department-id="1" name="w_branch_id[]" value="1">
-                                                        <span><strong>İT</strong> (İşçi:
-                                                            5)</span>
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </div>
+                                                @foreach ($branches as $branch)
+                                                    <div class="col-4">
+                                                        <label class="checkbox checkbox-primary">
+                                                            <input type="checkbox" class="report-branches"
+                                                                data-department-id="{{ !is_null($branch->departments) ? $branch->departments->id : '' }}"
+                                                                {{ in_array($branch->id, $user_branches) ? 'checked' : '' }} name="w_branch_id[]"
+                                                                value="{{ $branch->id }}">
+                                                            <span><strong>{{ $branch->name }}</strong> (İşçi:
+                                                                {{ $branch->users_count }})</span>
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                @endforeach
                                             </div>
                                         </div>
                                     </div>
@@ -140,14 +148,19 @@
                                         <div class="col-12 mt-2">
                                             <h3>İşçilər</h3>
                                             <div class="row">
-                                                <div class="col-4 mt-4">
-                                                    <label class="checkbox checkbox-primary">
-                                                        <input type="checkbox" data-branch-id="1" data-department-id="1"
-                                                            class="report-users" name="w_user_id[]" value="1">
-                                                        <span>Salam</span>
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </div>
+                                                @foreach ($users as $user)
+                                                    <div class="col-4 mt-4">
+                                                        <label class="checkbox checkbox-primary">
+                                                            <input type="checkbox"
+                                                                data-branch-id="{{ !is_null($user->branches) ? $user->branches->id : '' }}"
+                                                                data-department-id="{{ !is_null($user->departments) ? $user->departments->id : '' }}"
+                                                                class="report-users" {{ in_array($user->id, $meeting_users) ? 'checked' : '' }}
+                                                                name="w_user_id[]" value="{{ $user->id }}">
+                                                            <span>{{ $user->name }}</span>
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                @endforeach
                                             </div>
                                         </div>
                                     </div>

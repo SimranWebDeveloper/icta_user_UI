@@ -76,7 +76,7 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
-                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">Subject <span
+                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">${event.subject} <span
                                 class="text-lowercase">
                                 haqqında Rezerv
                             </span>
@@ -97,7 +97,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                        subject
+                                        ${event.subject}
                                     </li>
                                 </ul>
                             </div>
@@ -111,7 +111,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                       otaq nomrəsi
+                                       ${event.room_number}
                                     </li>
                                 </ul>
                             </div>
@@ -125,7 +125,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                    2024-08-09 07:08:00
+                                        ${moment(event.start).format('DD-MM-YYYY HH:mm')}
                                     </li>
                                 </ul>
                             </div>
@@ -139,7 +139,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                        30 dəq
+                                        ${event.duration} dəq
                                     </li>
                                 </ul>
                             </div>
@@ -153,7 +153,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                        content
+                                        ${event.contect}
                                     </li>
                                 </ul>
                             </div>
@@ -165,23 +165,9 @@
                                 <h3>İştirakçılar</h3>
                             </div>
                             <div class="card-body">
-                               
-
-                                    <div class="d-xl-flex mt-3 align-items-start">
-                                        <h3 class="col-xl-2 m-0">
-                                            Bilinməyən departament
-                                        </h3>
-
-                                        <h4 class="col-xl-2 mb-0 mt-2 mt-md-0">
-                                            Bilinməyən şöbə
-                                        </h4>
-
-                                        <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
-                                                <h5 class="mt-1 mb-1 mt-md-0 mb-md-0">name</h5>
-                                        </div>
-                                    </div>
-                                        <hr class="hr" />
+                                //burda olacaq 
                             </div>
+
 
                         </div>
                     </div>
@@ -197,7 +183,7 @@
                         cancelButtonColor: 'red'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = '{{ route('employee.brons.edit', 1) }}';
+                            window.location.href = `{{ route('employee.brons.edit', ['bron' => ':id']) }}`.replace(':id', event.id);
                         }
                     });
                 },
@@ -214,263 +200,28 @@
                     today: "Bu gün"
                 },
                 events: [
+                    @foreach ($meetings as $meeting)
                     {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
+                        title: "{{ $meeting->subject }}",
+                        start: "{{ $meeting->start_date_time }}",
+                        end: moment("{{ $meeting->start_date_time }}").add({{ $meeting->duration }}, 'minutes').format('YYYY-MM-DDTHH:mm'),
                         color: 'green',
                         textColor: 'white',
+                        subject: "{{ $meeting->subject }}",
+                        room_number: "{{ $meeting->rooms->name ?? 'Bilinmeyen Otaq' }}",
+                        duration: "{{ $meeting->duration }}",
+                        content: "{{ $meeting->content }}",
+                        participants: {!! json_encode($meeting->participants->pluck('name')->toArray()) !!},
+                        department: "{{ $meeting->department->name ?? 'Bilinmeyen Departament' }}",
+                        branch: "{{ $meeting->branch->name ?? 'Bilinmeyen Branch' }}",
+                        id: "{{ $meeting->id }}"
+
                     },
-                    {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    }, {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    }, {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    }, {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    }, {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    }, {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    }, {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    }, {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    }, {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    }, {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    }, {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    }, {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    },
-                    {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
-                        color: 'green',
-                        textColor: 'white',
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-07T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    },
+                    @endforeach
                 ],
-                timeFormat: 'H(:mm)',
+
+
+                timeFormat: 'HH:mm',
 
                 // dayRender: function (date, cell) {
                 //     let newDate = $.fullCalendar.formatDate(date, 'DD-MM-YYYY');
