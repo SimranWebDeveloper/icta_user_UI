@@ -1,5 +1,7 @@
 $(document).ready(function () {
     const surveys = window.surveyData;
+    const surveyStoreUrl = window.surveyStoreUrl; // URL-i dəyişkəndən əldə edin
+    const csrfToken = window.csrfToken; // CSRF tokeni dəyişkəndən əldə edin
 
     if (surveys && surveys.length > 0) {
         surveys.forEach(survey => {
@@ -33,22 +35,24 @@ $(document).ready(function () {
                 const inputs = form.querySelectorAll('input, textarea');
 
                 inputs.forEach(input => {
-                    if ((input.type === 'radio' || input.type === 'checkbox') && !input.checked) {
-                        const name = input.name;
-                        const options = document.querySelectorAll(`[name="${name}"]`);
-                        const isChecked = Array.from(options).some(option => option.checked);
+                    if (input.type !== 'hidden') {
+                        if ((input.type === 'radio' || input.type === 'checkbox') && !input.checked) {
+                            const name = input.name;
+                            const options = document.querySelectorAll(`[name="${name}"]`);
+                            const isChecked = Array.from(options).some(option => option.checked);
 
-                        if (!isChecked) {
+                            if (!isChecked) {
+                                allAnswered = false;
+                                showError(input);
+                            } else {
+                                removeError(input);
+                            }
+                        } else if (input.type === 'textarea' && !input.value.trim()) {
                             allAnswered = false;
                             showError(input);
                         } else {
                             removeError(input);
                         }
-                    } else if (input.type === 'textarea' && !input.value.trim()) {
-                        allAnswered = false;
-                        showError(input);
-                    } else {
-                        removeError(input);
                     }
                 });
 
@@ -94,7 +98,7 @@ $(document).ready(function () {
                 question.answers.forEach(option => {
                     optionsHtml += `
                       <div class="answers d-flex form-check">
-                          <input class="form-check-input" type="radio" name="question_${index}" id="option_${index}_${option.id}" required />
+                          <input class="form-check-input" type="radio" value="${option.name}" name="question[${question.id}]" id="option_${index}_${option.id}" required />
                           <label class="w-100" for="option_${index}_${option.id}">${option.name}</label>
                       </div>
                   `;
@@ -103,7 +107,7 @@ $(document).ready(function () {
                 question.answers.forEach(option => {
                     optionsHtml += `
                       <div class="answers d-flex form-check">
-                          <input class="form-check-input" type="checkbox" name="question_${index}[]" id="option_${index}_${option.id}" />
+                          <input class="form-check-input" type="checkbox" value="${option.name}" name="question[${question.id}][]" id="option_${index}_${option.id}" />
                           <label class="w-100" for="option_${index}_${option.id}">${option.name}</label>
                       </div>
                   `;
@@ -111,7 +115,7 @@ $(document).ready(function () {
             } else if (question.input_type === 'textarea') {
                 optionsHtml = `
                   <div>
-                      <textarea rows="7" cols="10" class="form-control" name="question_${index}" required></textarea>
+                      <textarea rows="7" cols="10" class="form-control" name="question[${question.id}]" required></textarea>
                   </div>
               `;
             }
@@ -135,7 +139,8 @@ $(document).ready(function () {
           <div class="pt-4 custom-container bg-white">
               <div class="row">
                   <div class="col-12">
-                      <form id="surveyForm">
+                      <form id="surveyForm" action="${surveyStoreUrl}" method="POST">
+                        <input name="_token" value="${csrfToken}" type="hidden">
                           <div class="card">
                               <div class="card-header">
                                   <div class="d-flex justify-content-between align-items-center">

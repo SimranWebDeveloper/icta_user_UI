@@ -1,5 +1,3 @@
-
-
 <div class="sidebar-left open rtl-ps-none" data-perfect-scrollbar data-suppress-scroll-x="true">
     <ul class="navigation-left">
         <li class="nav-item " data-item="">
@@ -46,88 +44,86 @@
             </li>
         @endif
 
-       @if($general_settings->ticket_module == 1)
-       <li class="nav-item">
-            <a class="nav-item-hold" href="{{ route('employee.tickets.index') }}">
-                <i class="nav-icon i-Ticket"></i>
-                <span class="nav-text">Texniki dəstək</span>
+        @if($general_settings->ticket_module == 1)
+            <li class="nav-item">
+                <a class="nav-item-hold" href="{{ route('employee.tickets.index') }}">
+                    <i class="nav-icon i-Ticket"></i>
+                    <span class="nav-text">Texniki dəstək</span>
+                </a>
+                <div class="triangle"></div>
+            </li>
+        @endif
+        <li class="nav-item " data-item="">
+            <a class="nav-item-hold" href="{{route('employee.brons.index')}}">
+                <i class="fa-thin fa-clipboard-list-check nav-icon" style="color: #000000;"></i> <span
+                    class="nav-text">Otaq bronu</span>
             </a>
             <div class="triangle"></div>
         </li>
-       @endif
     </ul>
 </div>
 
 <div class="sidebar-left-secondary rtl-ps-none" data-perfect-scrollbar data-suppress-scroll-x="true">
     <!-- Submenu Dashboards -->
-{{--    <ul class="childNav" data-parent="dashboard-department">--}}
-{{--        <li class="nav-item ">--}}
-{{--            <a class=""--}}
-{{--               href="{{ route('employee.departments.index') }}">--}}
-{{--                <i class="nav-icon i-Cash-register-2"></i>--}}
-{{--                <span class="item-name">Departamentlər</span>--}}
-{{--            </a>--}}
-{{--        </li>--}}
-{{--        <li class="nav-item ">--}}
-{{--            <a class=""--}}
-{{--               href="{{ route('employee.branches.index') }}">--}}
-{{--                <i class="nav-icon i-Cash-register-2"></i>--}}
-{{--                <span class="item-name">Şöbələr</span>--}}
-{{--            </a>--}}
-{{--        </li>--}}
-{{--        <li class="nav-item ">--}}
-{{--            <a class=""--}}
-{{--               href="{{ route('employee.positions.index') }}">--}}
-{{--                <i class="nav-icon i-Cash-register-2"></i>--}}
-{{--                <span class="item-name">Vəzifələr</span>--}}
-{{--            </a>--}}
-{{--        </li>--}}
-{{--        <li class="nav-item ">--}}
-{{--            <a class=""--}}
-{{--               href="{{ route('employee.rooms.index') }}">--}}
-{{--                <i class="nav-icon i-Cash-register-2"></i>--}}
-{{--                <span class="item-name">Otaqlar</span>--}}
-{{--            </a>--}}
-{{--        </li>--}}
-{{--        <li class="nav-item ">--}}
-{{--            <a class=""--}}
-{{--               href="{{ route('employee.users.index') }}">--}}
-{{--                <i class="nav-icon i-Cash-register-2"></i>--}}
-{{--                <span class="item-name">İşçilər</span>--}}
-{{--            </a>--}}
-{{--        </li>--}}
-{{--    </ul>--}}
+    {{-- <ul class="childNav" data-parent="dashboard-department">--}}
+        {{-- <li class="nav-item ">--}}
+            {{-- <a class="" --}} {{-- href="{{ route('employee.departments.index') }}">--}}
+                {{-- <i class="nav-icon i-Cash-register-2"></i>--}}
+                {{-- <span class="item-name">Departamentlər</span>--}}
+                {{-- </a>--}}
+            {{-- </li>--}}
+        {{-- <li class="nav-item ">--}}
+            {{-- <a class="" --}} {{-- href="{{ route('employee.branches.index') }}">--}}
+                {{-- <i class="nav-icon i-Cash-register-2"></i>--}}
+                {{-- <span class="item-name">Şöbələr</span>--}}
+                {{-- </a>--}}
+            {{-- </li>--}}
+        {{-- <li class="nav-item ">--}}
+            {{-- <a class="" --}} {{-- href="{{ route('employee.positions.index') }}">--}}
+                {{-- <i class="nav-icon i-Cash-register-2"></i>--}}
+                {{-- <span class="item-name">Vəzifələr</span>--}}
+                {{-- </a>--}}
+            {{-- </li>--}}
+        {{-- <li class="nav-item ">--}}
+            {{-- <a class="" --}} {{-- href="{{ route('employee.rooms.index') }}">--}}
+                {{-- <i class="nav-icon i-Cash-register-2"></i>--}}
+                {{-- <span class="item-name">Otaqlar</span>--}}
+                {{-- </a>--}}
+            {{-- </li>--}}
+        {{-- <li class="nav-item ">--}}
+            {{-- <a class="" --}} {{-- href="{{ route('employee.users.index') }}">--}}
+                {{-- <i class="nav-icon i-Cash-register-2"></i>--}}
+                {{-- <span class="item-name">İşçilər</span>--}}
+                {{-- </a>--}}
+            {{-- </li>--}}
+        {{-- </ul>--}}
 
-{{--    <ul class="childNav" data-parent="dashboard-inventory">--}}
-{{--        <li class="nav-item ">--}}
-{{--            <a class=""--}}
-{{--               href="{{ route('categories.index') }}">--}}
-{{--                <i class="nav-icon i-Cash-register-2"></i>--}}
-{{--                <span class="item-name">Kateqoriyalar</span>--}}
-{{--            </a>--}}
-{{--        </li>--}}
-{{--        <li class="nav-item ">--}}
-{{--            <a class=""--}}
-{{--               href="{{ route('vendors.index') }}">--}}
-{{--                <i class="nav-icon i-Cash-register-2"></i>--}}
-{{--                <span class="item-name">Təminatçılar</span>--}}
-{{--            </a>--}}
-{{--        </li>--}}
-{{--        <li class="nav-item ">--}}
-{{--            <a class=""--}}
-{{--               href="{{ route('products.index') }}">--}}
-{{--                <i class="nav-icon i-Cash-register-2"></i>--}}
-{{--                <span class="item-name">İnventarlar</span>--}}
-{{--            </a>--}}
-{{--        </li>--}}
+    {{-- <ul class="childNav" data-parent="dashboard-inventory">--}}
+        {{-- <li class="nav-item ">--}}
+            {{-- <a class="" --}} {{-- href="{{ route('categories.index') }}">--}}
+                {{-- <i class="nav-icon i-Cash-register-2"></i>--}}
+                {{-- <span class="item-name">Kateqoriyalar</span>--}}
+                {{-- </a>--}}
+            {{-- </li>--}}
+        {{-- <li class="nav-item ">--}}
+            {{-- <a class="" --}} {{-- href="{{ route('vendors.index') }}">--}}
+                {{-- <i class="nav-icon i-Cash-register-2"></i>--}}
+                {{-- <span class="item-name">Təminatçılar</span>--}}
+                {{-- </a>--}}
+            {{-- </li>--}}
+        {{-- <li class="nav-item ">--}}
+            {{-- <a class="" --}} {{-- href="{{ route('products.index') }}">--}}
+                {{-- <i class="nav-icon i-Cash-register-2"></i>--}}
+                {{-- <span class="item-name">İnventarlar</span>--}}
+                {{-- </a>--}}
+            {{-- </li>--}}
 
-{{--        <li class="nav-item ">--}}
-{{--            <a class=""--}}
-{{--               href="{{ route('invoices.index') }}">--}}
-{{--                <i class="nav-icon i-Cash-register-2"></i>--}}
-{{--                <span class="item-name">Qaimələr</span>--}}
-{{--            </a>--}}
-{{--        </li>--}}
-{{--    </ul>--}}
+        {{-- <li class="nav-item ">--}}
+            {{-- <a class="" --}} {{-- href="{{ route('invoices.index') }}">--}}
+                {{-- <i class="nav-icon i-Cash-register-2"></i>--}}
+                {{-- <span class="item-name">Qaimələr</span>--}}
+                {{-- </a>--}}
+            {{-- </li>--}}
+        {{-- </ul>--}}
 </div>
 <div class="sidebar-overlay"></div>

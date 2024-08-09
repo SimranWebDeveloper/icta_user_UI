@@ -18,6 +18,12 @@
                 </div>
             </div>
             <div class="card-body">
+                @if (session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <form method="POST" id="form" action="{{ route('hr.meetings.store') }}">
                     @csrf
                     <div class="row">
@@ -173,7 +179,7 @@
                             </div>
                         </div>
                         <div class="col-md-12 mt-4">
-                            <button class="btn btn-success btn-lg">Daxil edin</button>
+                            <button class="btn btn-success btn-lg" id="submitBtn">Daxil edin</button>
                         </div>
                     </div>
                 </form>
@@ -185,6 +191,34 @@
 
 @section('js')
 <script>
+    const submitBtn = document.getElementById('submitBtn');
+
+submitBtn.addEventListener('click', function (event) {
+    const inputs = document.querySelectorAll('input[required]');
+    inputs.forEach(input => {
+        if (input.value) {
+            input.setCustomValidity("");
+        } else {
+            input.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+        }
+    });
+    const selects = document.querySelectorAll('select[required]');
+    selects.forEach(select => {
+        if (select.value) {
+            select.setCustomValidity("");
+        } else {
+            select.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+        }
+    });
+    const texts = document.querySelectorAll('textarea[required]');
+    texts.forEach(text => {
+        if (text.value) {
+            text.setCustomValidity("");
+        } else {
+            text.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+        }
+    });
+})
     $('#room').change(function () {
         if ($(this).val()) {
             $('.none-field').show();

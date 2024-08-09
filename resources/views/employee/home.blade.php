@@ -1,6 +1,6 @@
 @extends('employee.layouts.app')
 <style>
-    @keyframes norm {
+    /* @keyframes norm {
         0% {
             color: blue;
         }
@@ -12,7 +12,7 @@
         100% {
             color: blue;
         }
-    }
+    } */
 
     @keyframes important {
         0% {
@@ -48,7 +48,7 @@
     }
 
     .normal {
-        animation: norm 2s infinite;
+        color: blue;
     }
 
     .unread {
@@ -63,20 +63,10 @@
         overflow-y: auto;
     }
 
-    
-
-    .carousel-inner img {
-        width: 100%;
-        height: 365px;
-        object-fit: cover;
-    }
 
 
-  
-    
-    
-    
-    </style>
+
+</style>
 
 @section('content')
 <div class="row">
@@ -120,7 +110,7 @@
     </div>
 </div>
 <div class="row mt-4">
-    
+
     @include('employee.layouts.partials.home-surveys')
     @include('employee.layouts.partials.home-meetings')
     @include('employee.layouts.partials.home-announcements')
