@@ -13,12 +13,13 @@ class AnnouncementsController extends Controller
     
     public function index()
     {
-        $now = Carbon::now();
+        $now = Carbon::now()->subHours(4); // Вычитаем 4 часа из текущего времени
         Announcements::where('end_date', '<', $now->format('Y-m-d'))->where('status', '!=', 0)->update(['status' => 0]);
+        
         $announcements = Announcements::all();
         return view('hr.announcements.index', compact('announcements'));
     }
-
+    
     
     public function create()
     {
