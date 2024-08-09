@@ -17,7 +17,7 @@ $(document).ready(function () {
     // cavablari gor
     $('.showSurveyButton').on('click', function() {
         const survey = $(this).data('survey');
-        showUserAnswer(survey, survey.priority === 0);
+        showSurveyPopup(survey, survey.priority === 0);
     });
     // cavabla
     $('.surveyButton').on('click', function() {
@@ -37,17 +37,17 @@ $(document).ready(function () {
        
                         <div class="card-body">
                             <div class="row">
-                                @foreach($survey->surveys_questions as $question)
+                               
                                     <div class="col-md-6 col-sm-12">
                                         <div class="card mb-4">
                                             <div class="card-header w-100 d-flex justify-content-center align-items-center">
-                                                <h3 class="m-0">{{ $loop->iteration }}.</h3>
-                                                <h3 class="m-0">{{ $question->question }}</h3>
+                                                <h3 class="m-0">Yaz</h3>
+                                                <h3 class="m-0">Yoxla</h3>
                                             </div>
                                             <div class="card-body">
-                                                @if($question->input_type == 'checkbox')
+                                                
                                                     <ul class="list-group-custom">
-                                                        @foreach($question->answers as $answer)
+                                                        
                                                             <li class="d-flex my-3 align-items-center w-100 justify-content-between">
                                                                 <div class="checkbox-wrapper d-flex">
                                                                     <!-- <input type="checkbox" disabled> -->
@@ -60,15 +60,13 @@ $(document).ready(function () {
                                                                 <div class="label-wrapper w-100 text-center"
                                                                     style="border-radius: 2.25rem;">
                                                                     <label class="d-flex justify-content-center align-items-center">
-                                                                        {{ $answer->name }}
+                                                                        label cababi
                                                                     </label>
                                                                 </div>
                                                             </li>
-                                                        @endforeach
+                                                       
                                                     </ul>
-                                                @elseif($question->input_type == 'radio')
                                                     <ul class="list-group-custom">
-                                                        @foreach($question->answers as $answer)
                                                             <li class="d-flex my-3 align-items-center w-100 justify-content-between">
                                                                 <div class="checkbox-wrapper d-flex">
                                                                     <i class="fa-sharp fa-thin fa-circle-dot"
@@ -79,21 +77,17 @@ $(document).ready(function () {
                                                                 <div class="label-wrapper w-100 text-center"
                                                                     style="border-radius: 2.25rem;">
                                                                     <label class="d-flex justify-content-center align-items-center">
-                                                                        {{ $answer->name }}
+                                                                        label cababi
                                                                     </label>
                                                                 </div>
                                                             </li>
-                                                        @endforeach
                                                     </ul>
-                                                @elseif($question->input_type == 'textarea')
                                                     <div class="form-floating">
                                                         <textarea rows="7" cols="10" class="form-control" disabled></textarea>
                                                     </div>
-                                                @endif
                                             </div>
                                         </div>
                                     </div>
-                                @endforeach
                             </div>
 
 
