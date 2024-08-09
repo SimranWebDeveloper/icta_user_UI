@@ -40,7 +40,7 @@
 
 <div class="col-lg-4 col-md-6">
     <div class="card">
-        <div class="card-header">Anketlər</div>
+        <div class="card-header text-center" style="font-size:24px">Anketlər</div>
         <div class="card-body scrollable-content pt-0">
             <div class="row">
                 @foreach($surveys as $survey)

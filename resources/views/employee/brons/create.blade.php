@@ -3,13 +3,13 @@
 <div class="card">
     <div class="card-header">
         <div class="d-flex justify-content-between align-items-center">
-            <h3 class="m-0">Yeni Rezerv</h3>
+            <h3 class="m-0">Yeni Bron</h3>
             <a href="{{ route('employee.brons.index') }}">
                 <button class="btn btn-danger">
                     <span class="me-2">
                         <i class="nav-icon i-Arrow-Back-2"></i>
                     </span>
-                    Rezervlər
+                    Bronlar
                 </button>
             </a>
         </div>

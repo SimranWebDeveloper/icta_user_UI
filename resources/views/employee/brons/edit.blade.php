@@ -5,7 +5,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h3 class="m-0">
                        <span class="text-capitalize">
-Rezerv                       </span>
+                       Bron                       </span>
                         redaktə et
                     </h3>
                     <a href="{{ route('employee.brons.index') }}">
@@ -13,7 +13,7 @@ Rezerv                       </span>
                             <span class="me-2">
                                 <i class="nav-icon i-Arrow-Back-2"></i>
                             </span>
-                            Rezerv
+                            Bron
                         </button>
                     </a>
                 </div>
