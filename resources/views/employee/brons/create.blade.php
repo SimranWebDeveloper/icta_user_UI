@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="card-body">
-        <form method="POST" id="form" action="{{ route('hr.meetings.store') }}">
+        <form method="POST" id="form" action="{{ route('employee.brons.store') }}">
             @csrf
             <div class="row">
                 <div class="col-md-6 form-group mb-3">
@@ -40,10 +40,11 @@
                     </div>
                     <select id="room" name="rooms_id" required class="form-control ui fluid">
                         <option value="" selected disabled>Otaq nömrəsini seçin</option>
-                        <option value="1" {{ old('rooms_id') == 1 ? 'selected' : '' }}>
-                            otaq 1
-                        </option>
-
+                        @foreach($rooms as $room)
+                            <option value="{{ $room->id }}" {{ old('rooms_id') == $room->id ? 'selected' : '' }}>
+                                {{ $room->name }}
+                            </option>
+                         @endforeach
                     </select>
                     @error('rooms_id')
                         <span class="text-danger">{{ $message }}</span>
@@ -69,6 +70,15 @@
                         @endforeach
                     </select>
                     @error('duration')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="col-md-4 form-group mb-3 d-none">
+                    <div class="select_label ui sub header">Növ <span class="text-danger">*</span></div>
+                    <select id="status" name="status" required class="form-control ui fluid">
+                        <option value="1" selected>Aktiv</option>
+                    </select>
+                    @error('type')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
@@ -99,27 +109,32 @@
                                     <div class="row">
                                         <div class="col-4">
                                             <h3>Departament</h3>
+                                            @foreach($departments as $department)
                                             <label class="checkbox checkbox-primary">
                                                 <input type="checkbox" class="report-departments"
-                                                    name="w_departments_id[]" value="1">
-                                                <span><strong>İT</strong> (Şöbə:
-                                                    3, İşçi:
-                                                    10)</span>
+                                                    name="w_departments_id[]" value="{{ $department->id }}">
+                                                <span><strong>{{ $department->name }}</strong> (Şöbə:
+                                                    {{ $department->branches_count }}, İşçi:
+                                                    {{ $department->users_count }})</span>
                                                 <span class="checkmark"></span>
                                             </label>
+                                        @endforeach
                                         </div>
                                         <div class="col-8">
                                             <h3>Şöbə</h3>
                                             <div class="row">
-                                                <div class="col-4">
-                                                    <label class="checkbox checkbox-primary">
-                                                        <input type="checkbox" class="report-branches"
-                                                            data-department-id="1" name="w_branch_id[]" value="1">
-                                                        <span><strong>İT</strong> (İşçi:
-                                                            5)</span>
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </div>
+                                                @foreach($branches as $branch)
+                                                            <div class="col-4">
+                                                                <label class="checkbox checkbox-primary">
+                                                                    <input type="checkbox" class="report-branches"
+                                                                        data-department-id="{{ !is_null($branch->departments) ? $branch->departments->id : '' }}"
+                                                                        name="w_branch_id[]" value="{{ $branch->id }}">
+                                                                    <span><strong>{{ $branch->name }}</strong> (İşçi:
+                                                                        {{ $branch->users_count }})</span>
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </div>
+                                                        @endforeach
                                             </div>
                                         </div>
                                     </div>
@@ -128,14 +143,19 @@
                                         <div class="col-12 mt-2">
                                             <h3>İşçilər</h3>
                                             <div class="row">
+                                                @foreach($users as $user)
                                                 <div class="col-4 mt-4">
                                                     <label class="checkbox checkbox-primary">
-                                                        <input type="checkbox" data-branch-id="1" data-department-id="1"
-                                                            class="report-users" name="w_user_id[]" value="1">
-                                                        <span>Salam</span>
+                                                        <input type="checkbox"
+                                                            data-branch-id="{{ !is_null($user->branches) ? $user->branches->id : '' }}"
+                                                            data-department-id="{{ !is_null($user->departments) ? $user->departments->id : '' }}"
+                                                            class="report-users" name="w_user_id[]"
+                                                            value="{{ $user->id }}">
+                                                        <span>{{ $user->name }}</span>
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </div>
+                                            @endforeach
                                             </div>
                                         </div>
                                     </div>
