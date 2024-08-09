@@ -264,38 +264,7 @@
                 html: ` <div class="row mb-4 w-100">
                 <div class="col-md-12">
                      <div class="card">
-                        <div class="card-header">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <ul class="m-0 p-0">
-                                        <li id="list-item">
-                                            @if ($survey->status == 0)
-                                                <button class="btn btn-danger text-white">
-                                                    Deaktiv
-                                                </button>
-                                            @elseif ($survey->status == 1)
-                                                <button class="btn btn-success text-white">
-                                                    Aktiv
-                                                </button>
-                                            @elseif ($survey->status == 2)
-                                                <button class="btn btn-warning text-white">
-                                                    Gözləmə
-                                                </button>
-                                            @endif
-                                        </li>
-                                    </ul>
-                                    <h3 class="ml-3 mt-0 mb-0 mr-0">{{ $survey->name }}</h3>
-                                </div>
-                                <a href="{{route('hr.surveys.index')}}">
-                                    <button class="btn btn-danger">
-                                        <span class="me-2">
-                                            <i class="nav-icon i-Arrow-Back-2"></i>
-                                        </span>
-                                        Anketler
-                                    </button>
-                                </a>
-                            </div>
-                        </div>
+       
                         <div class="card-body">
                             <div class="row">
                                 @foreach($survey->surveys_questions as $question)
@@ -357,69 +326,14 @@
                                 @endforeach
                             </div>
 
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h3>İştirakçılar</h3>
-                                        </div>
-                                        <div class="card-body">
-                                            @php
-                                                $groupedParticipants = $users->groupBy(function ($user) {
-                                                    return $user->departments_id . '-' . $user->branches_id;
-                                                });
-                                            @endphp
 
-                                            @foreach($groupedParticipants as $group => $users)
-                                                <div class="d-xl-flex mt-3 align-items-start">
-                                                    <h3 class="col-xl-2 m-0">
-                                                        {{ $departments[$users->first()->departments_id] ?? 'Bilinməyən departament' }}
-                                                    </h3>
-
-                                                    <h4 class="col-xl-2 mb-0 mt-2 mt-xl-0">
-                                                        {{ $branches[$users->first()->branches_id] ?? 'Bilinməyən şöbə' }}
-                                                    </h4>
-
-                                                    <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-xl-0">
-                                                        @foreach($users as $index => $user)
-                                                            <h5 style="cursor: pointer" class="mt-1 mb-1 mt-xl-0 mb-xl-0" id="employeeAnswer">{{ $user->name }}
-                                                            </h5>
-                                                            {{ $index < count($users) - 1 ? ', ' : '' }}
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                                @if (!$loop->last)
-                                                    <hr class="hr" />
-                                                @endif
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
-                        <div class="card-footer">
-                            <a href="{{route('hr.surveys.edit', $survey->id)}}">
-                                <button class="btn btn-info btn-lg">
-                                    <span class="me-2 ">
-                                        <i class="nav-icon i-Pen-2 font-weight-bold"></i>
-                                    </span>
-                                    Düzəliş et
-                                </button>
-                            </a>
-                            <a href="#" class="delete-item" data-id="{{ $survey->id }}">
-                                <button class="btn btn-danger btn-lg">
-                                    <span class="me-2">
-                                        <ion-icon name="trash-outline"></ion-icon>
-                                    </span>
-                                    Sil
-                                </button>
-                            </a>
-                        </div>
+
                     </div>
                 </div>
             </div> `,
-                showConfirmButton: false,
+                showConfirmButton: true,
                 customClass: {
                     popup: 'swal2-popup', // Ensures that only this modal has the specific width
                     container: 'employeeAnswerModal' // Custom class to differentiate this modal

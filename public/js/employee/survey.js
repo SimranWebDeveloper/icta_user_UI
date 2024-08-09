@@ -14,10 +14,104 @@ $(document).ready(function () {
         console.log('No surveys available.');
     }
 
+    // cavablari gor
+    $('.showSurveyButton').on('click', function() {
+        const survey = $(this).data('survey');
+        showUserAnswer(survey, survey.priority === 0);
+    });
+    // cavabla
     $('.surveyButton').on('click', function() {
         const survey = $(this).data('survey');
         showSurveyPopup(survey, survey.priority === 0);
     });
+
+    function showUserAnswer(survey, canCancel) {
+        $(".showSurveyButton").on("click", function () {
+
+            Swal.fire({
+                title: "Anket Detalları",
+
+                html: ` <div class="row mb-4 w-100">
+                <div class="col-md-12">
+                     <div class="card">
+       
+                        <div class="card-body">
+                            <div class="row">
+                                @foreach($survey->surveys_questions as $question)
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="card mb-4">
+                                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                                <h3 class="m-0">{{ $loop->iteration }}.</h3>
+                                                <h3 class="m-0">{{ $question->question }}</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                @if($question->input_type == 'checkbox')
+                                                    <ul class="list-group-custom">
+                                                        @foreach($question->answers as $answer)
+                                                            <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                                                <div class="checkbox-wrapper d-flex">
+                                                                    <!-- <input type="checkbox" disabled> -->
+                                                                    <!-- <i class="fa-light fa-square-check "                           style="color: #000000;"></i> -->
+                                                                    <!-- <i class="fa-duotone fa-solid fa-square-check text-50"></i> -->
+                                                                    <i class="fa-thin fa-square-check"
+                                                                        style='font-size: 40px; color:#C7C8CC'></i>
+                                                                    <!-- <i class="fa-thin fa-square-check text-50" style="color: #000000;"></i> -->
+                                                                </div>
+                                                                <div class="label-wrapper w-100 text-center"
+                                                                    style="border-radius: 2.25rem;">
+                                                                    <label class="d-flex justify-content-center align-items-center">
+                                                                        {{ $answer->name }}
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @elseif($question->input_type == 'radio')
+                                                    <ul class="list-group-custom">
+                                                        @foreach($question->answers as $answer)
+                                                            <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                                                <div class="checkbox-wrapper d-flex">
+                                                                    <i class="fa-sharp fa-thin fa-circle-dot"
+                                                                        style='font-size: 40px; color:#C7C8CC'></i>
+                                                                    <!-- <i class="fa-sharp-duotone fa-solid fa-circle-dot text-50"></i> -->
+                                                                    <!-- <input type="radio" disabled name="question_{{ $question->id }}"> -->
+                                                                </div>
+                                                                <div class="label-wrapper w-100 text-center"
+                                                                    style="border-radius: 2.25rem;">
+                                                                    <label class="d-flex justify-content-center align-items-center">
+                                                                        {{ $answer->name }}
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @elseif($question->input_type == 'textarea')
+                                                    <div class="form-floating">
+                                                        <textarea rows="7" cols="10" class="form-control" disabled></textarea>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div> `,
+                
+                showConfirmButton: true,
+            });
+
+
+        });
+
+
+    }
 
     function showSurveyPopup(survey, canCancel) {
         Swal.fire({
@@ -65,6 +159,7 @@ $(document).ready(function () {
             }
         });
     }
+
 
     function showError(input) {
         const errorText = document.createElement('span');
