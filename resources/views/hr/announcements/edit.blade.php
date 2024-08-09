@@ -142,7 +142,7 @@
 
                         <div class="col-md-6 form-group date-duration-field mb-3">
                             <label for="end_date" class="form-label">Bitmə tarixi <span class="text-danger">*</span></label>
-                            <input type="text" name="end_date" id="end_date" style="background:#f8f9fa" class="form-control" required disabled min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" value="{{ old('end_date', \Carbon\Carbon::parse($announcement->end_date)->format('Y-m-d')) }}">
+                            <input type="text" name="end_date" id="end_date" style="background:#f8f9fa" class="form-control" required min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" value="{{ old('end_date', \Carbon\Carbon::parse($announcement->end_date)->format('Y-m-d')) }}">
                             @if($errors->has('end_date'))
                                 <span class="text-danger">{{ $errors->first('end_date') }}</span>
                             @endif

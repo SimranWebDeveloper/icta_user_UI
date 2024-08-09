@@ -16,6 +16,11 @@
         cursor: pointer;
     }
 
+    .fc-content-skeleton {
+        overflow-y: auto;
+        height: 100px;
+    }
+
     @media screen and (max-width: 768px) {
         .swal2-popup {
             width: 99%;
@@ -29,13 +34,13 @@
 <div class="card">
     <div class="card-header">
         <div class="d-flex justify-content-between align-items-center">
-            <h3 class="m-0">Rezervlər</h3>
+            <h3 class="m-0">Bronlar</h3>
             <a href="{{ route('employee.brons.create') }}">
                 <button class="btn btn-success">
                     <span class="me-2">
                         <i class="nav-icon i-Add-File"></i>
                     </span>
-                    Yeni rezerv
+                    Yeni bron
                 </button>
             </a>
         </div>
@@ -217,12 +222,253 @@
                         textColor: 'white',
                     },
                     {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    }, {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    }, {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    }, {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    }, {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    }, {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    }, {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    }, {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    }, {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    }, {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    }, {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    }, {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    },
+                    {
+                        title: "Rezerv",
+                        start: '2024-08-05T09:05',
+                        end: '2024-08-05T12:05',
+                        color: 'green',
+                        textColor: 'white',
+                    },
+                    {
                         title: "Rezerv-2",
-                        start: '2024-08-05T12:15',
+                        start: '2024-08-07T12:15',
                         end: endDate,
                         color: 'green',
                         textColor: 'white'
-                    }
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
+                    {
+                        title: "Rezerv-2",
+                        start: '2024-08-07T12:15',
+                        end: endDate,
+                        color: 'green',
+                        textColor: 'white'
+                    },
                 ],
                 timeFormat: 'H(:mm)',
 
