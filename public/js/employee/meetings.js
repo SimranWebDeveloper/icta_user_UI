@@ -1,18 +1,17 @@
 $(document).ready(function () {
-    $(document).on('click', '#meetingButton', function () {
-        const meeting = $(this).data('meeting');
+    $(document).on("click", "#meetingButton", function () {
+        const meeting = $(this).data("meeting");
         let meetingTitle;
 
         if (meeting.type === 0) {
-            meetingTitle = 'İclas';
+            meetingTitle = "İclas";
         } else if (meeting.type === 1) {
-            meetingTitle = 'Tədbir';
+            meetingTitle = "Tədbir";
         }
 
         Swal.fire({
             title: meetingTitle,
-            html:
-                ` <div class="row mb-4 w-100">
+            html: ` <div class="row mb-4 w-100">
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
@@ -83,12 +82,12 @@ $(document).ready(function () {
                         </div>
                         <div class="card-footer">
                             <a href="#">
-                                <button class="btn btn-success btn-lg">
+                                <button class="btn btn-info btn-lg" value="1">
                                     İştirak edəcəm
                                 </button>
                             </a>
                             <a href="#">
-                                <button class="btn btn-danger btn-lg">
+                                <button class="btn btn-danger btn-lg" value="0">
                                     İştirak etməyəcəm
                                 </button>
                             </a>
