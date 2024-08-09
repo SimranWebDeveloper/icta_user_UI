@@ -5,6 +5,7 @@ namespace App\Http\Controllers\HR;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Announcements;
+use Carbon\Carbon;
 
 
 class AnnouncementsController extends Controller
@@ -12,6 +13,8 @@ class AnnouncementsController extends Controller
     
     public function index()
     {
+        $now = Carbon::now();
+        Announcements::where('end_date', '<', $now->format('Y-m-d'))->where('status', '!=', 0)->update(['status' => 0]);
         $announcements = Announcements::all();
         return view('hr.announcements.index', compact('announcements'));
     }
@@ -57,7 +60,7 @@ class AnnouncementsController extends Controller
     {
         $announcement = Announcements::findOrFail($id);        
         $data = $request->all();
-    
+
         if ($request->input('delete_image') == '1') {
             if ($announcement->image && \File::exists(public_path('assets/images/announcements/' . $announcement->image))) {
                 \File::delete(public_path('assets/images/announcements/' . $announcement->image));
