@@ -37,7 +37,7 @@
 
 <div class="col-lg-4 col-12 mt-4 mt-lg-0">
     <div class="card">
-        <div class="card-header text-center">Elanlar</div>
+        <div class="card-header text-center" style="font-size:24px">Elanlar</div>
         <div class="card-body fixed-height">
             @if($announcements->isEmpty())
                 <p class="no-announcement">Hal-hazırda aktiv elan yoxdur</p>
@@ -55,7 +55,7 @@
                                                 <img class="d-block w-100" style="border-radius:5px;" src="{{ $image }}"
                                                     alt="Slide {{ $index + 1 }}">
                                                 <div class="carousel-caption d-md-block p-3"
-                                                    style="border-radius:15px; background-color: rgba(125, 159, 246, 0.5);">
+                                                    style="border-radius:15px; background-color: rgba(125, 159, 246, 0.8);">
                                                     <h3 class="text-white announcementContent">{{ $announcement->title }}</h3>
                                                     <p class="text-white announcementContent">{{ $announcement->content }}</p>
                                                 </div>
