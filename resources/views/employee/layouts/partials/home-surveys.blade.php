@@ -66,7 +66,7 @@
                             </div>
             
                             @if ($surveyUser && $surveyUser->is_answered == 1)
-                                <button class="btn btn-success btn-md mt-3 showSurveyButton" data-survey='@json($survey)' data-is-answered="true">
+                                <button class="btn btn-success btn-md mt-3 showSurveyButton" data-survey-id='{{$survey->id}}' data-is-answered="true">
                                     Cavablari gör
                                 </button>
                             @else
