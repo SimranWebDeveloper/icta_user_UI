@@ -126,4 +126,27 @@ class EmployeeController extends Controller
 
         return redirect()->route('employee.home')->with('success', 'Anket müvəffəqiyyətlə cavablandırıldı');
     }
+
+    public function updateParticipationStatus(Request $request)
+{
+    $userId = Auth::id();
+    $meetingId = $request->meeting_id;
+    $participationStatus = $request->participation_status;
+
+    // Find the existing entry in the meetings_users table
+    $meetingUser = MeetingsUsers::where('users_id', $userId)
+        ->where('meetings_id', $meetingId)
+        ->first();
+
+    if ($meetingUser) {
+        // Update the participation status
+        $meetingUser->participation_status = $participationStatus;
+        $meetingUser->save();
+
+        return response()->json(['success' => true]);
+    } else {
+        return response()->json(['success' => false], 404);
+    }
+}
+ 
 }

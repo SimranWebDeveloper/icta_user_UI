@@ -252,6 +252,8 @@ Route::middleware(['logLastUserActivity'])->group(function () {
         Route::resource('/brons', EmployeeBronsController::class);
         Route::post('submit-survey', [EmployeeController::class, 'submitSurvey'])->name('employee-submitSurvey');
         Route::get('employee/brons/{bron}/edit', [EmployeeBronsController::class, 'edit'])->name('employee.brons.edit'); //bronun pop up üçün yazdim
+        Route::post('/update-participation-status', [EmployeeController::class, 'updateParticipationStatus'])->name('employee-updateParticipationStatus');
+
 
 
 
