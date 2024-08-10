@@ -19,14 +19,14 @@ class MeetingsController extends Controller
 
     public function index()
     {
-        $now = Carbon::now()->subHours(4);
+        $now = Carbon::now()->addHours(4);
         $meetings = Meetings::with('rooms')->whereIn('type', [0, 1])->get();
     
         foreach ($meetings as $meeting) {
-            $startDateTime = Carbon::parse($meeting->start_date_time)->subHours(4); 
+            $startDateTime = Carbon::parse($meeting->start_date_time); 
             $duration = $meeting->duration;
             $endDateTime = $startDateTime->copy()->addMinutes($duration);
-    
+            
             if ($endDateTime->lessThanOrEqualTo($now)) {
                 $meeting->update(['status' => 0]);
             }

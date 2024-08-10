@@ -40,3 +40,10 @@
         </div>
     </div>
 </div>
+
+<script>
+    window.participationStatusUrl = "{{ route('employee.employee-updateParticipationStatus') }}";
+    window.csrfToken = "{{ csrf_token() }}";
+</script>
+
+
