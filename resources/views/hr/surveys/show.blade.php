@@ -219,6 +219,10 @@
         </div>
     </div>
 </div>
+
+
+
+
 @endsection
 @section('js')
 <script>
@@ -261,79 +265,163 @@
 
             Swal.fire({
                 title: 'Istifadeci cavablari',
-                html: ` <div class="row mb-4 w-100">
-                <div class="col-md-12">
-                     <div class="card">
-       
-                        <div class="card-body">
-                            <div class="row">
-                                @foreach($survey->surveys_questions as $question)
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="card mb-4">
-                                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
-                                                <h3 class="m-0">{{ $loop->iteration }}.</h3>
-                                                <h3 class="m-0">{{ $question->question }}</h3>
-                                            </div>
-                                            <div class="card-body">
-                                                @if($question->input_type == 'checkbox')
-                                                    <ul class="list-group-custom">
-                                                        @foreach($question->answers as $answer)
-                                                            <li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                                                                <div class="checkbox-wrapper d-flex">
-                                                                    <!-- <input type="checkbox" disabled> -->
-                                                                    <!-- <i class="fa-light fa-square-check "                           style="color: #000000;"></i> -->
-                                                                    <!-- <i class="fa-duotone fa-solid fa-square-check text-50"></i> -->
-                                                                    <i class="fa-thin fa-square-check"
-                                                                        style='font-size: 40px; color:#C7C8CC'></i>
-                                                                    <!-- <i class="fa-thin fa-square-check text-50" style="color: #000000;"></i> -->
-                                                                </div>
-                                                                <div class="label-wrapper w-100 text-center"
-                                                                    style="border-radius: 2.25rem;">
-                                                                    <label class="d-flex justify-content-center align-items-center">
-                                                                        {{ $answer->name }}
-                                                                    </label>
-                                                                </div>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @elseif($question->input_type == 'radio')
-                                                    <ul class="list-group-custom">
-                                                        @foreach($question->answers as $answer)
-                                                            <li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                                                                <div class="checkbox-wrapper d-flex">
-                                                                    <i class="fa-sharp fa-thin fa-circle-dot"
-                                                                        style='font-size: 40px; color:#C7C8CC'></i>
-                                                                    <!-- <i class="fa-sharp-duotone fa-solid fa-circle-dot text-50"></i> -->
-                                                                    <!-- <input type="radio" disabled name="question_{{ $question->id }}"> -->
-                                                                </div>
-                                                                <div class="label-wrapper w-100 text-center"
-                                                                    style="border-radius: 2.25rem;">
-                                                                    <label class="d-flex justify-content-center align-items-center">
-                                                                        {{ $answer->name }}
-                                                                    </label>
-                                                                </div>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @elseif($question->input_type == 'textarea')
-                                                    <div class="form-floating">
-                                                        <textarea rows="7" cols="10" class="form-control" disabled></textarea>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                html: `
+                    <div class="row mb-4 w-100">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="card-body">
+                <div class="row">
+                    <!-- checkbox -->
+                    <div class="col-lg-6 col-12">                        
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">cox variantli</h3>
                             </div>
+                            <div class="card-body">
+                                <ul class="list-group-custom">
 
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                       <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">                                                
+                                                <input type="checkbox" disabled checked class=" rounded" style="width: 35px; height: 35px" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                </label>
+                                            </div>
+                                       </div>
+                                    </li>
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                       <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">                                                
+                                                <input type="checkbox" disabled  class=" rounded" style="width: 35px; height: 35px" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                </label>
+                                            </div>
+                                       </div>
+                                    </li>                              
 
+                                </ul>
+                            </div>
                         </div>
-
-
                     </div>
+                    <!-- radio -->
+                    <div class="col-lg-6 col-12">                        
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">2.</h3>
+                                <h3 class="m-0">Tek variantli</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group-custom">
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                       <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">                                                
+                                                <input type="radio" disabled checked name="radio_name" class=" rounded" style="width: 35px; height: 35px" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                </label>
+                                            </div>
+                                       </div>
+                                    </li>
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                       <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">                                                
+                                                <input type="radio" disabled name="radio_name" class=" rounded" style="width: 35px; height: 35px" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                    cavab 2 variant
+                                                </label>
+                                            </div>
+                                       </div>
+                                    </li>                              
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- text -->
+                    <div class="col-lg-6 col-12">                        
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">2.</h3>
+                                <h3 class="m-0">Metn</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="w-100  pl-0">
+
+                                    <li class=" d-flex my-3 align-items-center w-100 justify-content-between ">
+                                       <div class="d-flex align-items-center justify-content-between  w-100 ">
+                                            
+                                                <textarea  rows="7" cols="10" class="w-100 " disabled="" style="resize: none;"></textarea>
+
+                                       </div>
+                                    </li>
+                                                  
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
-            </div> `,
-                showConfirmButton: true,
+
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+                `,showConfirmButton: true,
                 customClass: {
                     popup: 'swal2-popup', // Ensures that only this modal has the specific width
                     container: 'employeeAnswerModal' // Custom class to differentiate this modal
@@ -346,3 +434,23 @@
     })
 </script>
 @endsection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
