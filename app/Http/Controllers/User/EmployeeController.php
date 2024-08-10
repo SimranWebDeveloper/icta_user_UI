@@ -126,4 +126,49 @@ class EmployeeController extends Controller
 
         return redirect()->route('employee.home')->with('success', 'Anket müvəffəqiyyətlə cavablandırıldı');
     }
+
+    public function updateParticipationStatus(Request $request)
+    {
+        $userId = Auth::id();
+        $meetingId = $request->meeting_id;
+        $participationStatus = $request->participation_status;
+
+        // Find the existing entry in the meetings_users table
+        $meetingUser = MeetingsUsers::where('users_id', $userId)
+            ->where('meetings_id', $meetingId)
+            ->first();
+
+        if ($meetingUser) {
+            // Update the participation status
+            $meetingUser->participation_status = $participationStatus;
+            $meetingUser->save();
+
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false], 404);
+        }
+    }
+
+    public function getUserAnswers($surveyId)
+    {
+        $userId = Auth::id();
+
+        // Fetch user answers for the given survey
+        $answers = UsersAnswers::where('users_id', $userId)
+            ->where('surveys_id', $surveyId)
+            ->get()
+            ->groupBy('surveys_questions_id');
+
+        $formattedAnswers = $answers->map(function($answersGroup) {
+            return $answersGroup->map(function($answer) {
+                return [
+                    'answer' => $answer->answer, // Adjust based on how you store answers
+                ];
+            });
+        });
+
+        return response()->json($formattedAnswers);
+    }
+
+ 
 }
