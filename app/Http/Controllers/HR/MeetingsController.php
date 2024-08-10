@@ -19,8 +19,8 @@ class MeetingsController extends Controller
 
     public function index()
     {
+        $now = Carbon::now()->subHours(4);
         $meetings = Meetings::with('rooms')->whereIn('type', [0, 1])->get();
-        $now = Carbon::now();
     
         foreach ($meetings as $meeting) {
             $startDateTime = Carbon::parse($meeting->start_date_time)->subHours(4); 

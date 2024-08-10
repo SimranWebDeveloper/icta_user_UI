@@ -58,8 +58,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
 
 <script>
-    let durationInMinutes = 60; // 2 hours
-    let endDate = moment('2024-08-05T12:15').add(durationInMinutes, 'minutes').format('YYYY-MM-DDTHH:mm');
+    @php
+        $groupedParticipants = [];
+        foreach ($meetings as $meeting) {
+            $participants = $meeting->participants->groupBy(function ($user) {
+                return $user->departments_id . '-' . $user->branches_id;
+            });
+
+            foreach ($participants as $group => $users) {
+                $department = $departments[$users->first()->departments_id] ?? 'Bilinməyən departament';
+                $branch = $branches[$users->first()->branches_id] ?? 'Bilinməyən şöbə';
+
+                $groupedParticipants[$meeting->id][] = [
+                    'department' => $department,
+                    'branch' => $branch,
+                    'users' => $users->pluck('name')->toArray()
+                ];
+            }
+        }
+    @endphp
+    let groupedParticipants = @json($groupedParticipants);
+
     $(document).ready(function () {
         $('#calendar').fullCalendar(
             {
@@ -68,6 +87,16 @@
                 dayNames: ['Bazar', 'Bazar ertəsi', 'Çərşənbə axşamı', 'Çərşənbə', 'Cümə axşamı', 'Cümə', 'Şənbə'],
                 dayNamesShort: ['B.', 'B.E', 'Ç.A', 'Ç.', 'C.A', 'C.', 'Ş.'],
                 eventClick: function (event) {
+                let participants = groupedParticipants[event.id] || [];
+                let participantsHtml = participants.map(group => {
+                    return `<div class="d-xl-flex mt-3 align-items-start">
+                        <h3 class="col-xl-2 m-0">${group.department}</h3>
+                        <h4 class="col-xl-2 mb-0 mt-2 mt-md-0">${group.branch}</h4>
+                        <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
+                            ${group.users.map(user => `<h5 class="mt-1 mb-1 mt-md-0 mb-md-0">${user}</h5>`).join(', ')}
+                        </div>
+                    </div>`;
+                }).join('<hr class="hr" />');
                     Swal.fire({
                         title: 'Event Details',
                         html: `<div class="row mb-4">
@@ -153,7 +182,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                        ${event.contect}
+                                        ${event.content}
                                     </li>
                                 </ul>
                             </div>
@@ -165,11 +194,7 @@
                                 <h3>İştirakçılar</h3>
                             </div>
                             <div class="card-body">
-                                //burda olacaq 
-                            </div>
-
-
-                        </div>
+                               ${participantsHtml}
                     </div>
                 </div>
 
@@ -208,9 +233,9 @@
                         color: 'green',
                         textColor: 'white',
                         subject: "{{ $meeting->subject }}",
+                        content: "{{ $meeting->content }}",
                         room_number: "{{ $meeting->rooms->name ?? 'Bilinmeyen Otaq' }}",
                         duration: "{{ $meeting->duration }}",
-                        content: "{{ $meeting->content }}",
                         participants: {!! json_encode($meeting->participants->pluck('name')->toArray()) !!},
                         department: "{{ $meeting->department->name ?? 'Bilinmeyen Departament' }}",
                         branch: "{{ $meeting->branch->name ?? 'Bilinmeyen Branch' }}",
