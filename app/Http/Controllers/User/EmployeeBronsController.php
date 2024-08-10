@@ -10,19 +10,28 @@ use App\Models\User;
 use App\Models\Branches;
 use App\Models\MeetingsUsers;
 use App\Models\Rooms;
+use Carbon\Carbon;  
 
 class EmployeeBronsController extends Controller
 {
     public function index()
     {
-        $meetings = Meetings::with('rooms')
-                            ->where('status', 1)
-                            ->where('type', 2)
-                            ->get();
+        $now = Carbon::now()->subHours(4);
+        $meetings = Meetings::with('rooms')->where('status', 1)->where('type', 2)->get();
+
+        foreach ($meetings as $meeting) {
+            $startDateTime = Carbon::parse($meeting->start_date_time)->subHours(4); 
+            $duration = $meeting->duration;
+            $endDateTime = $startDateTime->copy()->addMinutes($duration);
+
+            if ($endDateTime->lessThanOrEqualTo($now)) {
+                $meeting->update(['status' => 0]);
+            }
+        }
 
         foreach ($meetings as $meeting) {
             $meeting->participants = MeetingsUsers::where('meetings_id', $meeting->id)
-                                ->join('users', 'meetings_users.users_id', '=', 'users.id')
+            ->join('users', 'meetings_users.users_id', '=', 'users.id')
                                 ->select('users.*')
                                 ->get();
         }
@@ -32,7 +41,7 @@ class EmployeeBronsController extends Controller
 
         return view('employee.brons.index', compact('meetings', 'departments', 'branches'));
     }
-    
+
     public function create()
     {
         $departments = Departments::withCount('branches')->withCount('users')->where('status', 1)->get();
@@ -47,6 +56,25 @@ class EmployeeBronsController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        $startDateTime = Carbon::parse($data['start_date_time']);
+        $duration = $data['duration'];
+        $endDateTime = $startDateTime->copy()->addMinutes($duration);
+        $roomId = $data['rooms_id'];
+
+        $overlappingMeeting = Meetings::where('rooms_id', $roomId) ->where('status', 1)
+            ->where(function ($query) use ($startDateTime, $endDateTime) {
+                $query->whereBetween('start_date_time', [$startDateTime, $endDateTime])
+                    ->orWhereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
+                    ->orWhere(function ($subQuery) use ($startDateTime, $endDateTime) {
+                        $subQuery->where('start_date_time', '<', $startDateTime)
+                            ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$endDateTime]);
+                    });
+            })
+            ->exists();
+
+        if ($overlappingMeeting) {
+            return redirect()->back()->with('error', 'Göstərilən vaxtda bu otaq artıq doludur.');
+        }
         $meeting = Meetings::create($data);
 
         if ($request->has('w_user_id')) {
@@ -104,6 +132,31 @@ class EmployeeBronsController extends Controller
 
         $meeting = Meetings::findOrFail($id);
         $data = $request->all();
+        $startDateTime = Carbon::parse($data['start_date_time']);
+    $duration = $data['duration'];
+    $endDateTime = $startDateTime->copy()->addMinutes($duration);
+    $roomId = $data['rooms_id'];
+    $newStatus = $data['status'];
+
+    $statusChangedToActive = $meeting->status == 0 && $newStatus == 1;
+    $statusChangedFromActive = $meeting->status == 1 && $newStatus == 0;
+
+    if ($statusChangedToActive || $statusChangedFromActive) {
+        $overlappingMeeting = Meetings::where('rooms_id', $roomId)
+            ->where('status', 1) 
+            ->where('id', '!=', $id) 
+            ->where(function ($query) use ($startDateTime, $endDateTime) {
+                $query->where(function ($subQuery) use ($startDateTime, $endDateTime) {
+                    $subQuery->where('start_date_time', '<', $endDateTime)
+                             ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$startDateTime]);
+                });
+            })
+            ->exists();
+
+        if ($overlappingMeeting) {
+            return redirect()->back()->withErrors('Göstərilən vaxtda bu otaq artıq doludur.');
+        }
+    }
         $meeting->update($data);
         MeetingsUsers::where('meetings_id', $meeting->id)->delete();
 
@@ -123,7 +176,22 @@ class EmployeeBronsController extends Controller
     
     public function destroy(string $id) 
     {
-        return view('employee.brons.index');
+        try {
+            $meeting = Meetings::findOrFail($id);
+            $text = 'Bron məlumatları müvəffəqiyyətlə silindi';
+            $meeting->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => $text,
+                'route' => route('employee.brons.index')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Melumat silinərkən bir xəta baş verdi: ' . $e->getMessage()
+            ]);
+        }
 
     }
 }
