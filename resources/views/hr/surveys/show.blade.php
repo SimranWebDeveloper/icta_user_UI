@@ -262,7 +262,6 @@
 
 
         $("#employeeAnswer").on("click", function () {
-
             Swal.fire({
                 title: 'Istifadeci cavablari',
                 html: `
@@ -415,6 +414,7 @@
                 </div>
 
 
+                <p>last version</p>
             </div>
 
 
