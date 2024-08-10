@@ -262,7 +262,6 @@
 
 
         $("#employeeAnswer").on("click", function () {
-
             Swal.fire({
                 title: 'Istifadeci cavablari',
                 html: `
