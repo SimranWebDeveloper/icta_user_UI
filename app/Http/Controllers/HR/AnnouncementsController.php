@@ -13,7 +13,7 @@ class AnnouncementsController extends Controller
     
     public function index()
 {
-    $now = Carbon::now()->addHours(4)->;
+    $now = Carbon::now()->addHours(4);  //son
     $cutoffTime = $now->subDay()->endOfDay();
     
     Announcements::where('end_date', '<=', $cutoffTime->format('Y-m-d H:i:s'))
