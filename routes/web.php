@@ -255,6 +255,9 @@ Route::middleware(['logLastUserActivity'])->group(function () {
         Route::post('/update-participation-status', [EmployeeController::class, 'updateParticipationStatus'])->name('employee-updateParticipationStatus');
         Route::get('/survey/answers/{surveyId}', [EmployeeController::class, 'getUserAnswers'])
     ->name('survey.answers');
+    Route::get('/survey/answershr/{surveyId}/{userId}', [EmployeeController::class, 'getUserAnswersByHR'])
+    ->name('survey.answershr');
+
 
 
 

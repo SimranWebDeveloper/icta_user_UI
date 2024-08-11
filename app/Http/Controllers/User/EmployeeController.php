@@ -170,5 +170,24 @@ class EmployeeController extends Controller
         return response()->json($formattedAnswers);
     }
 
+    public function getUserAnswersByHR($surveyId, $userId)
+{
+    $answers = UsersAnswers::where('users_id', $userId)
+        ->where('surveys_id', $surveyId)
+        ->get()
+        ->groupBy('surveys_questions_id');
+
+    $formattedAnswers = $answers->map(function($answersGroup) {
+        return $answersGroup->map(function($answer) {
+            return [
+                'answer' => $answer->answer, // Adjust based on how you store answers
+            ];
+        });
+    });
+
+    return response()->json($formattedAnswers);
+}
+
+
  
 }
