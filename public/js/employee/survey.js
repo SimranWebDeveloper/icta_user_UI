@@ -1,26 +1,27 @@
 $(document).ready(function () {
     const surveys = window.surveyData;
-    const surveyStoreUrl = window.surveyStoreUrl; // URL-i dəyişkəndən əldə edin
-    const csrfToken = window.csrfToken; // CSRF tokeni dəyişkəndən əldə edin
+    const surveyStoreUrl = window.surveyStoreUrl;
+    const csrfToken = window.csrfToken;
 
-    if (surveys && surveys.length > 0) {
-        surveys.forEach((survey) => {
-            if (survey.priority === 1) {
-                // Trigger the popup on page load for high priority surveys
-                showSurveyPopup(survey, false);
-            }
-        });
-    } else {
-        console.log("No surveys available.");
+    // user anketi daha evvel cavabladi mı yoxlamaq
+    function openNextSurvey() {
+        const completedSurveys = JSON.parse(localStorage.getItem("completedSurveys")) || [];
+        const nextSurvey = surveys.find(survey => survey.priority === 1 && !completedSurveys.includes(survey.id));
+        
+        if (nextSurvey) {
+            showSurveyPopup(nextSurvey, false);
+        }
     }
 
-    // Show user answers
+    if (!localStorage.getItem("surveyCompleted")) {
+        openNextSurvey();
+    }
+
     $(".showSurveyButton").on("click", function () {
         const surveyId = $(this).data("survey-id");
         fetchUserAnswers(surveyId);
     });
 
-    // Show survey popup
     $(".surveyButton").on("click", function () {
         const survey = $(this).data("survey");
         showSurveyPopup(survey, survey.priority === 0);
@@ -31,9 +32,7 @@ $(document).ready(function () {
             url: `/employee/survey/answers/${surveyId}`,
             method: 'GET',
             success: function (response) {
-                // Assuming the survey data is also returned with the answers
                 const survey = surveys.find(s => s.id === surveyId);
-                console.log(response)
                 if (survey) {
                     showUserAnswersPopup(response, survey);
                 }
@@ -112,10 +111,6 @@ $(document).ready(function () {
             confirmButtonText: "Ok",
         });
     }
-    
-    
-    
-    
 
     function showSurveyPopup(survey, canCancel) {
         Swal.fire({
@@ -131,7 +126,7 @@ $(document).ready(function () {
                 let allAnswered = true;
                 const form = document.getElementById("surveyForm");
                 const inputs = form.querySelectorAll("input, textarea");
-
+    
                 inputs.forEach((input) => {
                     if (input.type !== "hidden") {
                         if (
@@ -146,7 +141,7 @@ $(document).ready(function () {
                             const isChecked = Array.from(options).some(
                                 (option) => option.checked
                             );
-
+    
                             if (!isChecked) {
                                 allAnswered = false;
                                 showError(input);
@@ -164,9 +159,24 @@ $(document).ready(function () {
                         }
                     }
                 });
-
+    
                 if (allAnswered) {
+                    // istifadeci anketi muveffeqiyyetle tamamliyanda completedSurveys listine elave et
+                    let completedSurveys = JSON.parse(localStorage.getItem("completedSurveys")) || [];
+                    completedSurveys.push(survey.id);
+                    localStorage.setItem("completedSurveys", JSON.stringify(completedSurveys));
+    
+                    // Formu gönder
                     form.submit();
+    
+                    // novbeti anketi aç
+                    const nextSurvey = surveys.find(s => s.priority === 1 && !completedSurveys.includes(s.id));
+                    if (nextSurvey) {
+                        // novbeti anketin açılmasını 1 saniye gecikdirmek ucun, belelikle form gönderildikden sonra açılacaq
+                        setTimeout(() => {
+                            showSurveyPopup(nextSurvey, false);
+                        }, 1000);
+                    }
                 } else {
                     Swal.showValidationMessage(
                         "Zəhmət olmasa təqdim etməzdən əvvəl bütün tələb olunan suallara cavab verin."
@@ -176,6 +186,8 @@ $(document).ready(function () {
             },
         });
     }
+    
+    
 
     function showError(input) {
         const errorText = document.createElement("span");
