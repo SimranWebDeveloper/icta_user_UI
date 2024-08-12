@@ -22,11 +22,192 @@ $(document).ready(function () {
         const surveyId = $(this).data("survey-id");
         fetchUserAnswers(surveyId);
     });
-
+    // Cavabla
     $(".surveyButton").on("click", function () {
         const survey = $(this).data("survey");
         showSurveyPopup(survey, survey.priority === 0);
     });
+    // anket Yenilendi
+    $(".newSurveyButton").on("click", function () {
+        const survey = $(this).data("survey");
+        const surveyId = $(this).data("survey-id");
+        newSurveyPopup(surveyId, survey);
+    });
+
+    function newSurveyPopup(surveyId, survey) {
+        // cavablandirilmis suallar
+        $.ajax({
+            url: `/employee/survey/answers/${surveyId}`,
+            method: 'GET',
+            success: function (response) {
+                const survey = surveys.find(s => s.id === surveyId);
+                if (survey) {
+                    showNewAnswersPopup(response, survey);
+                }
+            },
+            error: function (error) {
+                console.error("Failed to fetch user answers:", error);
+            }
+        });
+        // -----------------------
+
+        // no cavab suallar
+        
+        Swal.fire({
+            title: survey.name || "Survey",
+            html: generateSurveyHtml(survey),
+            showCancelButton: canCancel,
+            confirmButtonText: "Submit",
+            cancelButtonText: "Cancel",
+            allowOutsideClick: canCancel,
+            allowEscapeKey: canCancel,
+            allowEnterKey: canCancel,
+            preConfirm: () => {
+                let allAnswered = true;
+                const form = document.getElementById("surveyForm");
+                const inputs = form.querySelectorAll("input, textarea");
+    
+                inputs.forEach((input) => {
+                    if (input.type !== "hidden") {
+                        if (
+                            (input.type === "radio" ||
+                                input.type === "checkbox") &&
+                            !input.checked
+                        ) {
+                            const name = input.name;
+                            const options = document.querySelectorAll(
+                                `[name="${name}"]`
+                            );
+                            const isChecked = Array.from(options).some(
+                                (option) => option.checked
+                            );
+    
+                            if (!isChecked) {
+                                allAnswered = false;
+                                showError(input);
+                            } else {
+                                removeError(input);
+                            }
+                        } else if (
+                            input.type === "textarea" &&
+                            !input.value.trim()
+                        ) {
+                            allAnswered = false;
+                            showError(input);
+                        } else {
+                            removeError(input);
+                        }
+                    }
+                });
+    
+                if (allAnswered) {
+                    // istifadeci anketi muveffeqiyyetle tamamliyanda completedSurveys listine elave et
+                    let completedSurveys = JSON.parse(localStorage.getItem("completedSurveys")) || [];
+                    completedSurveys.push(survey.id);
+                    localStorage.setItem("completedSurveys", JSON.stringify(completedSurveys));
+    
+                    // Formu gönder
+                    form.submit();
+    
+                    // novbeti anketi aç
+                    const nextSurvey = surveys.find(s => s.priority === 1 && !completedSurveys.includes(s.id));
+                    if (nextSurvey) {
+                        // novbeti anketin açılmasını 1 saniye gecikdirmek ucun, belelikle form gönderildikden sonra açılacaq
+                        setTimeout(() => {
+                            showSurveyPopup(nextSurvey, false);
+                        }, 1000);
+                    }
+                } else {
+                    Swal.showValidationMessage(
+                        "Zəhmət olmasa təqdim etməzdən əvvəl bütün tələb olunan suallara cavab verin."
+                    );
+                    return false;
+                }
+            },
+        });
+
+    }
+
+    // cavablandirilmis suallar
+    function showNewAnswersPopup(answers, survey) {
+        let answersHtml = '';
+    
+        survey.surveys_questions.forEach((question, index) => {
+            const questionId = question.id;
+            const questionType = question.input_type; // Determine the question type (checkbox, radio, textarea)
+    
+            // Get the list of user's answers for this question
+            const answerList = answers[questionId] || []; // Adjust based on the response structure
+    
+            answersHtml += `<div class="col-xl-6 col-12">                        
+                <div class="card mb-4">
+                    <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                        <h3 class="m-0">${index + 1}.</h3>
+                        <h3 class="m-0">${question.question}</h3>
+                    </div>
+                    <div class="card-body">`;
+    
+            if (questionType === 'textarea') {
+                // Display the textarea with the user's answer
+                const textareaAnswer = answerList[0] ? answerList[0].answer : ''; // Adjust based on response structure
+            answersHtml += `<textarea disabled  rows="10" style='box-sizing:border-box; width: 100%;resize: "none" '>${textareaAnswer}</textarea>`;
+            } else {
+                // Display the options with user answers marked as checked
+                answersHtml += `<ul class="list-group-custom">`;
+                question.answers.forEach((option) => {
+                    // Determine if this option should be checked
+                    const isChecked = answerList.some(answer => answer.answer === option.name);
+    
+                    answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                            <div class="d-flex align-items-center justify-content-center">                                                
+                                <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded" style="width: 20px; height: 20px" />
+                            </div>
+                            <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                <label class="text-justify">
+                                    ${option.name}
+                                </label>
+                            </div>
+                        </div>
+                    </li>`;
+                });
+                answersHtml += `</ul>`;
+            }
+    
+            answersHtml += `</div>
+                </div>
+            </div>`;
+        });
+    
+        Swal.fire({
+            title: "User Answers",
+            html: `
+                <div class="row mb-4 w-100">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    ${answersHtml}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`,
+            showCancelButton: false,
+            confirmButtonText: "Ok",
+        });
+
+
+
+        // cavab yaz 
+        
+        
+           
+        
+        
+
+        // --------
+    }
 
     function fetchUserAnswers(surveyId) {
         $.ajax({

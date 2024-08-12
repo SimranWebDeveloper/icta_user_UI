@@ -170,6 +170,7 @@ class SurveysController extends Controller
             SurveysUsers::create([
                 'surveys_id' => $survey->id,
                 'users_id' => $userId,
+                'is_answered' => 2, 
             ]);
         }
 
