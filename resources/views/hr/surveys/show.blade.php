@@ -302,7 +302,7 @@
             const answerList = answers[questionId] || [];
 
             answersHtml += `<div class="col-lg-6 col-12">
-                <div class="card mb-4">
+                <div class="card mb-4==">
                     <div class="card-header w-100 d-flex justify-content-center align-items-center">
                         <h3 class="m-0">${index + 1}.</h3>
                         <h3 class="m-0">${question.question}</h3>
@@ -340,19 +340,23 @@
 
             title: `${user} Cavabları`,
             html: `
-                <div class="row mb-4 w-100">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row">
-                                    ${answersHtml}
-                                </div>
-                            </div>
+                 <div class="row mb-4 w-100">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            ${answersHtml}
                         </div>
                     </div>
-                </div>`,
+                </div>
+            </div>
+        </div>`,
             showCancelButton: false,
             confirmButtonText: "Ok",
+            customClass: {
+        popup: 'swal2-popup',
+        container: 'employeeAnswerModal'
+    }
         });
     }
 });
