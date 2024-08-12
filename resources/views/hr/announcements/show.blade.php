@@ -96,7 +96,7 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="card mt-4 w-50">
+                                <div class="card mt-4 w-50" style="margin-left: 20px;">
                                     <div class="card-header">
                                         <h3>Bitmə Tarixi</h3>
                                     </div>

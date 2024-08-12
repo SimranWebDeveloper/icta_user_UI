@@ -50,14 +50,14 @@
                                                 @php
                                                     $image = $announcement->image
                                                         ? asset('assets/images/announcements/' . $announcement->image)
-                                                        : 'https://static.thenounproject.com/png/1211233-200.png';
+                                                        : 'https://www.shutterstock.com/image-vector/premium-picture-icon-logo-line-600nw-749844106.jpg';
                                                 @endphp
                                                 <img class="d-block w-100" style="border-radius:5px;" src="{{ $image }}"
                                                     alt="Slide {{ $index + 1 }}">
                                                 <div class="carousel-caption d-md-block p-3"
                                                     style="border-radius:15px; background-color: rgba(125, 159, 246, 0.8);">
                                                     <h3 class="text-white announcementContent">{{ $announcement->title }}</h3>
-                                                    <p class="text-white announcementContent">{{ $announcement->content }}</p>
+                                                    <!-- <p class="text-white announcementContent">{{ $announcement->content }}</p> -->
                                                 </div>
                                             </div>
                             @endforeach
