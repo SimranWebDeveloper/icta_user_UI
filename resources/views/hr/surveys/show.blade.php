@@ -10,6 +10,10 @@
 
     }
 
+    .employeeAnswerModal .swal2-popup {
+        width: 80%;
+    }
+
     #list-item {
         list-style: none;
     }
@@ -176,7 +180,13 @@
 
                                             <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-xl-0">
                                                 @foreach($users as $index => $user)
-                                                    <h5 class="mt-1 mb-1 mt-xl-0 mb-xl-0">{{ $user->name }}</h5>
+                                                <h5 style="cursor: pointer" class="employeeAnswer mt-1 mb-1 mt-xl-0 mb-xl-0" 
+                                                    data-survey-id="{{ $survey->id }}" 
+                                                    data-user-id="{{ $user->id }}" 
+                                                    data-user-name="{{ $user->name }}">
+                                                    {{ $user->name }}
+                                                </h5>
+
                                                     {{ $index < count($users) - 1 ? ', ' : '' }}
                                                 @endforeach
                                             </div>
@@ -213,39 +223,143 @@
         </div>
     </div>
 </div>
+
+
+
+
 @endsection
 @section('js')
 <script>
     $(document).ready(function () {
-        $('.delete-item').on("click", function () {
-            const item_id = $(this).data('id');
-            Swal.fire({
-                title: "Silmək istədiyinizdən əminsiniz ?",
-                text: "Qeyd edək ki, silmək istədiyiniz elemendə bağlı olan bütün məlumatlar silinəcək!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Sil!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "/hr/surveys/" + item_id,
-                        type: "DELETE",
-                        data: {
-                            "_token": "{{ csrf_token() }}"
-                        },
-                        success: function (response) {
-                            Swal.fire(response.message).then((result) => {
-                                if (result.isConfirmed) {
-                                    location.href = response.route;
-                                }
-                            });
-                        },
-                    })
-                }
-            })
-        })
-    })
+    // Handle delete button click
+    $(document).on("click", ".delete-item", function () {
+        const item_id = $(this).data('id');
+        Swal.fire({
+            title: "Silmək istədiyinizdən əminsiniz?",
+            text: "Qeyd edək ki, silmək istədiyiniz elemendə bağlı olan bütün məlumatlar silinəcək!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sil!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "/hr/surveys/" + item_id,
+                    type: "DELETE",
+                    data: {
+                        "_token": "{{ csrf_token() }}"
+                    },
+                    success: function (response) {
+                        Swal.fire(response.message).then((result) => {
+                            if (result.isConfirmed) {
+                                location.href = response.route;
+                            }
+                        });
+                    },
+                });
+            }
+        });
+    });
+
+
+    
+    $(document).on("click", ".employeeAnswer", function () {
+        const survey = @json($survey);
+        const surveyId = $(this).data("survey-id");
+        const userId = $(this).data("user-id");
+        const user = $(this).data("user-name");
+        console.log('Survey ID:', surveyId);
+        fetchUserAnswers(surveyId, survey, user, userId );
+    });
+    
+    function fetchUserAnswers(surveyId, survey, user, userId) {
+        $.ajax({
+            url: `/employee/survey/answershr/${surveyId}/${userId}`,
+            method: 'GET',
+            success: function (response) {
+                console.log('Response:', response); 
+            if (survey) {
+                showUserAnswersPopup(response, survey, user);
+            } else {
+                console.error('Survey not found in surveys data.');
+            }
+        },
+        error: function (error) {
+            console.error("Failed to fetch user answers:", error);
+        }
+    });
+}
+
+
+    // Show user answers in a popup
+    function showUserAnswersPopup(answers, survey, user) {
+        let answersHtml = '';
+
+        survey.surveys_questions.forEach((question, index) => {
+            const questionId = question.id;
+            const questionType = question.input_type;
+            const answerList = answers[questionId] || [];
+
+            answersHtml += `<div class="col-lg-6 col-12">
+                <div class="card mb-4==">
+                    <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                        <h3 class="m-0">${index + 1}.</h3>
+                        <h3 class="m-0">${question.question}</h3>
+                    </div>
+                    <div class="card-body">`;
+
+            if (questionType === 'textarea') {
+                const textareaAnswer = answerList[0] ? answerList[0].answer : '';
+                answersHtml += `<textarea disabled cols="60" rows="10">${textareaAnswer}</textarea>`;
+            } else {
+                answersHtml += `<ul class="list-group-custom">`;
+                question.answers.forEach((option) => {
+                    const isChecked = answerList.some(answer => answer.answer === option.name);
+
+                    answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded" style="width: 35px; height: 35px" />
+                            </div>
+                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                <label class="text-justify">${option.name}</label>
+                            </div>
+                        </div>
+                    </li>`;
+                });
+                answersHtml += `</ul>`;
+            }
+
+            answersHtml += `</div>
+                </div>
+            </div>`;
+        });
+
+        Swal.fire({
+
+            title: `${user} Cavabları`,
+            html: `
+                 <div class="row mb-4 w-100">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            ${answersHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`,
+            showCancelButton: false,
+            confirmButtonText: "Ok",
+            customClass: {
+        popup: 'swal2-popup',
+        container: 'employeeAnswerModal'
+    }
+        });
+    }
+});
+
 </script>
 @endsection

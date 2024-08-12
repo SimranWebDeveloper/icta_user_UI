@@ -367,6 +367,16 @@
             minDate: "today",
             time_24hr: true,
             lang: "az",
+            minTime: new Date().toTimeString().slice(0, 5),
+        onChange: function(selectedDates, dateStr, instance) {
+            const now = new Date();
+            const selectedDate = selectedDates[0];
+            if (selectedDate.toDateString() === now.toDateString()) {
+                instance.set('minTime', now.toTimeString().slice(0, 5));
+            } else {
+                instance.set('minTime', '00:00'); 
+            }
+        }
 
         });
     });

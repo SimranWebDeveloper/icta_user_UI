@@ -64,7 +64,7 @@ $(document).ready(function () {
                                         <h3>Məzmun</h3>
                                     </div>
                                     <div class="card-body">
-                                        <div class="textarea" style="height:250px; overflow-y:scroll;text-align:start">
+                                        <div class="textarea" style="height:250px; overflow-y:auto;text-align:start">
                                             ${announcement.content}
                                         </div>
                                     </div>

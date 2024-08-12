@@ -16,6 +16,11 @@
         cursor: pointer;
     }
 
+    .fc-content-skeleton {
+        overflow-y: auto;
+        height: 100px;
+    }
+
     @media screen and (max-width: 768px) {
         .swal2-popup {
             width: 99%;
@@ -29,13 +34,13 @@
 <div class="card">
     <div class="card-header">
         <div class="d-flex justify-content-between align-items-center">
-            <h3 class="m-0">Rezervlər</h3>
+            <h3 class="m-0">Bronlar</h3>
             <a href="{{ route('employee.brons.create') }}">
                 <button class="btn btn-success">
                     <span class="me-2">
                         <i class="nav-icon i-Add-File"></i>
                     </span>
-                    Yeni rezerv
+                    Yeni bron
                 </button>
             </a>
         </div>
@@ -53,8 +58,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
 
 <script>
-    let durationInMinutes = 60; // 2 hours
-    let endDate = moment('2024-08-05T12:15').add(durationInMinutes, 'minutes').format('YYYY-MM-DDTHH:mm');
+    @php
+        $groupedParticipants = [];
+        foreach ($meetings as $meeting) {
+            $participants = $meeting->participants->groupBy(function ($user) {
+                return $user->departments_id . '-' . $user->branches_id;
+            });
+
+            foreach ($participants as $group => $users) {
+                $department = $departments[$users->first()->departments_id] ?? 'Bilinməyən departament';
+                $branch = $branches[$users->first()->branches_id] ?? 'Bilinməyən şöbə';
+
+                $groupedParticipants[$meeting->id][] = [
+                    'department' => $department,
+                    'branch' => $branch,
+                    'users' => $users->pluck('name')->toArray()
+                ];
+            }
+        }
+    @endphp
+    let groupedParticipants = @json($groupedParticipants);
+
     $(document).ready(function () {
         $('#calendar').fullCalendar(
             {
@@ -63,6 +87,16 @@
                 dayNames: ['Bazar', 'Bazar ertəsi', 'Çərşənbə axşamı', 'Çərşənbə', 'Cümə axşamı', 'Cümə', 'Şənbə'],
                 dayNamesShort: ['B.', 'B.E', 'Ç.A', 'Ç.', 'C.A', 'C.', 'Ş.'],
                 eventClick: function (event) {
+                let participants = groupedParticipants[event.id] || [];
+                let participantsHtml = participants.map(group => {
+                    return `<div class="d-xl-flex mt-3 align-items-start">
+                        <h3 class="col-xl-2 m-0">${group.department}</h3>
+                        <h4 class="col-xl-2 mb-0 mt-2 mt-md-0">${group.branch}</h4>
+                        <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
+                            ${group.users.map(user => `<h5 class="mt-1 mb-1 mt-md-0 mb-md-0">${user}</h5>`).join(', ')}
+                        </div>
+                    </div>`;
+                }).join('<hr class="hr" />');
                     Swal.fire({
                         title: 'Event Details',
                         html: `<div class="row mb-4">
@@ -71,7 +105,7 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
-                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">Subject <span
+                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">${event.subject} <span
                                 class="text-lowercase">
                                 haqqında Rezerv
                             </span>
@@ -92,7 +126,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                        subject
+                                        ${event.subject}
                                     </li>
                                 </ul>
                             </div>
@@ -106,7 +140,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                       otaq nomrəsi
+                                       ${event.room_number}
                                     </li>
                                 </ul>
                             </div>
@@ -120,7 +154,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                    2024-08-09 07:08:00
+                                        ${moment(event.start).format('DD-MM-YYYY HH:mm')}
                                     </li>
                                 </ul>
                             </div>
@@ -134,7 +168,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                        30 dəq
+                                        ${event.duration} dəq
                                     </li>
                                 </ul>
                             </div>
@@ -148,7 +182,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                        content
+                                        ${event.content}
                                     </li>
                                 </ul>
                             </div>
@@ -160,25 +194,7 @@
                                 <h3>İştirakçılar</h3>
                             </div>
                             <div class="card-body">
-                               
-
-                                    <div class="d-xl-flex mt-3 align-items-start">
-                                        <h3 class="col-xl-2 m-0">
-                                            Bilinməyən departament
-                                        </h3>
-
-                                        <h4 class="col-xl-2 mb-0 mt-2 mt-md-0">
-                                            Bilinməyən şöbə
-                                        </h4>
-
-                                        <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
-                                                <h5 class="mt-1 mb-1 mt-md-0 mb-md-0">name</h5>
-                                        </div>
-                                    </div>
-                                        <hr class="hr" />
-                            </div>
-
-                        </div>
+                               ${participantsHtml}
                     </div>
                 </div>
 
@@ -192,7 +208,7 @@
                         cancelButtonColor: 'red'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = '{{ route('employee.brons.edit', 1) }}';
+                            window.location.href = `{{ route('employee.brons.edit', ['bron' => ':id']) }}`.replace(':id', event.id);
                         }
                     });
                 },
@@ -209,22 +225,28 @@
                     today: "Bu gün"
                 },
                 events: [
+                    @foreach ($meetings as $meeting)
                     {
-                        title: "Rezerv",
-                        start: '2024-08-05T09:05',
-                        end: '2024-08-05T12:05',
+                        title: "{{ $meeting->subject }}",
+                        start: "{{ $meeting->start_date_time }}",
+                        end: moment("{{ $meeting->start_date_time }}").add({{ $meeting->duration }}, 'minutes').format('YYYY-MM-DDTHH:mm'),
                         color: 'green',
                         textColor: 'white',
+                        subject: "{{ $meeting->subject }}",
+                        content: "{{ $meeting->content }}",
+                        room_number: "{{ $meeting->rooms->name ?? 'Bilinmeyen Otaq' }}",
+                        duration: "{{ $meeting->duration }}",
+                        participants: {!! json_encode($meeting->participants->pluck('name')->toArray()) !!},
+                        department: "{{ $meeting->department->name ?? 'Bilinmeyen Departament' }}",
+                        branch: "{{ $meeting->branch->name ?? 'Bilinmeyen Branch' }}",
+                        id: "{{ $meeting->id }}"
+
                     },
-                    {
-                        title: "Rezerv-2",
-                        start: '2024-08-05T12:15',
-                        end: endDate,
-                        color: 'green',
-                        textColor: 'white'
-                    }
+                    @endforeach
                 ],
-                timeFormat: 'H(:mm)',
+
+
+                timeFormat: 'HH:mm',
 
                 // dayRender: function (date, cell) {
                 //     let newDate = $.fullCalendar.formatDate(date, 'DD-MM-YYYY');

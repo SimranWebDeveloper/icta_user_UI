@@ -19,10 +19,22 @@ class MeetingsController extends Controller
 
     public function index()
     {
-        $meetings = Meetings::with('rooms')->get();
+        $now = Carbon::now()->addHours(4);
+        $meetings = Meetings::with('rooms')->whereIn('type', [0, 1])->get();
+    
+        foreach ($meetings as $meeting) {
+            $startDateTime = Carbon::parse($meeting->start_date_time); 
+            $duration = $meeting->duration;
+            $endDateTime = $startDateTime->copy()->addMinutes($duration);
+            
+            if ($endDateTime->lessThanOrEqualTo($now)) {
+                $meeting->update(['status' => 0]);
+            }
+        }
+    
         return view('hr.meetings.index', compact('meetings'));
     }
-
+    
     public function create()
     {
 

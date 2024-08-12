@@ -21,15 +21,6 @@
                 </div>
             </div>
             <div class="container-fluid mt-4">
-                @if($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
                 <form method="POST" id="form" action="{{ route('hr.meetings.update', $meeting->id) }}">
                     @csrf
                     @method('PUT')
@@ -188,7 +179,7 @@
                             </div>
                         </div>
                         <div class="col-md-12 mb-1 mt-3">
-                            <button type="submit" class="btn btn-info btn-lg">
+                            <button type="submit" class="btn btn-info btn-lg" id="submitBtn">
                                 <span class="me-2">
                                     <i class="nav-icon i-Pen-2 font-weight-bold"></i>
                                 </span>
@@ -203,6 +194,34 @@
 @endsection
 @section('js')
 <script>
+      const submitBtn = document.getElementById('submitBtn');
+
+submitBtn.addEventListener('click', function (event) {
+    const inputs = document.querySelectorAll('input[required]');
+    inputs.forEach(input => {
+        if (input.value) {
+            input.setCustomValidity("");
+        } else {
+            input.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+        }
+    });
+    const selects = document.querySelectorAll('select[required]');
+    selects.forEach(select => {
+        if (select.value) {
+            select.setCustomValidity("");
+        } else {
+            select.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+        }
+    });
+    const texts = document.querySelectorAll('textarea[required]');
+    texts.forEach(text => {
+        if (text.value) {
+            text.setCustomValidity("");
+        } else {
+            text.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+        }
+    });
+})
     flatpickr("#date-time-picker", {
         allowInput: true,
         enableTime: true,
@@ -213,9 +232,22 @@
     });
 
     $('#form').on('submit', function (e) {
+        @if($errors->any())
+            Swal.fire({
+                title: "Xəta!",
+                text: "{{ implode(', ', $errors->all()) }}",
+                icon: "error"
+            });
+            e.preventDefault(); 
+        @endif
+
         if ($('.report-users:checked').length === 0) {
-            $('#err-text').html("Ən azı 1 iştirakçı seçin")
-            e.preventDefault()
+            Swal.fire({
+                title: "Xəta!",
+                text: "Ən azı 1 iştirakçı seçin",
+                icon: "warning"
+            });
+            e.preventDefault();
         }
     });
 
@@ -231,5 +263,6 @@
         const isChecked = $(this).is(':checked');
         $('.report-users[data-branch-id="' + branchId + '"]').prop('checked', isChecked);
     });
+
 </script>
 @endsection

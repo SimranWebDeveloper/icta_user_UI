@@ -7,6 +7,8 @@ $(document).ready(function () {
             meetingTitle = "İclas";
         } else if (meeting.type === 1) {
             meetingTitle = "Tədbir";
+        } else if (meeting.type === 2) {
+            meetingTitle = "Bron";
         }
 
         Swal.fire({
@@ -81,21 +83,49 @@ $(document).ready(function () {
                             </div>
                         </div>
                         <div class="card-footer">
-                            <a href="#">
-                                <button class="btn btn-info btn-lg" value="1">
-                                    İştirak edəcəm
-                                </button>
-                            </a>
-                            <a href="#">
-                                <button class="btn btn-danger btn-lg" value="0">
-                                    İştirak etməyəcəm
-                                </button>
-                            </a>
+                            <button class="btn btn-info btn-lg participation-button" value="1" data-meeting-id="${meeting.id}">
+                                İştirak edəcəm
+                            </button>
+                            <button class="btn btn-danger btn-lg participation-button" value="0" data-meeting-id="${meeting.id}">
+                                İştirak etməyəcəm
+                            </button>
                         </div>
                     </div>
                 </div>
             </div> `,
             showConfirmButton: false,
+        });
+    });
+
+    $(document).on("click", ".participation-button", function () {
+        const participationStatus = $(this).val();
+        const meetingId = $(this).data("meeting-id");
+
+        $.ajax({
+            url: window.participationStatusUrl, // Use the global variable
+            method: "POST",
+            data: {
+                _token: window.csrfToken, // Use the global variable
+                meeting_id: meetingId,
+                participation_status: participationStatus,
+            },
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Cavabınız qeyd olundu!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload();
+                });
+            },
+            error: function (xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Xəta baş verdi!',
+                    text: 'Cavabınız qeyd edilərkən xəta baş verdi. Zəhmət olmasa bir daha cəhd edin.',
+                });
+            }
         });
     });
 });
