@@ -29,22 +29,23 @@ $(document).ready(function () {
     });
     // anket Yenilendi
     $(".newSurveyButton").on("click", function () {
+        showNewAnswersPopup();
         const survey = $(this).data("survey");
         const surveyId = $(this).data("survey-id");
         // Cavablari gör
-            $.ajax({
-                url: `/employee/survey/answers/${surveyId}`,
-                method: 'GET',
-                success: function (response) {
-                    const survey = surveys.find(s => s.id === surveyId);
-                    if (survey) {
-                        showNewAnswersPopup(response, survey);
-                    }
-                },
-                error: function (error) {
-                    console.error("Failed to fetch user answers:", error);
-                }
-            });
+            // $.ajax({
+            //     url: `/employee/survey/answers/${surveyId}`,
+            //     method: 'GET',
+            //     success: function (response) {
+            //         const survey = surveys.find(s => s.id === surveyId);
+            //         if (survey) {
+            //             showNewAnswersPopup(response, survey);
+            //         }
+            //     },
+            //     error: function (error) {
+            //         console.error("Failed to fetch user answers:", error);
+            //     }
+            // });
 
         // Cavabla
         // showSurveyPopup(survey, survey.priority === 0);
@@ -54,73 +55,282 @@ $(document).ready(function () {
 
     // cavablandirilmis suallar    
     function showNewAnswersPopup(answers, survey) {
-        console.log('answers', answers);
         
-        // console.log('showNewAnswersPopup', answers['203'][0].answer);
-        // console.log('Ramal', answerList[0].answer);
-        let answersHtml = '';
-    
-        survey.surveys_questions.forEach((question, index) => {
-            const questionId = question.id;
-            const questionType = question.input_type; // Determine the question type (checkbox, radio, textarea)
-    
-            // Get the list of user's answers for this question
-            const answerList = answers[questionId] || []; // Adjust based on the response structure
-    
-            answersHtml += `<div class="col-xl-6 col-12">                        
-                <div class="card mb-4">
-                    <div class="card-header w-100 d-flex justify-content-center align-items-center">
-                        <h3 class="m-0">${index + 1}.</h3>
-                        <h3 class="m-0">${question.question}</h3>
-                    </div>
-                    <div class="card-body">`;
-    
-            if (questionType === 'textarea') {
-                // Display the textarea with the user's answer
-                const textareaAnswer = answerList[0] ? answerList[0].answer : ''; // Adjust based on response structure
-            answersHtml += `<textarea disabled  rows="10" style='box-sizing:border-box; width: 100%;resize: "none" '>${textareaAnswer}</textarea>`;
-            } else {
-                // Display the options with user answers marked as checked
-                answersHtml += `<ul class="list-group-custom">`;
-                question.answers.forEach((option) => {
-                    // Determine if this option should be checked
-                    const isChecked = answerList.some(answer => answer.answer === option.name);
-    
-                    answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
-                            <div class="d-flex align-items-center justify-content-center">                                                
-                                <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded" style="width: 20px; height: 20px" />
-                            </div>
-                            <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
-                                <label class="text-justify">
-                                    ${option.name}
-                                </label>
-                            </div>
-                        </div>
-                    </li>`;
-                });
-                answersHtml += `</ul>`;
-            }
-    
-            answersHtml += `</div>
-                </div>
-            </div>`;
-        });
-    
         Swal.fire({
             title: "User Answers",
             html: `
                 <div class="row mb-4 w-100">
-                    <div class="col-md-12">
-                        <div class="card">
+
+                <!-- deyisdirile bilmeyen cavablar -->
+
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">cox variantli</h3>
+                            </div>
                             <div class="card-body">
-                                <div class="row">
-                                    ${answersHtml}
-                                </div>
+                                <ul class="list-group-custom">
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <input type="checkbox" disabled checked class="rounded" style="width: 20px; height: 20px;" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                                <div class="d-flex align-items-center justify-content-center">                                                
+                                                    <input type="checkbox" disabled  class=" rounded" style="width: 20px; height: 20px" />
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                    <label class="text-justify">
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                    </label>
+                                                </div>
+                                        </div>
+                                    </li>  
+                                </ul>
                             </div>
                         </div>
                     </div>
-                </div>`,
+                    
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">Tek variantli</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group-custom">
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <input type="radio" name="radio_name" disabled checked class="rounded" style="width: 20px; height: 20px;" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                                <div class="d-flex align-items-center justify-content-center">                                                
+                                                    <input type="radio" disabled name="radio_name" class=" rounded" style="width: 20px; height: 20px" />
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                    <label class="text-justify">
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                    </label>
+                                                </div>
+                                        </div>
+                                    </li>  
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">Metn</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="w-100 pl-0">
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100">
+                                            <textarea rows="7" cols="10" class="w-100" disabled style="resize: none;"></textarea>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Deyisdirile bilen  -->
+
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">cox variantli</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group-custom">
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <input type="checkbox"  checked class="rounded" style="width: 20px; height: 20px;" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                                <div class="d-flex align-items-center justify-content-center">                                                
+                                                    <input type="checkbox"   class=" rounded" style="width: 20px; height: 20px" />
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                    <label class="text-justify">
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                    </label>
+                                                </div>
+                                        </div>
+                                    </li>  
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">Tek variantli</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group-custom">
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <input type="radio" name="radio_name"  checked class="rounded" style="width: 20px; height: 20px;" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                                <div class="d-flex align-items-center justify-content-center">                                                
+                                                    <input type="radio"  name="radio_name" class=" rounded" style="width: 20px; height: 20px" />
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                    <label class="text-justify">
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                    </label>
+                                                </div>
+                                        </div>
+                                    </li>  
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">Metn</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="w-100 pl-0">
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100">
+                                            <textarea rows="7" cols="10" class="w-100"  style="resize: none;"></textarea>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `,
             showCancelButton: false,
             confirmButtonText: "Ok",
         });
