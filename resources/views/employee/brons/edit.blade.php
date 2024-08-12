@@ -63,6 +63,16 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
+                        <div class="col-md-4 form-group mb-3 d-none">
+                            <div class="select_label ui sub header">Status</div>
+                            <select id="status" name="status" required class="form-control ui fluid">
+                                <option value="1" selected>Aktiv
+                                </option>
+                            </select>
+                            @error('status')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
                         <div class="col-md-6 form-group mb-3 none-field">
                             <div class="select_label ui sub header">Tarix <span class="text-danger">*</span></div>
                             <input type="text" id="date-time-picker" name="start_date_time" required
@@ -191,7 +201,17 @@
         dateFormat: "Y-m-d H:i",
         minDate: "today",
         time_24hr: true,
-        locale: "az"
+        locale: "az",
+        minTime: new Date().toTimeString().slice(0, 5),
+        onChange: function (selectedDates, dateStr, instance) {
+            const now = new Date();
+            const selectedDate = selectedDates[0];
+            if (selectedDate.toDateString() === now.toDateString()) {
+                instance.set('minTime', now.toTimeString().slice(0, 5));
+            } else {
+                instance.set('minTime', '00:00');
+            }
+        }
     });
 
     $('#form').on('submit', function (e) {
