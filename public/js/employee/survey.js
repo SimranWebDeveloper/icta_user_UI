@@ -3,13 +3,11 @@ $(document).ready(function () {
     const surveyStoreUrl = window.surveyStoreUrl;
     const csrfToken = window.csrfToken;
 
+    // user anketi daha evvel cavabladi mı yoxlamaq
     function openNextSurvey() {
         const completedSurveys = JSON.parse(localStorage.getItem("completedSurveys")) || [];
-        const nextSurvey = surveys.find(
-            (survey) =>
-                survey.priority === 1 && !completedSurveys.includes(survey.id)
-        );
-
+        const nextSurvey = surveys.find(survey => survey.priority === 1 && !completedSurveys.includes(survey.id));
+        
         if (nextSurvey) {
             showSurveyPopup(nextSurvey, false);
         }
@@ -19,164 +17,356 @@ $(document).ready(function () {
         openNextSurvey();
     }
 
-    $(".allSurveysButton").on("click", function () {
-        const survey = $(this).data("survey");
-        catchAllSurveys(survey);
-    });
-
-    function catchAllSurveys(survey) {
-        $.ajax({
-            url: `/employee/survey/answers/${survey.id}`,
-            method: "GET",
-            success: function (response) {
-                console.log(response)
-                let answersHtml = "";
-    
-                survey.surveys_questions.forEach((question, index) => {
-                    const questionId = question.id;
-                    const questionType = question.input_type;
-                    const answerList = response[questionId] || [];
-    
-                    answersHtml += `<div class="col-xl-6 col-12">                        
-                        <div class="card mb-4">
-                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
-                                <h3 class="m-0">${index + 1}.</h3>
-                                <h3 class="m-0">${question.question}</h3>
-                            </div>
-                            <div class="card-body">`;
-    
-                    if (questionType === "textarea") {
-                        const textareaAnswer = answerList.length > 0 ? answerList[0].answer : "";
-                        answersHtml += `<textarea rows="10" name="question_${questionId}" style="box-sizing:border-box; width: 100%;resize: none;" ${textareaAnswer ? "disabled" : ""}>${textareaAnswer}</textarea>`;
-                    } else {
-                        answersHtml += `<ul class="list-group-custom">`;
-                        question.answers.forEach((option) => {
-                            const isChecked = answerList.some(
-                                (answer) => answer.answer === option.name
-                            );
-    
-                            answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                                <div class="d-flex align-items-center justify-content-between  w-100 py-2">
-                                    <div class="d-flex align-items-center justify-content-center">                                                
-                                        <input type="${questionType}" name="question_${questionId}" value="${option.name}" ${isChecked ? "checked disabled" : ""} class="rounded" style="width: 20px; height: 20px" />
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
-                                        <label class="text-justify">
-                                            ${option.name}
-                                        </label>
-                                    </div>
-                                </div>
-                            </li>`;
-                        });
-                        answersHtml += `</ul>`;
-                    }
-    
-                    answersHtml += `</div>
-                        </div>
-                    </div>`;
-                });
-    
-                Swal.fire({
-                    title: "Survey Details",
-                    html: `<div class="row mb-4 w-100">
-                                <div class="col-md-12">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                ${answersHtml}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>`,
-                    showCancelButton: true,
-                    confirmButtonText: "Submit",
-                    preConfirm: () => {
-                        const updatedAnswers = [];
-    
-                        $("input[type='checkbox']:not(:disabled), input[type='radio']:not(:disabled)").each(function () {
-                            const nameAttr = $(this).attr("name");
-                            if (nameAttr) {
-                                updatedAnswers.push({
-                                    question_id: nameAttr.split("_")[1],
-                                    answer: $(this).val(),
-                                });
-                            }
-                        });
-    
-                        const textareaAnswers = $("textarea:not(:disabled)").map(function () {
-                            const nameAttr = $(this).attr("name");
-                            if (nameAttr) {
-                                return {
-                                    question_id: nameAttr.split("_")[1],
-                                    answer: $(this).val(),
-                                };
-                            }
-                        }).get();
-    
-                        updatedAnswers.push(...textareaAnswers);
-    
-                        return $.ajax({
-                            url: surveyStoreUrl,
-                            method: "POST",
-                            data: {
-                                _token: csrfToken,
-                                survey_id: survey.id,
-                                answers: updatedAnswers,
-                            },
-                        }).then((response) => {
-                            return response;
-                        }).catch((error) => {
-                            Swal.showValidationMessage(`Request failed: ${error}`);
-                        });
-                    }
-                });
-            },
-            error: function (error) {
-                console.error("Failed to fetch survey answers:", error);
-            },
-        });
-    }
-    
-    
-    
-
+    // Cavablari gör
     $(".showSurveyButton").on("click", function () {
         const surveyId = $(this).data("survey-id");
         fetchUserAnswers(surveyId);
     });
-
+    // Cavabla
     $(".surveyButton").on("click", function () {
         const survey = $(this).data("survey");
         showSurveyPopup(survey, survey.priority === 0);
     });
+    // anket Yenilendi
+    $(".allSurveysButton").on("click", function () {
+        showNewAnswersPopup();
+        const survey = $(this).data("survey");
+        const surveyId = $(this).data("survey-id");
+        // Cavablari gör
+            // $.ajax({
+            //     url: `/employee/survey/answers/${surveyId}`,
+            //     method: 'GET',
+            //     success: function (response) {
+            //         const survey = surveys.find(s => s.id === surveyId);
+            //         if (survey) {
+            //             showNewAnswersPopup(response, survey);
+            //         }
+            //     },
+            //     error: function (error) {
+            //         console.error("Failed to fetch user answers:", error);
+            //     }
+            // });
 
+        // Cavabla
+        // showSurveyPopup(survey, survey.priority === 0);
+    });
+
+
+
+    // cavablandirilmis suallar    
+    function showNewAnswersPopup(answers, survey) {
+        
+        Swal.fire({
+            title: "User Answers",
+            html: `
+                <div class="row mb-4 w-100">
+
+                <!-- deyisdirile bilmeyen cavablar -->
+
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">cox variantli</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group-custom">
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <input type="checkbox" disabled checked class="rounded" style="width: 20px; height: 20px;" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                                <div class="d-flex align-items-center justify-content-center">                                                
+                                                    <input type="checkbox" disabled  class=" rounded" style="width: 20px; height: 20px" />
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                    <label class="text-justify">
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                    </label>
+                                                </div>
+                                        </div>
+                                    </li>  
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">Tek variantli</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group-custom">
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <input type="radio" name="radio_name" disabled checked class="rounded" style="width: 20px; height: 20px;" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                                <div class="d-flex align-items-center justify-content-center">                                                
+                                                    <input type="radio" disabled name="radio_name" class=" rounded" style="width: 20px; height: 20px" />
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                    <label class="text-justify">
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                    </label>
+                                                </div>
+                                        </div>
+                                    </li>  
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">Metn</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="w-100 pl-0">
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100">
+                                            <textarea rows="7" cols="10" class="w-100" disabled style="resize: none;"></textarea>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Deyisdirile bilen  -->
+
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">cox variantli</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group-custom">
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <input type="checkbox"  checked class="rounded" style="width: 20px; height: 20px;" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                                <div class="d-flex align-items-center justify-content-center">                                                
+                                                    <input type="checkbox"   class=" rounded" style="width: 20px; height: 20px" />
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                    <label class="text-justify">
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                    </label>
+                                                </div>
+                                        </div>
+                                    </li>  
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">Tek variantli</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group-custom">
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <input type="radio" name="radio_name"  checked class="rounded" style="width: 20px; height: 20px;" />
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                                <label class="text-justify">
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                    cavab 1 variant
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                                <div class="d-flex align-items-center justify-content-center">                                                
+                                                    <input type="radio"  name="radio_name" class=" rounded" style="width: 20px; height: 20px" />
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                                    <label class="text-justify">
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                        cavab 2 variant
+                                                    </label>
+                                                </div>
+                                        </div>
+                                    </li>  
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">1.</h3>
+                                <h3 class="m-0">Metn</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="w-100 pl-0">
+                                    <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between w-100">
+                                            <textarea rows="7" cols="10" class="w-100"  style="resize: none;"></textarea>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `,
+            showCancelButton: false,
+            confirmButtonText: "Ok",
+        });
+    }
+    
+    
+
+    // Cavablari gör
     function fetchUserAnswers(surveyId) {
         $.ajax({
             url: `/employee/survey/answers/${surveyId}`,
-            method: "GET",
+            method: 'GET',
             success: function (response) {
-                console.log("Response:", response);
-                const survey = surveys.find((s) => s.id === surveyId);
+                console.log('Response:', response);
+                const survey = surveys.find(s => s.id === surveyId);
                 if (survey) {
                     showUserAnswersPopup(response, survey);
                 }
             },
             error: function (error) {
                 console.error("Failed to fetch user answers:", error);
-            },
+            }
         });
     }
 
+    // Cavablari gör
     function showUserAnswersPopup(answers, survey) {
-        let answersHtml = "";
-
+        let answersHtml = '';
+    
         survey.surveys_questions.forEach((question, index) => {
             const questionId = question.id;
-            const questionType = question.input_type;
-
-            const answerList = answers[questionId] || [];
-
+            const questionType = question.input_type; // Determine the question type (checkbox, radio, textarea)
+    
+            // Get the list of user's answers for this question
+            const answerList = answers[questionId] || []; // Adjust based on the response structure
+    
             answersHtml += `<div class="col-xl-6 col-12">                        
                 <div class="card mb-4">
                     <div class="card-header w-100 d-flex justify-content-center align-items-center">
@@ -184,54 +374,59 @@ $(document).ready(function () {
                         <h3 class="m-0">${question.question}</h3>
                     </div>
                     <div class="card-body">`;
-
-            if (questionType === "textarea") {
-                const textareaAnswer = answerList[0] ? answerList[0].answer : "";
-                answersHtml += `<textarea disabled rows="10" style="box-sizing:border-box; width: 100%;resize: none;">${textareaAnswer}</textarea>`;
+    
+            if (questionType === 'textarea') {
+                // Display the textarea with the user's answer
+                const textareaAnswer = answerList[0] ? answerList[0].answer : ''; // Adjust based on response structure
+            answersHtml += `<textarea disabled  rows="10" style='box-sizing:border-box; width: 100%;resize: "none" '>${textareaAnswer}</textarea>`;
             } else {
+                // Display the options with user answers marked as checked
                 answersHtml += `<ul class="list-group-custom">`;
                 question.answers.forEach((option) => {
-                    const isChecked = answerList.some(
-                        (answer) => answer.answer === option.name
-                    );
-
+                    // Determine if this option should be checked
+                    const isChecked = answerList.some(answer => answer.answer === option.name);
+    
                     answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
                             <div class="d-flex align-items-center justify-content-center">                                                
-                                <input type="${questionType}" disabled ${isChecked ? "checked" : ""} class="rounded" style="width: 20px; height: 20px" />
+                                <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded" style="width: 20px; height: 20px" />
                             </div>
-                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
-                                <label class="text-justify">${option.name}</label>
+                            <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                <label class="text-justify">
+                                    ${option.name}
+                                </label>
                             </div>
                         </div>
                     </li>`;
                 });
                 answersHtml += `</ul>`;
             }
-
+    
             answersHtml += `</div>
                 </div>
             </div>`;
         });
-
+    
         Swal.fire({
             title: "User Answers",
-            html: `<div class="row mb-4 w-100">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="row">
-                                        ${answersHtml}
-                                    </div>
+            html: `
+                <div class="row mb-4 w-100">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    ${answersHtml}
                                 </div>
                             </div>
                         </div>
-                    </div>`,
+                    </div>
+                </div>`,
             showCancelButton: false,
             confirmButtonText: "Ok",
         });
     }
 
+    // Cavabla
     function showSurveyPopup(survey, canCancel) {
         Swal.fire({
             title: survey.name || "Survey",
@@ -246,21 +441,32 @@ $(document).ready(function () {
                 let allAnswered = true;
                 const form = document.getElementById("surveyForm");
                 const inputs = form.querySelectorAll("input, textarea");
-
+    
                 inputs.forEach((input) => {
                     if (input.type !== "hidden") {
-                        if ((input.type === "radio" || input.type === "checkbox") && !input.checked) {
+                        if (
+                            (input.type === "radio" ||
+                                input.type === "checkbox") &&
+                            !input.checked
+                        ) {
                             const name = input.name;
-                            const options = document.querySelectorAll(`[name="${name}"]`);
-                            const isChecked = Array.from(options).some((option) => option.checked);
-
+                            const options = document.querySelectorAll(
+                                `[name="${name}"]`
+                            );
+                            const isChecked = Array.from(options).some(
+                                (option) => option.checked
+                            );
+    
                             if (!isChecked) {
                                 allAnswered = false;
                                 showError(input);
                             } else {
                                 removeError(input);
                             }
-                        } else if (input.type === "textarea" && input.value.trim() === "") {
+                        } else if (
+                            input.type === "textarea" &&
+                            !input.value.trim()
+                        ) {
                             allAnswered = false;
                             showError(input);
                         } else {
@@ -268,98 +474,143 @@ $(document).ready(function () {
                         }
                     }
                 });
-
-                if (!allAnswered) {
-                    Swal.showValidationMessage("Please answer all questions before submitting.");
-                    return false;
-                } else {
-                    const formData = new FormData(form);
-                    const data = {};
-
-                    for (const [key, value] of formData.entries()) {
-                        const match = key.match(/^question_(\d+)$/);
-                        if (match) {
-                            const questionId = match[1];
-                            if (!data[questionId]) {
-                                data[questionId] = [];
-                            }
-                            data[questionId].push(value);
-                        }
+    
+                if (allAnswered) {
+                    // istifadeci anketi muveffeqiyyetle tamamliyanda completedSurveys listine elave et
+                    let completedSurveys = JSON.parse(localStorage.getItem("completedSurveys")) || [];
+                    completedSurveys.push(survey.id);
+                    localStorage.setItem("completedSurveys", JSON.stringify(completedSurveys));
+    
+                    // Formu gönder
+                    form.submit();
+    
+                    // novbeti anketi aç
+                    const nextSurvey = surveys.find(s => s.priority === 1 && !completedSurveys.includes(s.id));
+                    if (nextSurvey) {
+                        // novbeti anketin açılmasını 1 saniye gecikdirmek ucun, belelikle form gönderildikden sonra açılacaq
+                        setTimeout(() => {
+                            showSurveyPopup(nextSurvey, false);
+                        }, 1000);
                     }
-
-                    return $.ajax({
-                        url: surveyStoreUrl,
-                        method: "POST",
-                        data: {
-                            _token: csrfToken,
-                            survey_id: survey.id,
-                            answers: data,
-                        },
-                    }).then((response) => {
-                        return response;
-                    }).catch((error) => {
-                        Swal.showValidationMessage(`Request failed: ${error}`);
-                    });
+                } else {
+                    Swal.showValidationMessage(
+                        "Zəhmət olmasa təqdim etməzdən əvvəl bütün tələb olunan suallara cavab verin."
+                    );
+                    return false;
                 }
             },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                saveCompletedSurvey(survey.id);
-                if (survey.priority === 1) {
-                    openNextSurvey();
-                }
-            }
         });
     }
-
-    function generateSurveyHtml(survey) {
-        let surveyHtml = `<form id="surveyForm">`;
-
-        survey.surveys_questions.forEach((question, index) => {
-            const questionType = question.input_type;
-
-            surveyHtml += `<div class="mb-3">
-                <label class="form-label">${index + 1}. ${question.question}</label>`;
-
-            if (questionType === "textarea") {
-                surveyHtml += `<textarea class="form-control" name="question_${question.id}" required></textarea>`;
-            } else if (questionType === "radio") {
-                question.answers.forEach((option) => {
-                    surveyHtml += `<div class="form-check">
-                        <input class="form-check-input" type="radio" name="question_${question.id}" value="${option.name}" required>
-                        <label class="form-check-label">${option.name}</label>
-                    </div>`;
-                });
-            } else if (questionType === "checkbox") {
-                question.answers.forEach((option) => {
-                    surveyHtml += `<div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="question_${question.id}" value="${option.name}">
-                        <label class="form-check-label">${option.name}</label>
-                    </div>`;
-                });
-            }
-
-            surveyHtml += `</div>`;
-        });
-
-        surveyHtml += `<input type="hidden" name="_token" value="${csrfToken}">
-            <input type="hidden" name="survey_id" value="${survey.id}">
-        </form>`;
-
-        return surveyHtml;
-    }
-
-    function saveCompletedSurvey(surveyId) {
-        const completedSurveys = JSON.parse(localStorage.getItem("completedSurveys")) || [];
-        completedSurveys.push(surveyId);
-        localStorage.setItem("completedSurveys", JSON.stringify(completedSurveys));
-    }
+    
+    
 
     function showError(input) {
-        $(input).addClass("is-invalid");
+        const errorText = document.createElement("span");
+        errorText.className = "error-text";
+        errorText.style.color = "red";
+        errorText.innerText = "Bu suala cavab verməyiniz tələb olunur.";
+
+        const parent = input.closest(".card-body");
+        if (!parent.querySelector(".error-text")) {
+            parent.appendChild(errorText);
+        }
     }
 
     function removeError(input) {
-        $(input).removeClass("is-invalid");
+        const parent = input.closest(".card-body");
+        const errorText = parent.querySelector(".error-text");
+        if (errorText) {
+            errorText.remove();
+        }
+    }
+
+    function generateSurveyHtml(survey) {
+        if (
+            !survey ||
+            !survey.surveys_questions ||
+            !Array.isArray(survey.surveys_questions)
+        ) {
+            return "<p>Hələki Heç Bir Sual Yoxdur.</p>";
+        }
+
+        let questionsHtml = "";
+        survey.surveys_questions.forEach((question, index) => {
+            let optionsHtml = "";
+            if (question.input_type === "radio") {
+                question.answers.forEach((option) => {
+                    optionsHtml += `
+                      <div class="answers d-flex form-check">
+                          <input class="form-check-input" type="radio" value="${option.name}" name="question[${question.id}]" id="option_${index}_${option.id}" required />
+                          <label class="w-100" for="option_${index}_${option.id}">${option.name}</label>
+                      </div>
+                  `;
+                });
+            } else if (question.input_type === "checkbox") {
+                question.answers.forEach((option) => {
+                    optionsHtml += `
+                      <div class="answers d-flex form-check">
+                          <input class="form-check-input" type="checkbox" value="${option.name}" name="question[${question.id}][]" id="option_${index}_${option.id}" />
+                          <label class="w-100" for="option_${index}_${option.id}">${option.name}</label>
+                      </div>
+                  `;
+                });
+            } else if (question.input_type === "textarea") {
+                optionsHtml = `
+                  <div>
+                      <textarea rows="7" cols="10" class="form-control" name="question[${question.id}]" required></textarea>
+                  </div>
+              `;
+            }
+
+            questionsHtml += `
+              <div class="col-md-6 col-sm-12 mb-4">
+                  <div class="card">
+                      <div class="card-header d-flex justify-content-center">
+                          <h4>${index + 1}.</h4>
+                          <h4>${question.question}</h4>
+                      </div>
+                      <div class="card-body">
+                          ${optionsHtml}
+                      </div>
+                  </div>
+              </div>
+          `;
+        });
+
+        return `
+          <div class="pt-4 custom-container bg-white">
+              <div class="row">
+                  <div class="col-12">
+                      <form id="surveyForm" action="${surveyStoreUrl}" method="POST">
+                        <input name="_token" value="${csrfToken}" type="hidden">
+                          <div class="card">
+                              <div class="card-header">
+                                  <div class="d-flex justify-content-between align-items-center">
+                                      <div class="name-date-wrapper">
+                                          <h3 class="ml-3 mt-0 mb-0 mr-0">
+                                            ${survey.name} 
+                                            ${
+                                                survey.is_anonym === 1
+                                                    ? "<span>(anonim)</span>"
+                                                    : ""
+                                            }
+                                        </h3>
+                                          <h4 class="ml-3 mt-0 mb-0 mr-0">Bitme Tarixi: ${new Date(
+                                              survey.expired_at
+                                          ).toLocaleDateString()} ${new Date(survey.expired_at).toLocaleTimeString()}</h4>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="card-body">
+                                  <div class="row">
+                                      ${questionsHtml}
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      `;
     }
 });
