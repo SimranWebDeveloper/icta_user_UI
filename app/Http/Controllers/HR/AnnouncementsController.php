@@ -14,9 +14,9 @@ class AnnouncementsController extends Controller
     public function index()
 {
     $now = Carbon::now()->addHours(4);  //son
-    $cutoffTime = $now->subDay()->endOfDay();
+   
     
-    Announcements::where('end_date', '<=', $cutoffTime->format('Y-m-d H:i:s'))
+    Announcements::where('end_date', '<=' , $now->format('Y-m-d H:i:s'))
                  ->where('status', '!=', 0)
                  ->update(['status' => 0]);
     
