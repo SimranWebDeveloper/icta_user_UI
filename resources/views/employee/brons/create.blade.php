@@ -44,7 +44,7 @@
                             <option value="{{ $room->id }}" {{ old('rooms_id') == $room->id ? 'selected' : '' }}>
                                 {{ $room->name }}
                             </option>
-                         @endforeach
+                        @endforeach
                     </select>
                     @error('rooms_id')
                         <span class="text-danger">{{ $message }}</span>
@@ -83,9 +83,9 @@
                     @enderror
                 </div>
                 <div class="col-md-12 form-group mb-3">
-                    <div class="select_label ui sub header">Məzmun <span class="text-danger">*</span></div>
-                    <textarea name="content" required rows="6" class="form-control" id="content"
-                        placeholder="Məzmun daxil edin" style="resize: none;"></textarea>
+                    <div class="select_label ui sub header">Məzmun</div>
+                    <textarea name="content" rows="6" class="form-control" id="content" placeholder="Məzmun daxil edin"
+                        style="resize: none;"></textarea>
                     @error('content')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -110,31 +110,31 @@
                                         <div class="col-4">
                                             <h3>Departament</h3>
                                             @foreach($departments as $department)
-                                            <label class="checkbox checkbox-primary">
-                                                <input type="checkbox" class="report-departments"
-                                                    name="w_departments_id[]" value="{{ $department->id }}">
-                                                <span><strong>{{ $department->name }}</strong> (Şöbə:
-                                                    {{ $department->branches_count }}, İşçi:
-                                                    {{ $department->users_count }})</span>
-                                                <span class="checkmark"></span>
-                                            </label>
-                                        @endforeach
+                                                <label class="checkbox checkbox-primary">
+                                                    <input type="checkbox" class="report-departments"
+                                                        name="w_departments_id[]" value="{{ $department->id }}">
+                                                    <span><strong>{{ $department->name }}</strong> (Şöbə:
+                                                        {{ $department->branches_count }}, İşçi:
+                                                        {{ $department->users_count }})</span>
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            @endforeach
                                         </div>
                                         <div class="col-8">
                                             <h3>Şöbə</h3>
                                             <div class="row">
                                                 @foreach($branches as $branch)
-                                                            <div class="col-4">
-                                                                <label class="checkbox checkbox-primary">
-                                                                    <input type="checkbox" class="report-branches"
-                                                                        data-department-id="{{ !is_null($branch->departments) ? $branch->departments->id : '' }}"
-                                                                        name="w_branch_id[]" value="{{ $branch->id }}">
-                                                                    <span><strong>{{ $branch->name }}</strong> (İşçi:
-                                                                        {{ $branch->users_count }})</span>
-                                                                    <span class="checkmark"></span>
-                                                                </label>
-                                                            </div>
-                                                        @endforeach
+                                                    <div class="col-4">
+                                                        <label class="checkbox checkbox-primary">
+                                                            <input type="checkbox" class="report-branches"
+                                                                data-department-id="{{ !is_null($branch->departments) ? $branch->departments->id : '' }}"
+                                                                name="w_branch_id[]" value="{{ $branch->id }}">
+                                                            <span><strong>{{ $branch->name }}</strong> (İşçi:
+                                                                {{ $branch->users_count }})</span>
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                @endforeach
                                             </div>
                                         </div>
                                     </div>
@@ -144,18 +144,18 @@
                                             <h3>İşçilər</h3>
                                             <div class="row">
                                                 @foreach($users as $user)
-                                                <div class="col-4 mt-4">
-                                                    <label class="checkbox checkbox-primary">
-                                                        <input type="checkbox"
-                                                            data-branch-id="{{ !is_null($user->branches) ? $user->branches->id : '' }}"
-                                                            data-department-id="{{ !is_null($user->departments) ? $user->departments->id : '' }}"
-                                                            class="report-users" name="w_user_id[]"
-                                                            value="{{ $user->id }}">
-                                                        <span>{{ $user->name }}</span>
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </div>
-                                            @endforeach
+                                                    <div class="col-4 mt-4">
+                                                        <label class="checkbox checkbox-primary">
+                                                            <input type="checkbox"
+                                                                data-branch-id="{{ !is_null($user->branches) ? $user->branches->id : '' }}"
+                                                                data-department-id="{{ !is_null($user->departments) ? $user->departments->id : '' }}"
+                                                                class="report-users" name="w_user_id[]"
+                                                                value="{{ $user->id }}">
+                                                            <span>{{ $user->name }}</span>
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                @endforeach
                                             </div>
                                         </div>
                                     </div>
@@ -172,11 +172,18 @@
     </div>
 </div>
 @endsection
+
 @section('js')
 <script>
     const submitBtn = document.getElementById('submitBtn');
+    const subjectInput = document.getElementById('subject');
+    const contentTextarea = document.getElementById('content');
 
     submitBtn.addEventListener('click', function (event) {
+        if (!contentTextarea.value) {
+            contentTextarea.value = subjectInput.value;
+        }
+
         const inputs = document.querySelectorAll('input[required]');
         inputs.forEach(input => {
             if (input.value) {
@@ -185,6 +192,7 @@
                 input.setCustomValidity("Zəhmət olmazsa xananı doldurun");
             }
         });
+
         const selects = document.querySelectorAll('select[required]');
         selects.forEach(select => {
             if (select.value) {
@@ -193,6 +201,7 @@
                 select.setCustomValidity("Zəhmət olmazsa xananı doldurun");
             }
         });
+
         const texts = document.querySelectorAll('textarea[required]');
         texts.forEach(text => {
             if (text.value) {
@@ -201,7 +210,8 @@
                 text.setCustomValidity("Zəhmət olmazsa xananı doldurun");
             }
         });
-    })
+    });
+
     $('#room').change(function () {
         if ($(this).val()) {
             $('.none-field').show();
@@ -218,13 +228,13 @@
         time_24hr: true,
         locale: "az",
         minTime: new Date().toTimeString().slice(0, 5),
-        onChange: function(selectedDates, dateStr, instance) {
+        onChange: function (selectedDates, dateStr, instance) {
             const now = new Date();
             const selectedDate = selectedDates[0];
             if (selectedDate.toDateString() === now.toDateString()) {
                 instance.set('minTime', now.toTimeString().slice(0, 5));
             } else {
-                instance.set('minTime', '00:00'); 
+                instance.set('minTime', '00:00');
             }
         }
     });
@@ -243,9 +253,7 @@
     $('.report-departments').on('change', function () {
         const department_id = $(this).val();
         if ($(this).is(':checked')) {
-            // Seçilən şöbələri tapır və işarələyir
             $('.report-branches[data-department-id="' + department_id + '"]').prop('checked', true);
-            // Seçilən şöbələrin istifadəçilərini işarələyir
             $('.report-users[data-department-id="' + department_id + '"]').each(function () {
                 const branchId = $(this).data('branch-id');
                 if ($('.report-branches[value="' + branchId + '"]').is(':checked')) {
@@ -255,7 +263,6 @@
                 }
             });
         } else {
-            // Departamentin işarəsini açdıqda şöbələri və istifadəçiləri işarəsiz edir
             $('.report-branches[data-department-id="' + department_id + '"]').prop('checked', false);
             $('.report-users[data-department-id="' + department_id + '"]').prop('checked', false);
         }
@@ -264,13 +271,10 @@
     $('.report-branches').on('change', function () {
         const branch_id = $(this).val();
         if ($(this).is(':checked')) {
-            // Şöbə seçildikdə istifadəçiləri işarələyir
             $('.report-users[data-branch-id="' + branch_id + '"]').prop('checked', true);
         } else {
-            // Şöbə işarəsi açıldıqda istifadəçiləri işarəsiz edir
             $('.report-users[data-branch-id="' + branch_id + '"]').prop('checked', false);
         }
     });
-
 </script>
 @endsection

@@ -193,32 +193,32 @@
 <script>
     const submitBtn = document.getElementById('submitBtn');
 
-submitBtn.addEventListener('click', function (event) {
-    const inputs = document.querySelectorAll('input[required]');
-    inputs.forEach(input => {
-        if (input.value) {
-            input.setCustomValidity("");
-        } else {
-            input.setCustomValidity("Zəhmət olmazsa xananı doldurun");
-        }
-    });
-    const selects = document.querySelectorAll('select[required]');
-    selects.forEach(select => {
-        if (select.value) {
-            select.setCustomValidity("");
-        } else {
-            select.setCustomValidity("Zəhmət olmazsa xananı doldurun");
-        }
-    });
-    const texts = document.querySelectorAll('textarea[required]');
-    texts.forEach(text => {
-        if (text.value) {
-            text.setCustomValidity("");
-        } else {
-            text.setCustomValidity("Zəhmət olmazsa xananı doldurun");
-        }
-    });
-})
+    submitBtn.addEventListener('click', function (event) {
+        const inputs = document.querySelectorAll('input[required]');
+        inputs.forEach(input => {
+            if (input.value) {
+                input.setCustomValidity("");
+            } else {
+                input.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+            }
+        });
+        const selects = document.querySelectorAll('select[required]');
+        selects.forEach(select => {
+            if (select.value) {
+                select.setCustomValidity("");
+            } else {
+                select.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+            }
+        });
+        const texts = document.querySelectorAll('textarea[required]');
+        texts.forEach(text => {
+            if (text.value) {
+                text.setCustomValidity("");
+            } else {
+                text.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+            }
+        });
+    })
     $('#room').change(function () {
         if ($(this).val()) {
             $('.none-field').show();
@@ -233,10 +233,22 @@ submitBtn.addEventListener('click', function (event) {
         dateFormat: "Y-m-d H:i",
         minDate: "today",
         time_24hr: true,
-        locale: "az"
+        locale: "az",
+        minTime: new Date().toTimeString().slice(0, 5),
+        onChange: function (selectedDates, dateStr, instance) {
+            const now = new Date();
+            const selectedDate = selectedDates[0];
+            if (selectedDate.toDateString() === now.toDateString()) {
+                instance.set('minTime', now.toTimeString().slice(0, 5));
+            } else {
+                instance.set('minTime', '00:00');
+            }
+        }
     });
 
     $('#form').on('submit', function (e) {
+        e.preventDefault(); // Prevent default form submission
+
         if ($('.report-users:checked').length === 0) {
             Swal.fire({
                 title: "Xəta!",
@@ -245,7 +257,38 @@ submitBtn.addEventListener('click', function (event) {
             })
             e.preventDefault()
         }
+
+        // Clear previous error messages
+        $('#err-text').html('');
+
+        // Serialize form data
+        var formData = $(this).serialize();
+
+        // Send the form data via AJAX
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+                if (response.status === 'error') {
+                    // Display error message under the submit button
+                    $('#err-text').html(response.message);
+                } else {
+                    // Display success message under the submit button
+                    $('#err-text').html(response.message);
+                    // Redirect if a redirect URL is provided
+                    if (response.route) {
+                        window.location.href = response.route;
+                    }
+                }
+            },
+            error: function (xhr) {
+                // Display a generic error message
+                $('#err-text').html('Bir hata oluştu. Lütfen tekrar deneyin.');
+            }
+        });
     });
+
 
     $('.report-departments').on('change', function () {
         const department_id = $(this).val();
