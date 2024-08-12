@@ -29,8 +29,10 @@ class EmployeeController extends Controller
     $announcements = Announcements::where('status', 1)->get();
 
     // Retrieve meetings for the user
-    $meetings_users = MeetingsUsers::where('users_id', $user->id)->pluck('meetings_id');
-    $meetings = Meetings::whereIn('id', $meetings_users)->where('status', 1)->with('rooms')->get();
+    $meetings_users = MeetingsUsers::where('users_id', $user->id)->get();
+    $meetings_ids = $meetings_users->pluck('meetings_id');
+    $meetings = Meetings::whereIn('id', $meetings_ids)->where('status', 1)->with('rooms')->get();
+
 
     // Retrieve surveys and related data
     $surveys_users = SurveysUsers::with('surveys')->where('users_id', $user->id)->get();
