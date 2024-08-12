@@ -64,8 +64,12 @@
                                     <p class="normal">Normal</p>
                                 @endif
                             </div>
+
+                                <button class="btn btn-success btn-md mt-3 allSurveysButton" data-survey-id='{{$survey->id}}' data-survey='@json($survey)' data-is-answered="true">
+                                    Butun sual ve cavablar
+                                </button>
             
-                            @if ($surveyUser && $surveyUser->is_answered == 1)
+                            <!-- @if ($surveyUser && $surveyUser->is_answered == 1)
                                 <button class="btn btn-success btn-md mt-3 showSurveyButton" data-survey-id='{{$survey->id}}' data-is-answered="true">
                                     Cavablari gör
                                 </button>
@@ -77,7 +81,7 @@
                                 <button class="btn btn-success btn-md mt-3 newSurveyButton" data-survey-id='{{$survey->id}}' data-survey='@json($survey)' data-is-answered="false">
                                     Anket Yenilendi
                                 </button>
-                            @endif
+                            @endif -->
 
                         </div>
                     </div>
@@ -100,6 +104,8 @@
 {{-- <button type="submit">Submit2</button>
 </form> --}}
 </div>
+
+
 
 
 <script>
