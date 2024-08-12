@@ -46,7 +46,7 @@ class EmployeeController extends Controller
                                     return [$surveyId => $answers->keyBy('surveys_questions_id')];
                                 });
 
-    return view('employee.home', compact('announcements', 'meetings', 'surveys', 'surveys_users', 'userAnswers'));
+    return view('employee.home', compact('announcements', 'meetings', 'surveys', 'surveys_users', 'userAnswers', 'meetings_users'));
 }
 
 
