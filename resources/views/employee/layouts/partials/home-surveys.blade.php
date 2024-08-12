@@ -69,11 +69,16 @@
                                 <button class="btn btn-success btn-md mt-3 showSurveyButton" data-survey-id='{{$survey->id}}' data-is-answered="true">
                                     Cavablari gör
                                 </button>
-                            @else
+                            @elseif ($surveyUser && $surveyUser->is_answered == 0)
                                 <button class="btn btn-success btn-md mt-3 surveyButton" data-survey='@json($survey)' data-is-answered="false">
                                     Cavabla
                                 </button>
+                            @elseif ($surveyUser && $surveyUser->is_answered == 2)
+                                <button class="btn btn-success btn-md mt-3 newSurveyButton" data-survey-id='{{$survey->id}}' data-survey='@json($survey)' data-is-answered="false">
+                                    Anket Yenilendi
+                                </button>
                             @endif
+
                         </div>
                     </div>
                 </div>
