@@ -17,6 +17,7 @@ $(document).ready(function () {
         openNextSurvey();
     }
 
+    // Cavablari gör
     $(".showSurveyButton").on("click", function () {
         const surveyId = $(this).data("survey-id");
         fetchUserAnswers(surveyId);
@@ -53,7 +54,7 @@ $(document).ready(function () {
             // Get the list of user's answers for this question
             const answerList = answers[questionId] || []; // Adjust based on the response structure
     
-            answersHtml += `<div class="col-lg-6 col-12">                        
+            answersHtml += `<div class="col-xl-6 col-12">                        
                 <div class="card mb-4">
                     <div class="card-header w-100 d-flex justify-content-center align-items-center">
                         <h3 class="m-0">${index + 1}.</h3>
@@ -64,7 +65,7 @@ $(document).ready(function () {
             if (questionType === 'textarea') {
                 // Display the textarea with the user's answer
                 const textareaAnswer = answerList[0] ? answerList[0].answer : ''; // Adjust based on response structure
-            answersHtml += `<textarea disabled cols="60" rows="10">${textareaAnswer}</textarea>`;
+            answersHtml += `<textarea disabled  rows="10" style='box-sizing:border-box; width: 100%;resize: "none" '>${textareaAnswer}</textarea>`;
             } else {
                 // Display the options with user answers marked as checked
                 answersHtml += `<ul class="list-group-custom">`;
@@ -75,7 +76,7 @@ $(document).ready(function () {
                     answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
                         <div class="d-flex align-items-center justify-content-between  w-100 py-2">
                             <div class="d-flex align-items-center justify-content-center">                                                
-                                <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded" style="width: 35px; height: 35px" />
+                                <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded" style="width: 20px; height: 20px" />
                             </div>
                             <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
                                 <label class="text-justify">
