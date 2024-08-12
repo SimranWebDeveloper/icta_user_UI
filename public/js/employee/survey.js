@@ -31,105 +31,33 @@ $(document).ready(function () {
     $(".newSurveyButton").on("click", function () {
         const survey = $(this).data("survey");
         const surveyId = $(this).data("survey-id");
-        newSurveyPopup(surveyId, survey);
+        // Cavablari gör
+            $.ajax({
+                url: `/employee/survey/answers/${surveyId}`,
+                method: 'GET',
+                success: function (response) {
+                    const survey = surveys.find(s => s.id === surveyId);
+                    if (survey) {
+                        showNewAnswersPopup(response, survey);
+                    }
+                },
+                error: function (error) {
+                    console.error("Failed to fetch user answers:", error);
+                }
+            });
+
+        // Cavabla
+        // showSurveyPopup(survey, survey.priority === 0);
     });
 
-    function newSurveyPopup(surveyId, survey) {
-        // cavablandirilmis suallar
-        $.ajax({
-            url: `/employee/survey/answers/${surveyId}`,
-            method: 'GET',
-            success: function (response) {
-                const survey = surveys.find(s => s.id === surveyId);
-                if (survey) {
-                    showNewAnswersPopup(response, survey);
-                }
-            },
-            error: function (error) {
-                console.error("Failed to fetch user answers:", error);
-            }
-        });
-        // -----------------------
 
-        // no cavab suallar
-        
-        Swal.fire({
-            title: survey.name || "Survey",
-            html: generateSurveyHtml(survey),
-            showCancelButton: canCancel,
-            confirmButtonText: "Submit",
-            cancelButtonText: "Cancel",
-            allowOutsideClick: canCancel,
-            allowEscapeKey: canCancel,
-            allowEnterKey: canCancel,
-            preConfirm: () => {
-                let allAnswered = true;
-                const form = document.getElementById("surveyForm");
-                const inputs = form.querySelectorAll("input, textarea");
-    
-                inputs.forEach((input) => {
-                    if (input.type !== "hidden") {
-                        if (
-                            (input.type === "radio" ||
-                                input.type === "checkbox") &&
-                            !input.checked
-                        ) {
-                            const name = input.name;
-                            const options = document.querySelectorAll(
-                                `[name="${name}"]`
-                            );
-                            const isChecked = Array.from(options).some(
-                                (option) => option.checked
-                            );
-    
-                            if (!isChecked) {
-                                allAnswered = false;
-                                showError(input);
-                            } else {
-                                removeError(input);
-                            }
-                        } else if (
-                            input.type === "textarea" &&
-                            !input.value.trim()
-                        ) {
-                            allAnswered = false;
-                            showError(input);
-                        } else {
-                            removeError(input);
-                        }
-                    }
-                });
-    
-                if (allAnswered) {
-                    // istifadeci anketi muveffeqiyyetle tamamliyanda completedSurveys listine elave et
-                    let completedSurveys = JSON.parse(localStorage.getItem("completedSurveys")) || [];
-                    completedSurveys.push(survey.id);
-                    localStorage.setItem("completedSurveys", JSON.stringify(completedSurveys));
-    
-                    // Formu gönder
-                    form.submit();
-    
-                    // novbeti anketi aç
-                    const nextSurvey = surveys.find(s => s.priority === 1 && !completedSurveys.includes(s.id));
-                    if (nextSurvey) {
-                        // novbeti anketin açılmasını 1 saniye gecikdirmek ucun, belelikle form gönderildikden sonra açılacaq
-                        setTimeout(() => {
-                            showSurveyPopup(nextSurvey, false);
-                        }, 1000);
-                    }
-                } else {
-                    Swal.showValidationMessage(
-                        "Zəhmət olmasa təqdim etməzdən əvvəl bütün tələb olunan suallara cavab verin."
-                    );
-                    return false;
-                }
-            },
-        });
 
-    }
-
-    // cavablandirilmis suallar
+    // cavablandirilmis suallar    
     function showNewAnswersPopup(answers, survey) {
+        console.log('answers', answers);
+        
+        // console.log('showNewAnswersPopup', answers['203'][0].answer);
+        // console.log('Ramal', answerList[0].answer);
         let answersHtml = '';
     
         survey.surveys_questions.forEach((question, index) => {
@@ -196,24 +124,17 @@ $(document).ready(function () {
             showCancelButton: false,
             confirmButtonText: "Ok",
         });
-
-
-
-        // cavab yaz 
-        
-        
-           
-        
-        
-
-        // --------
     }
+    
+    
 
+    // Cavablari gör
     function fetchUserAnswers(surveyId) {
         $.ajax({
             url: `/employee/survey/answers/${surveyId}`,
             method: 'GET',
             success: function (response) {
+                console.log('Response:', response);
                 const survey = surveys.find(s => s.id === surveyId);
                 if (survey) {
                     showUserAnswersPopup(response, survey);
@@ -225,6 +146,7 @@ $(document).ready(function () {
         });
     }
 
+    // Cavablari gör
     function showUserAnswersPopup(answers, survey) {
         let answersHtml = '';
     
@@ -294,6 +216,7 @@ $(document).ready(function () {
         });
     }
 
+    // Cavabla
     function showSurveyPopup(survey, canCancel) {
         Swal.fire({
             title: survey.name || "Survey",
