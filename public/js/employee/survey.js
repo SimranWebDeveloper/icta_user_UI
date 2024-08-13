@@ -23,108 +23,134 @@ $(document).ready(function () {
         const survey = $(this).data("survey");
         catchAllSurveys(survey);
     });
-    // anket Yenilendi
-    $(".newSurveyButton").on("click", function () {
-        const survey = $(this).data("survey");
-        const surveyId = $(this).data("survey-id");
-        // Cavablari gör
-            $.ajax({
-                url: `/employee/survey/answers/${surveyId}`,
-                method: 'GET',
-                success: function (response) {
-                    const survey = surveys.find(s => s.id === surveyId);
-                    if (survey) {
-                        showNewAnswersPopup(response, survey);
-                    }
-                },
-                error: function (error) {
-                    console.error("Failed to fetch user answers:", error);
-                }
-            });
 
-        // Cavabla
-        // showSurveyPopup(survey, survey.priority === 0);
-    });
-
-
-
-    // cavablandirilmis suallar    
-    function showNewAnswersPopup(answers, survey) {
-        console.log('answers', answers);
-        
-        // console.log('showNewAnswersPopup', answers['203'][0].answer);
-        // console.log('Ramal', answerList[0].answer);
-        let answersHtml = '';
+    function catchAllSurveys(survey) {
+        $.ajax({
+            url: `/employee/survey/answers/${survey.id}`,
+            method: "GET",
+            success: function (response) {
+                console.log(response)
+                let answersHtml = "";
     
-        survey.surveys_questions.forEach((question, index) => {
-            const questionId = question.id;
-            const questionType = question.input_type; // Determine the question type (checkbox, radio, textarea)
+                survey.surveys_questions.forEach((question, index) => {
+                    const questionId = question.id;
+                    const questionType = question.input_type;
+                    const answerList = response[questionId] || [];
     
-            // Get the list of user's answers for this question
-            const answerList = answers[questionId] || []; // Adjust based on the response structure
-    
-            answersHtml += `<div class="col-xl-6 col-12">                        
-                <div class="card mb-4">
-                    <div class="card-header w-100 d-flex justify-content-center align-items-center">
-                        <h3 class="m-0">${index + 1}.</h3>
-                        <h3 class="m-0">${question.question}</h3>
-                    </div>
-                    <div class="card-body">`;
-    
-            if (questionType === 'textarea') {
-                // Display the textarea with the user's answer
-                const textareaAnswer = answerList[0] ? answerList[0].answer : ''; // Adjust based on response structure
-            answersHtml += `<textarea disabled  rows="10" style='box-sizing:border-box; width: 100%;resize: "none" '>${textareaAnswer}</textarea>`;
-            } else {
-                // Display the options with user answers marked as checked
-                answersHtml += `<ul class="list-group-custom">`;
-                question.answers.forEach((option) => {
-                    // Determine if this option should be checked
-                    const isChecked = answerList.some(answer => answer.answer === option.name);
-    
-                    answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
-                            <div class="d-flex align-items-center justify-content-center">                                                
-                                <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded" style="width: 20px; height: 20px" />
+                    answersHtml += `<div class="col-xl-6 col-12">                        
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">${index + 1}.</h3>
+                                <h3 class="m-0">${question.question}</h3>
                             </div>
-                            <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
-                                <label class="text-justify">
-                                    ${option.name}
-                                </label>
-                            </div>
-                        </div>
-                    </li>`;
-                });
-                answersHtml += `</ul>`;
-            }
+                            <div class="card-body">`;
     
-            answersHtml += `</div>
-                </div>
-            </div>`;
-        });
+                    if (questionType === "textarea") {
+                        const textareaAnswer = answerList.length > 0 ? answerList[0].answer : "";
+                        answersHtml += `<textarea rows="10" name="question_${questionId}" style="box-sizing:border-box; width: 100%;resize: none;" ${textareaAnswer ? "disabled" : ""}>${textareaAnswer}</textarea>`;
+                    } else {
+                        answersHtml += `<ul class="list-group-custom">`;
+                        question.answers.forEach((option) => {
+                            const isChecked = answerList.some(
+                                (answer) => answer.answer === option.name
+                            );
     
-        Swal.fire({
-            title: "User Answers",
-            html: `
-                <div class="row mb-4 w-100">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row">
-                                    ${answersHtml}
+                            answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                <div class="d-flex align-items-center justify-content-between  w-100 py-2">
+                                    <div class="d-flex align-items-center justify-content-center">                                                
+                                        <input type="${questionType}" name="question_${questionId}" value="${option.name}" ${isChecked ? "checked disabled" : ""} class="rounded" style="width: 20px; height: 20px" />
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
+                                        <label class="text-justify">
+                                            ${option.name}
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
+                            </li>`;
+                        });
+                        answersHtml += `</ul>`;
+                    }
+    
+                    answersHtml += `</div>
                         </div>
-                    </div>
-                </div>`,
-            showCancelButton: false,
-            confirmButtonText: "Ok",
+                    </div>`;
+                });
+    
+                Swal.fire({
+                    title: "Survey Details",
+                    html: `<div class="row mb-4 w-100">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                ${answersHtml}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`,
+                    showCancelButton: true,
+                    confirmButtonText: "Submit",
+                    preConfirm: () => {
+                        const updatedAnswers = [];
+    
+                        $("input[type='checkbox']:not(:disabled), input[type='radio']:not(:disabled)").each(function () {
+                            const nameAttr = $(this).attr("name");
+                            if (nameAttr) {
+                                updatedAnswers.push({
+                                    question_id: nameAttr.split("_")[1],
+                                    answer: $(this).val(),
+                                });
+                            }
+                        });
+    
+                        const textareaAnswers = $("textarea:not(:disabled)").map(function () {
+                            const nameAttr = $(this).attr("name");
+                            if (nameAttr) {
+                                return {
+                                    question_id: nameAttr.split("_")[1],
+                                    answer: $(this).val(),
+                                };
+                            }
+                        }).get();
+    
+                        updatedAnswers.push(...textareaAnswers);
+    
+                        return $.ajax({
+                            url: surveyStoreUrl,
+                            method: "POST",
+                            data: {
+                                _token: csrfToken,
+                                survey_id: survey.id,
+                                answers: updatedAnswers,
+                            },
+                        }).then((response) => {
+                            return response;
+                        }).catch((error) => {
+                            Swal.showValidationMessage(`Request failed: ${error}`);
+                        });
+                    }
+                });
+            },
+            error: function (error) {
+                console.error("Failed to fetch survey answers:", error);
+            },
         });
     }
     
     
+    
 
-    // Cavablari gör
+    $(".showSurveyButton").on("click", function () {
+        const surveyId = $(this).data("survey-id");
+        fetchUserAnswers(surveyId);
+    });
+
+    $(".surveyButton").on("click", function () {
+        const survey = $(this).data("survey");
+        showSurveyPopup(survey, survey.priority === 0);
+    });
+
     function fetchUserAnswers(surveyId) {
         $.ajax({
             url: `/employee/survey/answers/${surveyId}`,
