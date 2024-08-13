@@ -29,14 +29,15 @@ $(document).ready(function () {
             url: `/employee/survey/answers/${survey.id}`,
             method: "GET",
             success: function (response) {
+                console.log(response)
                 let answersHtml = "";
-
+    
                 survey.surveys_questions.forEach((question, index) => {
                     const questionId = question.id;
                     const questionType = question.input_type;
-
                     const answerList = response[questionId] || [];
-
+                    console.log(answerList)
+    
                     answersHtml += `<div class="col-xl-6 col-12">                        
                         <div class="card mb-4">
                             <div class="card-header w-100 d-flex justify-content-center align-items-center">
@@ -44,21 +45,21 @@ $(document).ready(function () {
                                 <h3 class="m-0">${question.question}</h3>
                             </div>
                             <div class="card-body">`;
-
+    
                     if (questionType === "textarea") {
-                        const textareaAnswer = answerList[0] ? answerList[0].answer : "";
-                        answersHtml += `<textarea rows="10" style="box-sizing:border-box; width: 100%;resize: none;" disabled>${textareaAnswer}</textarea>`;
+                        const textareaAnswer = answerList.length > 0 ? answerList[0].answer : "";
+                        answersHtml += `<textarea rows="10" name="question_${questionId}" style="box-sizing:border-box; width: 100%;resize: none;" ${textareaAnswer ? "disabled" : ""}>${textareaAnswer}</textarea>`;
                     } else {
                         answersHtml += `<ul class="list-group-custom">`;
                         question.answers.forEach((option) => {
                             const isChecked = answerList.some(
                                 (answer) => answer.answer === option.name
                             );
-
+    
                             answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
                                 <div class="d-flex align-items-center justify-content-between  w-100 py-2">
                                     <div class="d-flex align-items-center justify-content-center">                                                
-                                        <input type="${questionType}" name="question_${questionId}" value="${option.name}" ${isChecked ? "checked disabled" : "disabled"} class="rounded" style="width: 20px; height: 20px" />
+                                        <input type="${questionType}" name="question_${questionId}" value="${option.name}" ${isChecked ? "checked disabled" : ""} class="rounded" style="width: 20px; height: 20px" />
                                     </div>
                                     <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
                                         <label class="text-justify">
@@ -70,12 +71,12 @@ $(document).ready(function () {
                         });
                         answersHtml += `</ul>`;
                     }
-
+    
                     answersHtml += `</div>
                         </div>
                     </div>`;
                 });
-
+    
                 Swal.fire({
                     title: "Survey Details",
                     html: `<div class="row mb-4 w-100">
@@ -93,25 +94,29 @@ $(document).ready(function () {
                     confirmButtonText: "Submit",
                     preConfirm: () => {
                         const updatedAnswers = [];
-
+    
                         $("input[type='checkbox']:not(:disabled), input[type='radio']:not(:disabled)").each(function () {
-                            if ($(this).is(":checked")) {
+                            const nameAttr = $(this).attr("name");
+                            if (nameAttr) {
                                 updatedAnswers.push({
-                                    question_id: $(this).attr("name").split("_")[1],
+                                    question_id: nameAttr.split("_")[1],
                                     answer: $(this).val(),
                                 });
                             }
                         });
-
+    
                         const textareaAnswers = $("textarea:not(:disabled)").map(function () {
-                            return {
-                                question_id: $(this).attr("name").split("_")[1],
-                                answer: $(this).val(),
-                            };
+                            const nameAttr = $(this).attr("name");
+                            if (nameAttr) {
+                                return {
+                                    question_id: nameAttr.split("_")[1],
+                                    answer: $(this).val(),
+                                };
+                            }
                         }).get();
-
+    
                         updatedAnswers.push(...textareaAnswers);
-
+    
                         return $.ajax({
                             url: surveyStoreUrl,
                             method: "POST",
@@ -133,6 +138,9 @@ $(document).ready(function () {
             },
         });
     }
+    
+    
+    
 
     $(".showSurveyButton").on("click", function () {
         const surveyId = $(this).data("survey-id");
