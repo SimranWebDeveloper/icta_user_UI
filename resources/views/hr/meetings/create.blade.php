@@ -18,12 +18,6 @@
                 </div>
             </div>
             <div class="card-body">
-                @if (session('error'))
-                    <div class="alert alert-danger">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
                 <form method="POST" id="form" action="{{ route('hr.meetings.store') }}">
                     @csrf
                     <div class="row">
@@ -247,44 +241,51 @@
     });
 
     $('#form').on('submit', function (e) {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault();
 
         if ($('.report-users:checked').length === 0) {
             Swal.fire({
                 title: "Xəta!",
                 text: "Ən azı 1 iştirakçı seçin",
-                icon: "warning"
-            })
-            e.preventDefault()
+                icon: "warning",
+            });
+            return;
         }
 
-        // Clear previous error messages
-        $('#err-text').html('');
-
-        // Serialize form data
         var formData = $(this).serialize();
 
-        // Send the form data via AJAX
         $.ajax({
             url: $(this).attr('action'),
             type: 'POST',
             data: formData,
             success: function (response) {
                 if (response.status === 'error') {
-                    // Display error message under the submit button
-                    $('#err-text').html(response.message);
+                    Swal.fire({
+                        title: "Xəta!",
+                        text: response.message,
+                        icon: "error",
+                        confirmButtonText: "Tamam"
+                    });
                 } else {
-                    // Display success message under the submit button
-                    $('#err-text').html(response.message);
-                    // Redirect if a redirect URL is provided
-                    if (response.route) {
-                        window.location.href = response.route;
-                    }
+                    Swal.fire({
+                        title: "Uğurlu!",
+                        text: response.message,
+                        icon: "success",
+                        confirmButtonText: "Tamam"
+                    }).then((result) => {
+                        if (result.isConfirmed || result.isDismissed) {
+                            window.location.href = "/hr/meetings";
+                        }
+                    });
                 }
             },
             error: function (xhr) {
-                // Display a generic error message
-                $('#err-text').html('Bir hata oluştu. Lütfen tekrar deneyin.');
+                Swal.fire({
+                    title: "Xəta!",
+                    text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                    icon: "error",
+                    confirmButtonText: "Tamam"
+                });
             }
         });
     });

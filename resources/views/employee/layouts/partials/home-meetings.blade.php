@@ -13,6 +13,9 @@
         color: #666;
         text-align: center;
     }
+    .employeeMeetingModal .swal2-popup {
+        width: 30%;
+    }
 
     #meetings {
         transition: .4s;
@@ -22,7 +25,7 @@
         scale: 1.05;
     }
 
-    .card-header.subject {
+    .card-header>.subject {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -42,8 +45,8 @@
                                     @endphp
                                     <div class="col-6 mt-4">
                                         <div id="meetings" class="card" data-meeting='@json($meeting)'>
-                                            <div class="card-header text-center subject d-flex justify-content-between align-items-center">
-                                                {{ $meeting->subject }} 
+                                            <div class="card-header pl-2 pr-2 d-flex justify-content-between align-items-center">
+                                                <p class="subject p-0 m-0">{{ $meeting->subject }}</p> 
                                                 @php
                                                     $status = $meetingUser->participation_status;
                                                 @endphp
@@ -64,9 +67,6 @@
                                                             <i class="fa-solid fa-question-circle" style="color: #888888;font-size:20px"></i>
                                                     @endswitch
                                                 @endif
-
-                                            
-                                            
                                             </div>
                                             <div class="card-body">
                                                 <p>{{ $meeting->rooms->name }}</p>
@@ -76,18 +76,21 @@
                                                 </p>
                                                 @if ($meetingUser && $meetingUser->participation_status === 1)
                                                     <button id="meetingButton" class="btn btn-success btn-md mt-3 meetingButton"
+                                                    data-is-answered="true"
                                                     data-meeting='@json($meeting)'>
                                                     Cavablandırıldı
                                                 </button>
                                                 @elseif ($meetingUser && $meetingUser->participation_status === 0)
                                                 <button id="meetingButton" class="btn btn-success btn-md mt-3 meetingButton"
+                                                data-is-answered="false"
                                                 data-meeting='@json($meeting)'>
                                                 Cavablandırıldı
                                             </button>
                                                 @else
                                                 <button id="meetingButton" class="btn btn-success btn-md mt-3 meetingButton"
+                                                data-is-answered="null"
                                                 data-meeting='@json($meeting)'>
-                                                Cavablandir
+                                                Cavabla
                                             </button>
                                                 @endif
 

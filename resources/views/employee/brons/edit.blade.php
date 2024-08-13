@@ -215,11 +215,55 @@
     });
 
     $('#form').on('submit', function (e) {
+        e.preventDefault();
+
         if ($('.report-users:checked').length === 0) {
-            $('#err-text').html("Ən azı 1 iştirakçı seçin")
-            e.preventDefault()
+            Swal.fire({
+                title: "Xəta!",
+                text: "Ən azı 1 iştirakçı seçin",
+                icon: "warning",
+            });
+            return;
         }
+
+        var formData = $(this).serialize();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+                if (response.status === 'error') {
+                    Swal.fire({
+                        title: "Xəta!",
+                        text: response.message,
+                        icon: "error",
+                        confirmButtonText: "Tamam"
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Uğurlu!",
+                        text: response.message,
+                        icon: "success",
+                        confirmButtonText: "Tamam"
+                    }).then((result) => {
+                        if (result.isConfirmed || result.isDismissed) {
+                            window.location.href = "/employee/brons";
+                        }
+                    });
+                }
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    title: "Xəta!",
+                    text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                    icon: "error",
+                    confirmButtonText: "Tamam"
+                });
+            }
+        });
     });
+     
 
     $('.report-departments').on('change', function () {
         const departmentId = $(this).val();
