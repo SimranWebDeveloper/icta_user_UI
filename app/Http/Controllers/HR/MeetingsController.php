@@ -133,12 +133,8 @@ class MeetingsController extends Controller
         $duration = $data['duration'];
         $endDateTime = $startDateTime->copy()->addMinutes($duration);
         $roomId = $data['rooms_id'];
-        $newStatus = $data['status'];
 
-        $statusChangedToActive = $meeting->status == 0 && $newStatus == 1;
-        $statusChangedFromActive = $meeting->status == 1 && $newStatus == 0;
-
-        if ($statusChangedToActive || $statusChangedFromActive) {
+       
             $overlappingMeeting = Meetings::where('rooms_id', $roomId)
                 ->where('status', 1)
                 ->where('id', '!=', $id)
@@ -153,7 +149,6 @@ class MeetingsController extends Controller
             if ($overlappingMeeting) {
                 return redirect()->back()->withErrors('Göstərilən vaxtda bu otaq artıq doludur.');
             }
-        }
 
         $meeting->update($data);
 
