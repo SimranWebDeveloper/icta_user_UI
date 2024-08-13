@@ -113,15 +113,17 @@ $(document).ready(function () {
 
 
         // Cavab ver olan hisse--------------------------------------------------------------------------------------------------------  
+        let checkSubmit = 'Ok';
         let questionsHtml = "";      
         const showNewQuestion = allData.filter(question => !keysArray.includes(question.id.toString()));
 
         if (showNewQuestion.length===0) {
+            checkSubmit = 'Ok';
             questionsHtml='<p>Hələki Heç Bir Sual əlavə olunmayıb.</p>';
         }
             
         else{
-        
+            checkSubmit = 'Submit';
             showNewQuestion.forEach((question, index) => {
                 
                 let optionsHtml = "";
@@ -202,7 +204,7 @@ $(document).ready(function () {
                 </div>                       
                 `,
             showCancelButton: false,
-            confirmButtonText: "Submit",
+            confirmButtonText: checkSubmit,
 
 
             cancelButtonText: "Cancel",
@@ -214,7 +216,8 @@ $(document).ready(function () {
                 const form = document.getElementById("newSurveyForm");
                 const inputs = form.querySelectorAll("input, textarea");
 
-                form.submit();
+                if (checkSubmit==='Submit') form.submit();
+                
 
                 return
     
