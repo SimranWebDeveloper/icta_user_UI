@@ -205,6 +205,7 @@ $(document).ready(function () {
         
         Swal.fire({
             title: "Istifadeci Anketi",
+
             html: `
 
                  <div class="row">
@@ -245,6 +246,8 @@ $(document).ready(function () {
                 `,
             showCancelButton: false,
             confirmButtonText: "Ok",
+            showCancelButton: false,
+            confirmButtonText: "Submit",
         });
     }
 
