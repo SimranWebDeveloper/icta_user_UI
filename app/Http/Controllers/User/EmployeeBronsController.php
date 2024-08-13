@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Models\Branches;
 use App\Models\MeetingsUsers;
 use App\Models\Rooms;
-use Carbon\Carbon;  
+use Carbon\Carbon;
 
 class EmployeeBronsController extends Controller
 {
@@ -20,7 +20,7 @@ class EmployeeBronsController extends Controller
         $meetings = Meetings::with('rooms')->where('status', 1)->where('type', 2)->get();
 
         foreach ($meetings as $meeting) {
-            $startDateTime = Carbon::parse($meeting->start_date_time)->subHours(4); 
+            $startDateTime = Carbon::parse($meeting->start_date_time)->subHours(4);
             $duration = $meeting->duration;
             $endDateTime = $startDateTime->copy()->addMinutes($duration);
 
@@ -31,9 +31,9 @@ class EmployeeBronsController extends Controller
 
         foreach ($meetings as $meeting) {
             $meeting->participants = MeetingsUsers::where('meetings_id', $meeting->id)
-            ->join('users', 'meetings_users.users_id', '=', 'users.id')
-                                ->select('users.*')
-                                ->get();
+                ->join('users', 'meetings_users.users_id', '=', 'users.id')
+                ->select('users.*')
+                ->get();
         }
 
         $departments = Departments::pluck('name', 'id');
@@ -47,12 +47,12 @@ class EmployeeBronsController extends Controller
         $departments = Departments::withCount('branches')->withCount('users')->where('status', 1)->get();
         $branches = Branches::withCount('users')->where('status', 1)->get();
         $users = User::all();
-        $rooms = Rooms::all(); 
-        
+        $rooms = Rooms::all();
+
         return view('employee.brons.create', compact('departments', 'branches', 'users', 'rooms'));
 
     }
-   
+
     public function store(Request $request)
     {
         $data = $request->all();
@@ -61,7 +61,7 @@ class EmployeeBronsController extends Controller
         $endDateTime = $startDateTime->copy()->addMinutes($duration);
         $roomId = $data['rooms_id'];
 
-        $overlappingMeeting = Meetings::where('rooms_id', $roomId) ->where('status', 1)
+        $overlappingMeeting = Meetings::where('rooms_id', $roomId)->where('status', 1)
             ->where(function ($query) use ($startDateTime, $endDateTime) {
                 $query->whereBetween('start_date_time', [$startDateTime, $endDateTime])
                     ->orWhereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
@@ -73,15 +73,20 @@ class EmployeeBronsController extends Controller
             ->exists();
 
         if ($overlappingMeeting) {
-            return redirect()->back()->with('error', 'Göstərilən vaxtda bu otaq artıq doludur.');
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Seçilmiş otaq artıq seçilmiş vaxt üçün bron edilib.'
+            ]);
         }
         $meeting = Meetings::create($data);
 
         if ($request->has('w_user_id')) {
             foreach ($request->input('w_user_id') as $userId) {
-                if (!MeetingsUsers::where('meetings_id', $meeting->id)
-                                ->where('users_id', $userId)
-                                ->exists()) {
+                if (
+                    !MeetingsUsers::where('meetings_id', $meeting->id)
+                        ->where('users_id', $userId)
+                        ->exists()
+                ) {
                     MeetingsUsers::create([
                         'meetings_id' => $meeting->id,
                         'users_id' => $userId,
@@ -89,11 +94,11 @@ class EmployeeBronsController extends Controller
                 }
             }
         }
-        $text =  'Bron müvəffəqiyyətlə yaradıldı';
+        $text = 'Bron müvəffəqiyyətlə yaradıldı';
         return redirect()->route('employee.brons.index')->with('success', $text);
     }
-   
-    public function show(string $id) 
+
+    public function show(string $id)
     {
         // $meeting = Meetings::findOrFail($id);
 
@@ -108,55 +113,58 @@ class EmployeeBronsController extends Controller
         return view('employee.brons.show');
 
     }
-    
-    public function edit(string $id) 
+
+    public function edit(string $id)
     {
         $meeting = Meetings::findOrFail($id);
-    
+
         $departments = Departments::withCount(['branches', 'users'])->where('status', 1)->get();
         $branches = Branches::withCount('users')->where('status', 1)->get();
-        $users =  User::all();
+        $users = User::all();
         $rooms = Rooms::all();
-    
+
         $meeting_users = MeetingsUsers::where('meetings_id', $meeting->id)->pluck('users_id')->toArray();
-        $user_departments = User::whereIn('id', $meeting_users) ->pluck('departments_id')->toArray();
+        $user_departments = User::whereIn('id', $meeting_users)->pluck('departments_id')->toArray();
         $user_branches = User::whereIn('id', $meeting_users)->pluck('branches_id')->toArray();
-    
+
         return view('employee.brons.edit', compact('meeting', 'departments', 'branches', 'users', 'user_departments', 'user_branches', 'meeting_users', 'rooms'));
 
     }
 
-    
-    public function update(Request $request, string $id) 
+
+    public function update(Request $request, string $id)
     {
 
         $meeting = Meetings::findOrFail($id);
         $data = $request->all();
         $startDateTime = Carbon::parse($data['start_date_time']);
-    $duration = $data['duration'];
-    $endDateTime = $startDateTime->copy()->addMinutes($duration);
-    $roomId = $data['rooms_id'];
-    $newStatus = $data['status'];
+        $duration = $data['duration'];
+        $endDateTime = $startDateTime->copy()->addMinutes($duration);
+        $roomId = $data['rooms_id'];
+        $newStatus = $data['status'];
 
-    $statusChangedToActive = $meeting->status == 0 && $newStatus == 1;
-    $statusChangedFromActive = $meeting->status == 1 && $newStatus == 0;
+        $statusChangedToActive = $meeting->status == 0 && $newStatus == 1;
+        $statusChangedFromActive = $meeting->status == 1 && $newStatus == 0;
 
-    if ($statusChangedToActive || $statusChangedFromActive) {
-        $overlappingMeeting = Meetings::where('rooms_id', $roomId)
-            ->where('status', 1) 
-            ->where('id', '!=', $id) 
-            ->where(function ($query) use ($startDateTime, $endDateTime) {
-                $query->where(function ($subQuery) use ($startDateTime, $endDateTime) {
-                    $subQuery->where('start_date_time', '<', $endDateTime)
-                             ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$startDateTime]);
-                });
-            })
-            ->exists();
+        if ($statusChangedToActive || $statusChangedFromActive) {
+            $overlappingMeeting = Meetings::where('rooms_id', $roomId)
+                ->where('status', 1)
+                ->where('id', '!=', $id)
+                ->where(function ($query) use ($startDateTime, $endDateTime) {
+                    $query->where(function ($subQuery) use ($startDateTime, $endDateTime) {
+                        $subQuery->where('start_date_time', '<', $endDateTime)
+                            ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$startDateTime]);
+                    });
+                })
+                ->exists();
 
-        if ($overlappingMeeting) {
-            return redirect()->back()->withErrors('Göstərilən vaxtda bu otaq artıq doludur.');
+            if ($overlappingMeeting) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Seçilmiş otaq artıq seçilmiş vaxt üçün bron edilib.'
+                ]);
+            }
         }
-    }
         $meeting->update($data);
         MeetingsUsers::where('meetings_id', $meeting->id)->delete();
 
@@ -173,8 +181,8 @@ class EmployeeBronsController extends Controller
 
     }
 
-    
-    public function destroy(string $id) 
+
+    public function destroy(string $id)
     {
         try {
             $meeting = Meetings::findOrFail($id);

@@ -21,20 +21,20 @@ class MeetingsController extends Controller
     {
         $now = Carbon::now()->addHours(4);
         $meetings = Meetings::with('rooms')->whereIn('type', [0, 1])->get();
-    
+
         foreach ($meetings as $meeting) {
-            $startDateTime = Carbon::parse($meeting->start_date_time); 
+            $startDateTime = Carbon::parse($meeting->start_date_time);
             $duration = $meeting->duration;
             $endDateTime = $startDateTime->copy()->addMinutes($duration);
-            
+
             if ($endDateTime->lessThanOrEqualTo($now)) {
                 $meeting->update(['status' => 0]);
             }
         }
-    
+
         return view('hr.meetings.index', compact('meetings'));
     }
-    
+
     public function create()
     {
 
@@ -55,7 +55,7 @@ class MeetingsController extends Controller
         $endDateTime = $startDateTime->copy()->addMinutes($duration);
         $roomId = $data['rooms_id'];
 
-        $overlappingMeeting = Meetings::where('rooms_id', $roomId) ->where('status', 1)
+        $overlappingMeeting = Meetings::where('rooms_id', $roomId)->where('status', 1)
             ->where(function ($query) use ($startDateTime, $endDateTime) {
                 $query->whereBetween('start_date_time', [$startDateTime, $endDateTime])
                     ->orWhereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
@@ -66,8 +66,12 @@ class MeetingsController extends Controller
             })
             ->exists();
 
+
         if ($overlappingMeeting) {
-            return redirect()->back()->with('error', 'Göstərilən vaxtda bu otaq artıq doludur.');
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Seçilmiş otaq artıq seçilmiş vaxt üçün bron edilib.'
+            ]);
         }
 
         $meeting = Meetings::create($data);
@@ -121,52 +125,52 @@ class MeetingsController extends Controller
     }
 
     public function update(Request $request, string $id)
-{
-    $meeting = Meetings::findOrFail($id);
+    {
+        $meeting = Meetings::findOrFail($id);
 
-    $data = $request->all();
-    $startDateTime = Carbon::parse($data['start_date_time']);
-    $duration = $data['duration'];
-    $endDateTime = $startDateTime->copy()->addMinutes($duration);
-    $roomId = $data['rooms_id'];
-    $newStatus = $data['status'];
+        $data = $request->all();
+        $startDateTime = Carbon::parse($data['start_date_time']);
+        $duration = $data['duration'];
+        $endDateTime = $startDateTime->copy()->addMinutes($duration);
+        $roomId = $data['rooms_id'];
+        $newStatus = $data['status'];
 
-    $statusChangedToActive = $meeting->status == 0 && $newStatus == 1;
-    $statusChangedFromActive = $meeting->status == 1 && $newStatus == 0;
+        $statusChangedToActive = $meeting->status == 0 && $newStatus == 1;
+        $statusChangedFromActive = $meeting->status == 1 && $newStatus == 0;
 
-    if ($statusChangedToActive || $statusChangedFromActive) {
-        $overlappingMeeting = Meetings::where('rooms_id', $roomId)
-            ->where('status', 1) 
-            ->where('id', '!=', $id) 
-            ->where(function ($query) use ($startDateTime, $endDateTime) {
-                $query->where(function ($subQuery) use ($startDateTime, $endDateTime) {
-                    $subQuery->where('start_date_time', '<', $endDateTime)
-                             ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$startDateTime]);
-                });
-            })
-            ->exists();
+        if ($statusChangedToActive || $statusChangedFromActive) {
+            $overlappingMeeting = Meetings::where('rooms_id', $roomId)
+                ->where('status', 1)
+                ->where('id', '!=', $id)
+                ->where(function ($query) use ($startDateTime, $endDateTime) {
+                    $query->where(function ($subQuery) use ($startDateTime, $endDateTime) {
+                        $subQuery->where('start_date_time', '<', $endDateTime)
+                            ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$startDateTime]);
+                    });
+                })
+                ->exists();
 
-        if ($overlappingMeeting) {
-            return redirect()->back()->withErrors('Göstərilən vaxtda bu otaq artıq doludur.');
+            if ($overlappingMeeting) {
+                return redirect()->back()->withErrors('Göstərilən vaxtda bu otaq artıq doludur.');
+            }
         }
-    }
 
-    $meeting->update($data);
+        $meeting->update($data);
 
-    MeetingsUsers::where('meetings_id', $meeting->id)->delete();
+        MeetingsUsers::where('meetings_id', $meeting->id)->delete();
 
-    if ($request->has('w_user_id')) {
-        foreach ($request->input('w_user_id') as $userId) {
-            MeetingsUsers::create([
-                'meetings_id' => $meeting->id,
-                'users_id' => $userId,
-            ]);
+        if ($request->has('w_user_id')) {
+            foreach ($request->input('w_user_id') as $userId) {
+                MeetingsUsers::create([
+                    'meetings_id' => $meeting->id,
+                    'users_id' => $userId,
+                ]);
+            }
         }
-    }
 
-    $text = $data['type'] == 0 ? 'İclas məlumatları müvəffəqiyyətlə dəyişdirildi' : 'Tədbir məlumatları müvəffəqiyyətlə dəyişdirildi';
-    return redirect()->route('hr.meetings.index')->with('success', $text);
-}
+        $text = $data['type'] == 0 ? 'İclas məlumatları müvəffəqiyyətlə dəyişdirildi' : 'Tədbir məlumatları müvəffəqiyyətlə dəyişdirildi';
+        return redirect()->route('hr.meetings.index')->with('success', $text);
+    }
 
     public function destroy(string $id)
     {

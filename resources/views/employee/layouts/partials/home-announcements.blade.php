@@ -32,7 +32,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    
 </style>
 
 <div class="col-lg-4 col-12 mt-4 mt-lg-0">
@@ -50,7 +49,7 @@
                                                 @php
                                                     $image = $announcement->image
                                                         ? asset('assets/images/announcements/' . $announcement->image)
-                                                        : 'https://www.shutterstock.com/image-vector/premium-picture-icon-logo-line-600nw-749844106.jpg';
+                                                        : asset('assets/images/announcements/no_announcement.svg');
                                                 @endphp
                                                 <img class="d-block w-100" style="border-radius:5px;" src="{{ $image }}"
                                                     alt="Slide {{ $index + 1 }}">
