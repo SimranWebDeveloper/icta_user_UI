@@ -66,12 +66,15 @@ $(document).ready(function () {
     function showAllSurveys(checkedAnswers, allData) {
         console.log("allData:", allData);
         console.log("checkedAnswers:", checkedAnswers);
-        
+
+        const keysArray = Object.keys(checkedAnswers);
         
         let answersHtml = '';
 
+        const showOldQuestion = allData.filter(question => keysArray.includes(question.id.toString()));
         
-        allData.forEach((question, index) => {
+
+        showOldQuestion.forEach((question, index) => {
             
             
             // Cavablari gor olan hisse -----------------------------------------------------------------------------------------
@@ -106,18 +109,13 @@ $(document).ready(function () {
             if (questionType === 'textarea') {
                 // Display the textarea with the user's answer
                 const textareaAnswer = answerList[(questionId).toString()][0].answer || []; // Adjust based on response structure
-            answersHtml += `<textarea disabled  rows="10" style='box-sizing:border-box; width: 100%;resize: "none" '>${textareaAnswer}</textarea>`;
+            answersHtml += `<textarea disabled  rows="6" style='box-sizing:border-box; width: 100%; resize:none '>${textareaAnswer}</textarea>`;
             } 
             else {
                 // Display the options with user answers marked as checked
                 answersHtml += `<ul class="list-group-custom">`;
                 question.answers.forEach((option) => {
-                    // Determine if this option should be checked
-                    
-                    
-                    // let isChecked =  answerList[(questionId).toString()].some(answer => answer.answer === option.name);
-                    // console.log("isChecked:", isChecked);
-                    
+
                     let isChecked = false;
                     if (Array.isArray(answerList[(questionId).toString()])) {
                          isChecked = answerList[(questionId).toString()].some(answer => answer.answer === option.name);
@@ -150,7 +148,7 @@ $(document).ready(function () {
         // ----------------------------------------------------------------------------------------------------------------------------
 
         // Cavab ver olan hisse--------------------------------------------------------------------------------------------------------
-        const keysArray = Object.keys(checkedAnswers);
+        // const keysArray = Object.keys(checkedAnswers);
         // console.log('keysArray:', keysArray);
         
         const editNewQuestion = allData.filter(question => !keysArray.includes(question.id.toString()));
@@ -209,21 +207,21 @@ $(document).ready(function () {
             title: "Istifadeci Anketi",
             html: `
 
-                <div class="row">
-                    ${answersHtml}                        
-                </div>
+                 <div class="row">
+                     ${answersHtml}                        
+                 </div>
 
                 <div class="row">
-
+                            
                             <div class="col-12">
                                 <form id="surveyForm" action="${surveyStoreUrl}" method="POST">
                                     <input name="_token" value="${csrfToken}" type="hidden">
                                     <div class="card">
                                         <div class="card-header">
                                             <div class="d-flex justify-content-between align-items-center">
-                                                <div class="name-date-wrapper">
-                                                    <h3 class="ml-3 mt-0 mb-0 mr-0">
-                                                        
+                                                <div class="name-date-wrapper ">
+                                                    <h3 class="ml-3 mt-0 mb-0 mr-0 w-100 text-center ">
+                                                       Anketə  əlavə olunmuş yeni sual və ya suallar
                                                     </h3>
                                                     
                                                 </div>
