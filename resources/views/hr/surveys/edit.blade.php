@@ -97,8 +97,8 @@
                             <!-- question 1 -->
                             @foreach ($data->surveys_questions as $question_key => $question)
 
-                                <div class="col-lg-6 my-3" id="c{{$question->id}}">
-
+                                <div class="col-lg-6 my-3"  id="c{{$question->id}}">
+                                        <input type="hidden" name="ids[]" value="{{$question->id}}" />
                                         <div class="row  custom-card  position-relative ">
 
                                             <button type="button" class="position-left btn btn-danger z-custom-index"
@@ -476,7 +476,7 @@ if (questionType.value === 'textarea') {
 
         let newQuestion = `           
                 <div class="row  custom-card  position-relative ">
-                    
+                        <input type="hidden" name="ids[]" value="${lastQuestionId}" />
                         <button type="button"  class="position-left btn btn-danger z-custom-index" onclick="removeQuestion(${lastQuestionId})" >X</button>
                     
                     <div class="col-md-8 form-group mb-3">
@@ -504,7 +504,7 @@ if (questionType.value === 'textarea') {
                         @endif
                     </div>
 
-                    <div class="col-md-12 form-group mb-3" id="todo-content-${lastQuestionId}" >
+                    <div class="col-md-12 form-group mb-3"    id="todo-content-${lastQuestionId}" >
                         <div class="select_label ui sub header ">Cavab və ya cavablar <span class="text-danger">*</span></div>
                         <div class="todo-container" style="width: 100%;">        
                             <div id="todo-header">

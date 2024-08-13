@@ -305,9 +305,9 @@
 
             answersHtml += `<div class="col-xl-6 col-12">
                 <div class="card mb-4">
-                    <div class="card-header w-100 d-flex justify-content-center align-items-center bg-primary " >
-                        <h3 class="m-0 text-white">${index + 1}.</h3>
-                        <h3 class="m-0 text-white">${question.question}</h3>
+                    <div class="card-header w-100 d-flex justify-content-center align-items-center  " >
+                        <h3 class="m-0 ">${index + 1}.</h3>
+                        <h3 class="m-0 ">${question.question}</h3>
                     </div>
                     <div class="card-body">`;
 
