@@ -158,7 +158,7 @@
 
                                         <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
                                             @foreach($users as $index => $user)
-                                                <h5 class="mt-1 mb-1 mt-md-0 mb-md-0">{{ $user->name }}</h5>
+                                                <h5 class="text-info mt-1 mb-1 mt-md-0 mb-md-0">{{ $user->name }}</h5>
                                                 {{ $index < count($users) - 1 ? ', ' : '' }}
                                             @endforeach
                                         </div>

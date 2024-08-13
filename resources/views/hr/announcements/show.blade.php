@@ -63,8 +63,8 @@
                                     <img class="rounded"
                                         src="{{ asset('assets/images/announcements/' . $announcement->image) }}" alt="">
                                 @else
-                                    <img class="not-found-img w-50"
-                                        src="{{asset('assets/images/announcements/not-found-image.jpg')}}" alt="">
+                                    <img class="not-found-img rounded"
+                                        src="{{asset('assets/images/announcements/no_announcement.svg')}}" alt="">
                                 @endif
                             </div>
                         </div>

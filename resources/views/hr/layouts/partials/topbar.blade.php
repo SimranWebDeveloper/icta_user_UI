@@ -26,7 +26,8 @@
                 <a href="#" id="userDropdown" alt="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <h5 style="text-align: right">{{Auth::user()->name}}
                     </h5>
-                    <p style="text-align: right; margin-bottom: 0;";>{{\Illuminate\Support\Facades\Auth::user()->position}}</p>
+                    <p style="text-align: right; margin-bottom: 0;" ;>
+                        {{\Illuminate\Support\Facades\Auth::user()->position}}</p>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                     <a class="dropdown-item" href="{{ route('hr.profile') }}">Hesab məlumatları</a>

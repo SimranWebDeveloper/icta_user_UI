@@ -3,7 +3,7 @@ $(document).ready(function () {
         const announcement = $(this).data("announcement");
         const imageUrl = announcement.image
             ? `/assets/images/announcements/${announcement.image}`
-            : "https://www.shutterstock.com/image-vector/premium-picture-icon-logo-line-600nw-749844106.jpg";
+            : "/assets/images/announcements/no_announcement.svg";
 
         Swal.fire({
             title: "Elan Detalları",
@@ -15,7 +15,7 @@ $(document).ready(function () {
                                     <h3>Şəkil</h3>
                                 </div>
                                 <div class="card-body d-flex justify-content-center h-50">
-                                    <img class="not-found-img" src="${imageUrl}" alt="Image not available">
+                                    <img class="not-found-img rounded" src="${imageUrl}" alt="Image not available">
                                 </div>
                             </div>
                         </div>

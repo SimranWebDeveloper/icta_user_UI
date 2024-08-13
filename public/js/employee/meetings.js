@@ -1,6 +1,7 @@
 $(document).ready(function () {
     $(document).on("click", "#meetingButton", function () {
         const meeting = $(this).data("meeting");
+        const is_answered = $(this).data("is-answered");
         let meetingTitle;
 
         if (meeting.type === 0) {
@@ -9,6 +10,26 @@ $(document).ready(function () {
             meetingTitle = "Tədbir";
         } else if (meeting.type === 2) {
             meetingTitle = "Bron";
+        }
+        let participationButtons;
+        if (is_answered === true) {
+            participationButtons = `
+                <button class="btn btn-danger btn-lg participation-button" value="0" data-meeting-id="${meeting.id}">
+                    İştirak etməyəcəm
+                </button>`;
+        } else if (is_answered === false) {
+            participationButtons = `
+                <button class="btn btn-info btn-lg participation-button" value="1" data-meeting-id="${meeting.id}">
+                    İştirak edəcəm
+                </button>`;
+        } else {
+            participationButtons = `
+                <button class="btn btn-info btn-lg participation-button" value="1" data-meeting-id="${meeting.id}">
+                    İştirak edəcəm
+                </button>
+                <button class="btn btn-danger btn-lg participation-button" value="0" data-meeting-id="${meeting.id}">
+                    İştirak etməyəcəm
+                </button>`;
         }
 
         Swal.fire({
@@ -83,12 +104,7 @@ $(document).ready(function () {
                             </div>
                         </div>
                         <div class="card-footer">
-                            <button class="btn btn-info btn-lg participation-button" value="1" data-meeting-id="${meeting.id}">
-                                İştirak edəcəm
-                            </button>
-                            <button class="btn btn-danger btn-lg participation-button" value="0" data-meeting-id="${meeting.id}">
-                                İştirak etməyəcəm
-                            </button>
+                            ${participationButtons}
                         </div>
                     </div>
                 </div>
@@ -102,30 +118,34 @@ $(document).ready(function () {
         const meetingId = $(this).data("meeting-id");
 
         $.ajax({
-            url: window.participationStatusUrl, // Use the global variable
+            url: window.participationStatusUrl,
             method: "POST",
             data: {
-                _token: window.csrfToken, // Use the global variable
+                _token: window.csrfToken,
                 meeting_id: meetingId,
                 participation_status: participationStatus,
             },
             success: function (response) {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Cavabınız qeyd olundu!',
+                    icon: "success",
+                    title: "Cavabınız qeyd olundu!",
                     showConfirmButton: false,
-                    timer: 1500
+                    customClass: {
+                        popup: "swal2-popup",
+                        container: "employeeMeetingModal",
+                    },
+                    timer: 1500,
                 }).then(() => {
                     location.reload();
                 });
             },
             error: function (xhr, status, error) {
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Xəta baş verdi!',
-                    text: 'Cavabınız qeyd edilərkən xəta baş verdi. Zəhmət olmasa bir daha cəhd edin.',
+                    icon: "error",
+                    title: "Xəta baş verdi!",
+                    text: "Cavabınız qeyd edilərkən xəta baş verdi. Zəhmət olmasa bir daha cəhd edin.",
                 });
-            }
+            },
         });
     });
 });
