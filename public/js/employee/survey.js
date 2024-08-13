@@ -215,7 +215,7 @@ $(document).ready(function () {
                 <div class="row">
                             
                             <div class="col-12">
-                                <form id="surveyForm" action="${surveyStoreUrl}" method="POST">
+                                <form id="newSurveyForm" action="${surveyStoreUrl}" method="POST">
                                     <input name="_token" value="${csrfToken}" type="hidden">
                                     <div class="card">
                                         <div class="card-header">
@@ -245,9 +245,19 @@ $(document).ready(function () {
                 
                 `,
             showCancelButton: false,
-            confirmButtonText: "Ok",
-            showCancelButton: false,
             confirmButtonText: "Submit",
+
+
+            cancelButtonText: "Cancel",
+            allowOutsideClick: true,
+            allowEscapeKey: true,
+            allowEnterKey: true,
+            preConfirm: () => {
+                const form = document.getElementById("newSurveyForm");
+
+                form.submit();
+            },
+        
         });
     }
 
