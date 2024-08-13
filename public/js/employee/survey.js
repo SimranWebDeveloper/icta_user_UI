@@ -34,6 +34,9 @@ $(document).ready(function () {
                         //surveys - butun suall ve cabalari
                         // response - hansi sualin cavabi varsa gelen cavablar
                         showAllSurveys(response, survey.surveys_questions);
+
+
+                        
                         
                     }
                 },
@@ -61,22 +64,36 @@ $(document).ready(function () {
 
     // Anket yenilendi
     function showAllSurveys(checkedAnswers, allData) {
-        console.log('checkedAnswers:', checkedAnswers);
-        console.log('allData:', allData);
+        console.log("allData:", allData);
+        console.log("checkedAnswers:", checkedAnswers);
+        
         
         let answersHtml = '';
 
         
         allData.forEach((question, index) => {
             
+            
             // Cavablari gor olan hisse -----------------------------------------------------------------------------------------
             const questionId = question.id;
             const questionType = question.input_type; // Determine the question type (checkbox, radio, textarea)
+
+
+            // console.log("question:", question.answers);
+            // console.log("checkedAnswers",checkedAnswers[questionId]);
+
+            // question.answers.forEach((variant) => {
+            //     console.log("variant:", variant.name);
+            //     const isChecked =  checkedAnswers[questionId].some(answer => answer.answer === variant.name);
+            //     console.log("isChecked:", isChecked);
                 
+                
+            // })      
+
             // Get the list of user's answers for this question
             
-            const answerList = question.answers || []; // Adjust based on the response structure
-            console.log('answerList:', answerList);
+            const answerList = checkedAnswers || []; // Adjust based on the response structure
+          
             
             answersHtml += `<div class="col-xl-6 col-12">                        
                 <div class="card mb-4">
@@ -88,7 +105,7 @@ $(document).ready(function () {
             
             if (questionType === 'textarea') {
                 // Display the textarea with the user's answer
-                const textareaAnswer = answerList[0] ? answerList[0].name : ''; // Adjust based on response structure
+                const textareaAnswer = answerList[(questionId).toString()][0].answer || []; // Adjust based on response structure
             answersHtml += `<textarea disabled  rows="10" style='box-sizing:border-box; width: 100%;resize: "none" '>${textareaAnswer}</textarea>`;
             } 
             else {
@@ -96,8 +113,20 @@ $(document).ready(function () {
                 answersHtml += `<ul class="list-group-custom">`;
                 question.answers.forEach((option) => {
                     // Determine if this option should be checked
-                    const isChecked = answerList.some(answer => answer.name === option.name);
                     
+                    
+                    // let isChecked =  answerList[(questionId).toString()].some(answer => answer.answer === option.name);
+                    // console.log("isChecked:", isChecked);
+                    
+                    let isChecked = false;
+                    if (Array.isArray(answerList[(questionId).toString()])) {
+                         isChecked = answerList[(questionId).toString()].some(answer => answer.answer === option.name);
+                        console.log('isChecked:', isChecked);
+                    } else {
+                        console.log(`No answers found for question ID: ${questionId}`);
+                         isChecked = false; // or any other default handling
+                    }
+
                     answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
                         <div class="d-flex align-items-center justify-content-between  w-100 py-2">
                             <div class="d-flex align-items-center justify-content-center">                                                
@@ -122,10 +151,10 @@ $(document).ready(function () {
 
         // Cavab ver olan hisse--------------------------------------------------------------------------------------------------------
         const keysArray = Object.keys(checkedAnswers);
-        console.log('keysArray:', keysArray);
+        // console.log('keysArray:', keysArray);
         
         const editNewQuestion = allData.filter(question => !keysArray.includes(question.id.toString()));
-        console.log('editNewQuestion:', editNewQuestion);
+        // console.log('editNewQuestion:', editNewQuestion);
         
         let questionsHtml = "";
 
@@ -228,7 +257,7 @@ $(document).ready(function () {
             url: `/employee/survey/answers/${surveyId}`,
             method: 'GET',
             success: function (response) {
-                console.log('Response:', response);
+                // console.log('Response:', response);
                 const survey = surveys.find(s => s.id === surveyId);
                 if (survey) {
                     showUserAnswersPopup(response, survey);
