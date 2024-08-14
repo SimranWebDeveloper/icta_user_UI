@@ -87,23 +87,29 @@ class SurveysController extends Controller
 
 
    
-    public function show(string $id) 
-    {
-        $survey = Surveys::with([
-            'surveys_questions.answers', 
-            
-        ])->findOrFail($id);
-    
-        $departments = Departments::pluck('name', 'id');
-        $branches = Branches::pluck('name', 'id');
+public function show(string $id) 
+{
+    $survey = Surveys::with([
+        'surveys_questions.answers', 
+    ])->findOrFail($id);
 
-        $users = SurveysUsers::where('surveys_id', $survey->id)
+    $departments = Departments::pluck('name', 'id');
+    $branches = Branches::pluck('name', 'id');
+
+    $users = SurveysUsers::where('surveys_id', $survey->id)
         ->join('users', 'surveys_users.users_id', '=', 'users.id')
         ->select('users.*')
         ->get();
-    
-        return view('hr.surveys.show', compact('survey', 'departments', 'branches','users'));
+
+    $is_answered = [];
+    foreach ($users as $user) {
+        $is_answered[$user->id] = SurveysUsers::where('users_id', $user->id)
+            ->where('surveys_id', $survey->id)
+            ->value('is_answered');
     }
+
+    return view('hr.surveys.show', compact('survey', 'departments', 'branches', 'users', 'is_answered'));
+}
     
     public function edit($id) 
     {
@@ -120,61 +126,91 @@ class SurveysController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    $survey = Surveys::findOrFail($id);
+    {
 
-    $survey->update([
-        'name' => $request->name,
-        'expired_at' => $request->expired_at,
-        'status' => $request->status,
-        'is_anonym' => $request->is_anonym,
-        'priority' => $request->priority,
-    ]);
+        $survey = Surveys::findOrFail($id);
 
-    $questions_id = $survey->surveys_questions()->pluck('id')->toArray();
+        $survey->update([
+            'name' => $request->name,
+            'expired_at' => $request->expired_at,
+            'status' => $request->status,
+            'is_anonym' => $request->is_anonym,
+            'priority' => $request->priority,
+        ]);
+
+        $ids = $request->ids; // 67, 68, 69
+        $current_ids = $survey->surveys_questions()->pluck('id')->toArray(); // 67, 68 
+
+        $insert_ids = array_diff( $ids,$current_ids); 
+
+        
+        // 70, 71
+        foreach ($insert_ids as $key => $id) {
+            $id = intval($id);
+            foreach ($request->question[$id] as $question_key => $question_value) {
+
+                $question_text = is_array($question_value) ? $question_value[0] : $question_value;
+                $input_type = isset($request->input_type[$id]) ? (is_array($request->input_type[$id]) ? $request->input_type[$id][0] : $request->input_type[$id]) : null;
+                if (isset($question_text) && !empty($question_text)) {
+                    $question = SurveysQuestions::create([
+                        'surveys_id' => $survey->id,
+                        'question' => $question_text,
+                        'input_type' => $input_type,
+                    ]);
     
-    $answers = Answers::whereIn('surveys_questions_id', $questions_id)->get();
-    foreach ($answers as $answer) {
-        $answer->delete();
-    }
-
-    $survey->surveys_questions()->delete();
-
-    foreach ($request->question as $question_key => $question_value) {
-        $question_text = is_array($question_value) ? $question_value[0] : $question_value;
-        $input_type = isset($request->input_type[$question_key]) ? (is_array($request->input_type[$question_key]) ? $request->input_type[$question_key][0] : $request->input_type[$question_key]) : null;
-
-        if (isset($question_text) && !empty($question_text)) {
-            $question = SurveysQuestions::create([
-                'surveys_id' => $survey->id,
-                'question' => $question_text,
-                'input_type' => $input_type,
-            ]);
-
-            if (!empty($request->answer_value[$question_key])) {
-                foreach ($request->answer_value[$question_key] as $answer_text) {
-                    if (isset($answer_text) && !empty($answer_text)) {
-                        Answers::create([
-                            'surveys_questions_id' => $question->id,
-                            'name' => $answer_text,
-                        ]);
+                    if (!empty($request->answer_value[$id])) {
+                        foreach ($request->answer_value[$id] as $answer_text) {
+                            if (isset($answer_text) && !empty($answer_text)) {
+                                Answers::create([
+                                    'surveys_questions_id' => $question->id,
+                                    'name' => $answer_text,
+                                ]);
+                            }
+                        }
                     }
                 }
             }
         }
-    }
 
-    SurveysUsers::where('surveys_id', $survey->id)->delete();
+        $delete_ids = array_diff( $current_ids, $ids); 
 
-        foreach ($request->w_user_id as $userId) {
-            SurveysUsers::create([
-                'surveys_id' => $survey->id,
-                'users_id' => $userId,
-            ]);
+
+
+        $answers = Answers::whereIn('surveys_questions_id', $delete_ids)->get();
+        foreach ($answers as $answer) {
+            $answer->delete();
         }
 
-    return redirect()->route('hr.surveys.index')->with('success', 'Anket müvəffəqiyyətlə yeniləndi');
-}
+        $survey->surveys_questions()->whereIn('id', $delete_ids)->delete();
+
+
+        SurveysUsers::where('surveys_id', $survey->id)->delete();
+
+            foreach ($request->w_user_id as $userId) {
+                SurveysUsers::create([
+                    'surveys_id' => $survey->id,
+                    'users_id' => $userId,
+                    'is_answered' => 2, 
+                ]);
+            }
+
+        return redirect()->route('hr.surveys.index')->with('success', 'Anket müvəffəqiyyətlə yeniləndi');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function destroy($id) 
     {

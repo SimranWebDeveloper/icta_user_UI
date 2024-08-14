@@ -179,15 +179,23 @@
                                             </h4>
 
                                             <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-xl-0">
-                                                @foreach($users as $index => $user)
-                                                    <h5 style="cursor: pointer" class="employeeAnswer mt-1 mb-1 mt-xl-0 mb-xl-0"
-                                                        data-survey-id="{{ $survey->id }}" data-user-id="{{ $user->id }}"
-                                                        data-user-name="{{ $user->name }}">
-                                                        {{ $user->name }}
-                                                    </h5>
+                                            @foreach($users as $index => $user)
+                                                <h5 style="cursor: pointer" 
+                                                    class="employeeAnswer mt-1 mb-1 mt-xl-0 mb-xl-0 
+                                                    @if(isset($is_answered[$user->id]) && $is_answered[$user->id] == 1) 
+                                                        text-success 
+                                                    @elseif(isset($is_answered[$user->id]) && $is_answered[$user->id] == 2) 
+                                                        text-warning 
+                                                    @else 
+                                                        text-danger 
+                                                    @endif" 
+                                                    data-survey-id="{{ $survey->id }}" 
+                                                    data-user-id="{{ $user->id }}" 
+                                                    data-user-name="{{ $user->name }}">
+                                                     {{ $survey->is_anonym ? 'Anonim istifadəçi '.$index+1 : $user->name }}
+                                                </h5>,
+                                            @endforeach
 
-                                                    {{ $index < count($users) - 1 ? ', ' : '' }}
-                                                @endforeach
                                             </div>
                                         </div>
                                         @if (!$loop->last)
@@ -222,6 +230,8 @@
         </div>
     </div>
 </div>
+
+
 
 
 
@@ -262,32 +272,29 @@
         });
 
 
-
-        $(document).on("click", ".employeeAnswer", function () {
-            const survey = @json($survey);
-            const surveyId = $(this).data("survey-id");
-            const userId = $(this).data("user-id");
-            const user = $(this).data("user-name");
-            console.log('Survey ID:', surveyId);
-            fetchUserAnswers(surveyId, survey, user, userId);
-        });
-
-        function fetchUserAnswers(surveyId, survey, user, userId) {
-            $.ajax({
-                url: `/employee/survey/answershr/${surveyId}/${userId}`,
-                method: 'GET',
-                success: function (response) {
-                    console.log('Response:', response);
-                    if (survey) {
-                        showUserAnswersPopup(response, survey, user);
-                    } else {
-                        console.error('Survey not found in surveys data.');
-                    }
-                },
-                error: function (error) {
-                    console.error("Failed to fetch user answers:", error);
-                }
-            });
+    
+    $(document).on("click", ".employeeAnswer", function () {
+        const survey = @json($survey);
+        const surveyId = $(this).data("survey-id");
+        const userId = $(this).data("user-id");
+        const user = $(this).data("user-name");
+        fetchUserAnswers(surveyId, survey, user, userId );
+    });
+    
+    function fetchUserAnswers(surveyId, survey, user, userId) {
+        $.ajax({
+            url: `/employee/survey/answershr/${surveyId}/${userId}`,
+            method: 'GET',
+            success: function (response) {
+                console.log('Response:', response); 
+            if (survey) {
+                showUserAnswersPopup(response, survey, user);
+            } else {
+                console.error('Survey not found in surveys data.');
+            }
+        },
+        error: function (error) {
+            console.error("Failed to fetch user answers:", error);
         }
 
 
@@ -295,50 +302,58 @@
         function showUserAnswersPopup(answers, survey, user) {
             let answersHtml = '';
 
+        const isAnonym = survey.is_anonym;
+        console.log(isAnonym);
+        
+        
+       
             survey.surveys_questions.forEach((question, index) => {
                 const questionId = question.id;
                 const questionType = question.input_type;
                 const answerList = answers[questionId] || [];
-
-                answersHtml += `<div class="col-lg-6 col-12">
-                <div class="card mb-4==">
-                    <div class="card-header w-100 d-flex justify-content-center align-items-center">
-                        <h3 class="m-0">${index + 1}.</h3>
-                        <h3 class="m-0">${question.question}</h3>
-                    </div>
-                    <div class="card-body">`;
-
+    
+                answersHtml += `<div class="col-xl-6 col-12">
+                    <div class="card mb-4">
+                        <div class="card-header w-100 d-flex justify-content-center align-items-center  " >
+                            <h3 class="m-0 ">${index + 1}.</h3>
+                            <h3 class="m-0 ">${question.question}</h3>
+                        </div>
+                        <div class="card-body">`;
+    
                 if (questionType === 'textarea') {
                     const textareaAnswer = answerList[0] ? answerList[0].answer : '';
-                    answersHtml += `<textarea disabled cols="60" rows="10">${textareaAnswer}</textarea>`;
+                    answersHtml += `<textarea disabled  rows="10" style='box-sizing: border-box; width: 100%; resize: "none"'>${textareaAnswer}</textarea>`;
                 } else {
                     answersHtml += `<ul class="list-group-custom">`;
                     question.answers.forEach((option) => {
                         const isChecked = answerList.some(answer => answer.answer === option.name);
-
+    
                         answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
-                            <div class="d-flex align-items-center justify-content-center">
-                                <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded" style="width: 35px; height: 35px" />
+                            <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded border-bottom" style="width: 20px; height: 20px" />
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                    <label class="text-justify">${option.name}</label>
+                                </div>
                             </div>
-                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
-                                <label class="text-justify">${option.name}</label>
-                            </div>
-                        </div>
-                    </li>`;
+                        </li>`;
                     });
                     answersHtml += `</ul>`;
                 }
-
+    
                 answersHtml += `</div>
-                </div>
-            </div>`;
+                    </div>
+                </div>`;
             });
+            
+        
+
 
             Swal.fire({
 
-                title: `${user} Cavabları`,
-                html: `
+            title: `${survey.is_anonym ? 'Anonim istifadəçi' : user} Cavabları`,
+            html: `
                  <div class="row mb-4 w-100">
             <div class="col-md-12">
                 <div class="card">
