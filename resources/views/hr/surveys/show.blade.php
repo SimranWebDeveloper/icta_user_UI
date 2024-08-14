@@ -271,100 +271,102 @@
             });
         });
 
+        // Handle employee answer click
+        $(document).on("click", ".employeeAnswer", function () {
+            const survey = @json($survey);
+            const surveyId = $(this).data("survey-id");
+            const userId = $(this).data("user-id");
+            const user = $(this).data("user-name");
+            fetchUserAnswers(surveyId, survey, user, userId);
+        });
 
-    
-    $(document).on("click", ".employeeAnswer", function () {
-        const survey = @json($survey);
-        const surveyId = $(this).data("survey-id");
-        const userId = $(this).data("user-id");
-        const user = $(this).data("user-name");
-        fetchUserAnswers(surveyId, survey, user, userId );
-    });
-    
-    function fetchUserAnswers(surveyId, survey, user, userId) {
-        $.ajax({
-            url: `/employee/survey/answershr/${surveyId}/${userId}`,
-            method: 'GET',
-            success: function (response) {
-                console.log('Response:', response); 
-            if (survey) {
-                showUserAnswersPopup(response, survey, user);
-            } else {
-                console.error('Survey not found in surveys data.');
-            }
-        },
-        error: function (error) {
-            console.error("Failed to fetch user answers:", error);
+        // Fetch user answers
+        function fetchUserAnswers(surveyId, survey, user, userId) {
+            $.ajax({
+                url: `/employee/survey/answershr/${surveyId}/${userId}`,
+                method: 'GET',
+                success: function (response) {
+                    console.log('Response:', response); 
+                    if (survey) {
+                        showUserAnswersPopup(response, survey, user);
+                    } else {
+                        console.error('Survey not found in surveys data.');
+                    }
+                },
+                error: function (error) {
+                    console.error("Failed to fetch user answers:", error);
+                }
+            });
         }
-
 
         // Show user answers in a popup
         function showUserAnswersPopup(answers, survey, user) {
             let answersHtml = '';
 
-        const isAnonym = survey.is_anonym;
-        console.log(isAnonym);
-        
-        
-       
+            const isAnonym = survey.is_anonym;
+            console.log(isAnonym);
+
             survey.surveys_questions.forEach((question, index) => {
                 const questionId = question.id;
                 const questionType = question.input_type;
                 const answerList = answers[questionId] || [];
-    
-                answersHtml += `<div class="col-xl-6 col-12">
-                    <div class="card mb-4">
-                        <div class="card-header w-100 d-flex justify-content-center align-items-center  " >
-                            <h3 class="m-0 ">${index + 1}.</h3>
-                            <h3 class="m-0 ">${question.question}</h3>
-                        </div>
-                        <div class="card-body">`;
-    
+
+                answersHtml += `
+                    <div class="col-xl-6 col-12">
+                        <div class="card mb-4">
+                            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                <h3 class="m-0">${index + 1}.</h3>
+                                <h3 class="m-0">${question.question}</h3>
+                            </div>
+                            <div class="card-body">`;
+
                 if (questionType === 'textarea') {
                     const textareaAnswer = answerList[0] ? answerList[0].answer : '';
-                    answersHtml += `<textarea disabled  rows="10" style='box-sizing: border-box; width: 100%; resize: "none"'>${textareaAnswer}</textarea>`;
+                    answersHtml += `
+                        <textarea disabled rows="10" style="box-sizing: border-box; width: 100%; resize: none;">
+                            ${textareaAnswer}
+                        </textarea>`;
                 } else {
                     answersHtml += `<ul class="list-group-custom">`;
                     question.answers.forEach((option) => {
                         const isChecked = answerList.some(answer => answer.answer === option.name);
-    
-                        answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                            <div class="d-flex align-items-center justify-content-between w-100 py-2">
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded border-bottom" style="width: 20px; height: 20px" />
+
+                        answersHtml += `
+                            <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} 
+                                               class="rounded border-bottom" style="width: 20px; height: 20px" />
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                        <label class="text-justify">${option.name}</label>
+                                    </div>
                                 </div>
-                                <div class="d-flex align-items-center justify-content-center w-100 pl-3">
-                                    <label class="text-justify">${option.name}</label>
-                                </div>
-                            </div>
-                        </li>`;
+                            </li>`;
                     });
                     answersHtml += `</ul>`;
                 }
-    
-                answersHtml += `</div>
-                    </div>
-                </div>`;
-            });
-            
-        
 
+                answersHtml += `
+                            </div>
+                        </div>
+                    </div>`;
+            });
 
             Swal.fire({
-
-            title: `${survey.is_anonym ? 'Anonim istifadəçi' : user} Cavabları`,
-            html: `
-                 <div class="row mb-4 w-100">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            ${answersHtml}
+                title: `${survey.is_anonym ? 'Anonim istifadəçi' : user} Cavabları`,
+                html: `
+                    <div class="row mb-4 w-100">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        ${answersHtml}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>`,
+                    </div>`,
                 showCancelButton: false,
                 confirmButtonText: "Ok",
                 customClass: {
@@ -374,6 +376,6 @@
             });
         }
     });
-
 </script>
+
 @endsection
