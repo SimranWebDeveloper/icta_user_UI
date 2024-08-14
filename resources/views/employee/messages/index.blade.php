@@ -41,10 +41,10 @@
 
                     <div class="contacts-scrollable perfect-scrollbar ps ims-users">
                         @foreach ($users as $user)
-                            <div class="p-3 d-flex border-bottom align-items-center {{ isUserActive($user->id) ? 'online' : 'offline' }} online clearfix fore-user"
+                        <div class="p-3 d-flex border-bottom align-items-center contact online clearfix fore-user"
                                  data-user-id="{{ $user->id }}" data-user-name="{{ $user->name }}">
-                                <img src="https://gull-html-laravel.ui-lib.com/assets/images/faces/13.jpg" alt=""
-                                     class="avatar-sm rounded-circle mr-3">
+                                 <img src="{{ asset('assets/images/avatars/' . ($user->avatar ? $user->avatar : 'user.jpg')) }}" alt=""
+                                 class="avatar-sm rounded-circle mr-3">
                                 <h6 class="">{{ $user->name }}</h6>
                             </div>
                         @endforeach
