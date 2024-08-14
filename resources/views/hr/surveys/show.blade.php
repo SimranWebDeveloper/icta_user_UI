@@ -179,16 +179,26 @@
                                             </h4>
 
                                             <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-xl-0">
-                                                @foreach($users as $index => $user)
-                                                <h5 style="cursor: pointer" class="employeeAnswer mt-1 mb-1 mt-xl-0 mb-xl-0 text-danger" 
+                                            @foreach($users as $index => $user)
+                                                <h5 style="cursor: pointer" 
+                                                    class="employeeAnswer mt-1 mb-1 mt-xl-0 mb-xl-0 
+                                                    @if(isset($is_answered[$user->id]) && $is_answered[$user->id] == 1) 
+                                                        text-success 
+                                                    @elseif(isset($is_answered[$user->id]) && $is_answered[$user->id] == 2) 
+                                                        text-warning 
+                                                    @else 
+                                                        text-danger 
+                                                    @endif" 
                                                     data-survey-id="{{ $survey->id }}" 
                                                     data-user-id="{{ $user->id }}" 
                                                     data-user-name="{{ $user->name }}">
                                                     {{ $user->name }}
                                                 </h5>
 
-                                                    {{ $index < count($users) - 1 ? ', ' : '' }}
-                                                @endforeach
+                                            @endforeach
+
+
+
                                             </div>
                                         </div>
                                         @if (!$loop->last)
@@ -271,7 +281,6 @@
         const surveyId = $(this).data("survey-id");
         const userId = $(this).data("user-id");
         const user = $(this).data("user-name");
-        console.log('Survey ID:', surveyId);
         fetchUserAnswers(surveyId, survey, user, userId );
     });
     
@@ -298,46 +307,60 @@
     function showUserAnswersPopup(answers, survey, user) {
         let answersHtml = '';
 
-        survey.surveys_questions.forEach((question, index) => {
-            const questionId = question.id;
-            const questionType = question.input_type;
-            const answerList = answers[questionId] || [];
-
-            answersHtml += `<div class="col-xl-6 col-12">
-                <div class="card mb-4">
-                    <div class="card-header w-100 d-flex justify-content-center align-items-center  " >
-                        <h3 class="m-0 ">${index + 1}.</h3>
-                        <h3 class="m-0 ">${question.question}</h3>
-                    </div>
-                    <div class="card-body">`;
-
-            if (questionType === 'textarea') {
-                const textareaAnswer = answerList[0] ? answerList[0].answer : '';
-                answersHtml += `<textarea disabled  rows="10" style='box-sizing: border-box; width: 100%; resize: "none"'>${textareaAnswer}</textarea>`;
-            } else {
-                answersHtml += `<ul class="list-group-custom">`;
-                question.answers.forEach((option) => {
-                    const isChecked = answerList.some(answer => answer.answer === option.name);
-
-                    answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between w-100 py-2">
-                            <div class="d-flex align-items-center justify-content-center">
-                                <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded border-bottom" style="width: 20px; height: 20px" />
-                            </div>
-                            <div class="d-flex align-items-center justify-content-center w-100 pl-3">
-                                <label class="text-justify">${option.name}</label>
-                            </div>
+        const isAnonym = survey.is_anonym;
+        console.log(isAnonym);
+        
+        
+        if (isAnonym===0) {
+            survey.surveys_questions.forEach((question, index) => {
+                const questionId = question.id;
+                const questionType = question.input_type;
+                const answerList = answers[questionId] || [];
+    
+                answersHtml += `<div class="col-xl-6 col-12">
+                    <div class="card mb-4">
+                        <div class="card-header w-100 d-flex justify-content-center align-items-center  " >
+                            <h3 class="m-0 ">${index + 1}.</h3>
+                            <h3 class="m-0 ">${question.question}</h3>
                         </div>
-                    </li>`;
-                });
-                answersHtml += `</ul>`;
-            }
+                        <div class="card-body">`;
+    
+                if (questionType === 'textarea') {
+                    const textareaAnswer = answerList[0] ? answerList[0].answer : '';
+                    answersHtml += `<textarea disabled  rows="10" style='box-sizing: border-box; width: 100%; resize: "none"'>${textareaAnswer}</textarea>`;
+                } else {
+                    answersHtml += `<ul class="list-group-custom">`;
+                    question.answers.forEach((option) => {
+                        const isChecked = answerList.some(answer => answer.answer === option.name);
+    
+                        answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                            <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded border-bottom" style="width: 20px; height: 20px" />
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center w-100 pl-3">
+                                    <label class="text-justify">${option.name}</label>
+                                </div>
+                            </div>
+                        </li>`;
+                    });
+                    answersHtml += `</ul>`;
+                }
+    
+                answersHtml += `</div>
+                    </div>
+                </div>`;
+            });
+            
+        }
 
-            answersHtml += `</div>
-                </div>
-            </div>`;
-        });
-
+        else{
+            answersHtml = `<div class="col-12">
+                    <p>
+                        Bu istifdeci cavablari gizli olduguna gore cavablari gormek mumkun deyil
+                    </p>
+                    `; 
+        }
         Swal.fire({
 
             title: `${user} Cavabları`,

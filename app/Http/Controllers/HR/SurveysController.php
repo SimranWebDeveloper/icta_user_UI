@@ -87,23 +87,29 @@ class SurveysController extends Controller
 
 
    
-    public function show(string $id) 
-    {
-        $survey = Surveys::with([
-            'surveys_questions.answers', 
-            
-        ])->findOrFail($id);
-    
-        $departments = Departments::pluck('name', 'id');
-        $branches = Branches::pluck('name', 'id');
+public function show(string $id) 
+{
+    $survey = Surveys::with([
+        'surveys_questions.answers', 
+    ])->findOrFail($id);
 
-        $users = SurveysUsers::where('surveys_id', $survey->id)
+    $departments = Departments::pluck('name', 'id');
+    $branches = Branches::pluck('name', 'id');
+
+    $users = SurveysUsers::where('surveys_id', $survey->id)
         ->join('users', 'surveys_users.users_id', '=', 'users.id')
         ->select('users.*')
         ->get();
-    
-        return view('hr.surveys.show', compact('survey', 'departments', 'branches','users'));
+
+    $is_answered = [];
+    foreach ($users as $user) {
+        $is_answered[$user->id] = SurveysUsers::where('users_id', $user->id)
+            ->where('surveys_id', $survey->id)
+            ->value('is_answered');
     }
+
+    return view('hr.surveys.show', compact('survey', 'departments', 'branches', 'users', 'is_answered'));
+}
     
     public function edit($id) 
     {
