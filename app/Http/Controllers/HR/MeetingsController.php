@@ -48,52 +48,75 @@ class MeetingsController extends Controller
     }
 
     public function store(Request $request)
+{
+    $data = $request->all();
+    $startDateTime = Carbon::parse($data['start_date_time']);
+    $endDateTime = $startDateTime->copy()->addMinutes($data['duration']);
+    $roomId = $data['rooms_id'];
+    $userIds = $request->input('w_user_id', []);
+
+    // Helper function to check time overlap
+    $checkTimeOverlap = function ($query) use ($startDateTime, $endDateTime) {
+        $query->whereBetween('start_date_time', [$startDateTime, $endDateTime])
+            ->orWhereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
+            ->orWhere(function ($subQuery) use ($startDateTime, $endDateTime) {
+                $subQuery->where('start_date_time', '<', $startDateTime)
+                    ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$endDateTime]);
+            });
+    };
+
+    // Check if the meeting overlaps with existing meetings in the selected room
+    if (Meetings::where('rooms_id', $roomId)->where('status', 1)
+        ->where($checkTimeOverlap)
+        ->exists()) 
     {
-        $data = $request->all();
-        $startDateTime = Carbon::parse($data['start_date_time']);
-        $duration = $data['duration'];
-        $endDateTime = $startDateTime->copy()->addMinutes($duration);
-        $roomId = $data['rooms_id'];
-
-        $overlappingMeeting = Meetings::where('rooms_id', $roomId)->where('status', 1)
-            ->where(function ($query) use ($startDateTime, $endDateTime) {
-                $query->whereBetween('start_date_time', [$startDateTime, $endDateTime])
-                    ->orWhereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
-                    ->orWhere(function ($subQuery) use ($startDateTime, $endDateTime) {
-                        $subQuery->where('start_date_time', '<', $startDateTime)
-                            ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$endDateTime]);
-                    });
-            })
-            ->exists();
-
-
-        if ($overlappingMeeting) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Seçilmiş otaq artıq seçilmiş vaxt üçün bron edilib.'
-            ]);
-        }
-
-        $meeting = Meetings::create($data);
-
-        if ($request->has('w_user_id')) {
-            foreach ($request->input('w_user_id') as $userId) {
-                if (
-                    !MeetingsUsers::where('meetings_id', $meeting->id)
-                        ->where('users_id', $userId)
-                        ->exists()
-                ) {
-                    MeetingsUsers::create([
-                        'meetings_id' => $meeting->id,
-                        'users_id' => $userId,
-                    ]);
-                }
-            }
-        }
-
-        $text = $request->input('type') == 0 ? 'Görüş uğurla yaradıldı' : 'Tədbir uğurla yaradıldı';
-        return redirect()->route('hr.meetings.index')->with('success', $text);
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Seçilmiş otaq artıq seçilmiş vaxt üçün bron edilib.'
+        ]);
     }
+
+    // Check if any selected users are participating in meetings in other rooms during the given time
+    $conflictingUsers = MeetingsUsers::join('meetings', 'meetings.id', '=', 'meetings_users.meetings_id')
+        ->where('meetings.status', 1)
+        ->where('meetings.rooms_id', '<>', $roomId)
+        ->where($checkTimeOverlap)
+        ->whereIn('meetings_users.users_id', $userIds)
+        ->pluck('meetings_users.users_id')
+        ->toArray();
+
+    // Get the names of conflicting users
+    $conflictingUserNames = User::whereIn('id', $conflictingUsers)->pluck('name')->toArray();
+
+    // If any user is already booked, return an error
+    if (count(array_diff($userIds, $conflictingUsers)) < count($userIds)) {
+        $conflictingUserNamesList = implode(', ', $conflictingUserNames);
+        return response()->json([
+            'status' => 'error',
+            'message' => "Seçilmiş vaxtda digər görüşdə iştirak edən istifadəçilər: $conflictingUserNamesList."
+        ]);
+    }
+
+    // Create the new meeting
+    $meeting = Meetings::create($data);
+
+    // Attach users to the meeting
+    foreach ($userIds as $userId) {
+        MeetingsUsers::updateOrCreate([
+            'meetings_id' => $meeting->id,
+            'users_id' => $userId,
+        ]);
+    }
+
+    $text = $request->input('type') == 0 ? 'Görüş uğurla yaradıldı' : 'Tədbir uğurla yaradıldı';
+    return redirect()->route('hr.meetings.index')->with('success', $text);
+}
+
+
+
+
+
+
 
     public function show(string $id)
     {
