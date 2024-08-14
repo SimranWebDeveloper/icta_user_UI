@@ -18,6 +18,7 @@ class HrMessagesController extends Controller
             ->orWhere('from_user_id', Auth::id())
             ->get();
 
+
         return view('hr.messages.index', compact('users', 'messages'));
     }
 

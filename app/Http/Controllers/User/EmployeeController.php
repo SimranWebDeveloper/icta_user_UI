@@ -8,6 +8,7 @@ use App\Models\MeetingsUsers;
 use App\Models\SurveysQuestions;
 use App\Models\SurveysUsers;
 use App\Models\User;
+use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Announcements;
@@ -63,20 +64,20 @@ class EmployeeController extends Controller
     {
         $data = $request->all();
         $user = User::find($id);
-        if ($request->filled('password')) {
-            if (Hash::check($request->new_password, $user->password)) {
-                return redirect()->route('employee.profile')
-                    ->with('error', 'Daxil etdiyiniz yeni şifrə mövcud şifrə ilə eynidir!');
-            } elseif (!Hash::check($request->password, $user->password)) {
-                return redirect()->route('employee.profile')
-                    ->with('error', 'Mövcud şifrəni düzgün daxil etməmisiniz!');
-            } else {
-                $user->password = Hash::make($request->new_password);
-                $user->save();
-            }
-        }
+        // if ($request->filled('password')) {
+        //     if (Hash::check($request->new_password, $user->password)) {
+        //         return redirect()->route('employee.profile')
+        //             ->with('error', 'Daxil etdiyiniz yeni şifrə mövcud şifrə ilə eynidir!');
+        //     } elseif (!Hash::check($request->password, $user->password)) {
+        //         return redirect()->route('employee.profile')
+        //             ->with('error', 'Mövcud şifrəni düzgün daxil etməmisiniz!');
+        //     } else {
+        //         $user->password = Hash::make($request->new_password);
+        //         $user->save();
+        //     }
+        // }
         $user->name = $request->name;
-        $user->b_day = $request->b_day;
+        $user->b_day = $request->b_day ?? '0000-00-00';
         $user->email = $request->email;
 
         if ($request->hasFile('avatar')) {
