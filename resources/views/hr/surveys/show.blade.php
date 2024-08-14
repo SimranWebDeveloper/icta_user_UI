@@ -192,12 +192,9 @@
                                                     data-survey-id="{{ $survey->id }}" 
                                                     data-user-id="{{ $user->id }}" 
                                                     data-user-name="{{ $user->name }}">
-                                                    {{ $user->name }}
-                                                </h5>
-
+                                                     {{ $survey->is_anonym ? 'Anonim istifadəçi '.$index+1 : $user->name }}
+                                                </h5>,
                                             @endforeach
-
-
 
                                             </div>
                                         </div>
@@ -311,7 +308,7 @@
         console.log(isAnonym);
         
         
-        if (isAnonym===0) {
+       
             survey.surveys_questions.forEach((question, index) => {
                 const questionId = question.id;
                 const questionType = question.input_type;
@@ -352,18 +349,12 @@
                 </div>`;
             });
             
-        }
+        
 
-        else{
-            answersHtml = `<div class="col-12">
-                    <p>
-                        Bu istifdeci cavablari gizli olduguna gore cavablari gormek mumkun deyil
-                    </p>
-                    `; 
-        }
+
         Swal.fire({
 
-            title: `${user} Cavabları`,
+            title: `${survey.is_anonym ? 'Anonim istifadəçi' : user} Cavabları`,
             html: `
                  <div class="row mb-4 w-100">
             <div class="col-md-12">

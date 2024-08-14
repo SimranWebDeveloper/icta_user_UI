@@ -68,23 +68,16 @@
 
 
 
-
+                             
+                            <button class="btn btn-success btn-md mt-3 allSurveysButton" data-is-answered='{{$surveyUser->is_answered}}'  data-survey-id='{{$survey->id}}' data-survey='@json($survey)' data-is-answered="true">
+                                @if ($surveyUser && $surveyUser->is_answered == 0) Cavabla
+                                @elseif ($surveyUser && $surveyUser->is_answered == 1) Cavablari gör
+                                @elseif ($surveyUser && $surveyUser->is_answered == 2) Anket Yenilendi
+                                @endif
+                            </button>
                       
                                 
-            
-                            @if ($surveyUser && $surveyUser->is_answered == 1)
-                                <button class="btn btn-success btn-md mt-3 showSurveyButton" data-survey-id='{{$survey->id}}' data-is-answered="true">
-                                    Cavablari gör
-                                </button>
-                            @elseif ($surveyUser && $surveyUser->is_answered == 0)
-                                <button class="btn btn-success btn-md mt-3 surveyButton" data-survey='@json($survey)' data-is-answered="false">
-                                    Cavabla
-                                </button>
-                            @elseif ($surveyUser && $surveyUser->is_answered == 2)  
-                                <button class="btn btn-success btn-md mt-3 allSurveysButton" data-survey-id='{{$survey->id}}' data-survey='@json($survey)' data-is-answered="true">
-                                    Anket Yenilendi
-                                </button>
-                            @endif
+
 
                         </div>
                     </div>
@@ -94,18 +87,6 @@
             </div>
         </div>
     </div>
-
-    {{-- <form action="">
-
-    @csrf
-    <button type="submit">Submit</button>
-    </form>
-
-    <form action=""> --}}
-
-{{-- @csrf --}}
-{{-- <button type="submit">Submit2</button>
-</form> --}}
 </div>
 
 
