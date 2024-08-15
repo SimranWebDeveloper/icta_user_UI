@@ -23,15 +23,13 @@ $(document).ready(function () {
     }
 
 
-    // Anket Yenilendi 1
+    // Anket Yenilendi 
     $(".allSurveysButton").on("click", function () {
         
         const surveyId = $(this).data("survey-id");
         const surveyObj = $(this).data("survey");
         const isAnswered = $(this).data("is-answered");
   
-
-        // Cavablari gör
             $.ajax({
                 url: `/employee/survey/answers/${surveyId}`,
                 method: 'GET',
@@ -39,9 +37,7 @@ $(document).ready(function () {
                     
                     const survey = surveys.find(s => s.id === surveyId);
                     
-                    if (survey) {
-                        
-                        
+                    if (survey) {                     
                         
                         showAllSurveys(response, survey.surveys_questions,surveyObj,isAnswered);
                         
@@ -65,9 +61,9 @@ $(document).ready(function () {
         const showOldQuestion = allData.filter(question => keysArray.includes(question.id.toString()));
         
 
+        // Cavablari gor olan hisse -----------------------------------------------------------------------------------------
         showOldQuestion.forEach((question, index) => {            
             
-            // Cavablari gor olan hisse -----------------------------------------------------------------------------------------
             const questionId = question.id;
             const questionType = question.input_type;             
             const answerList = checkedAnswers || []; 
@@ -118,7 +114,6 @@ $(document).ready(function () {
                 </div>
             </div>`;
         });
-        // ----------------------------------------------------------------------------------------------------------------------------
 
 
         // Cavab ver olan hisse--------------------------------------------------------------------------------------------------------  
@@ -129,9 +124,9 @@ $(document).ready(function () {
         // cavabi gor 
         if (showNewQuestion.length===0  && isAnswered===1) {
             checkSubmit = 'Ok';
-            questionsHtml=`                       
-            `;
+            questionsHtml=``;
         }
+
          // anket yenilendi ve yeni sual elave edilmedi 
         else if (showNewQuestion.length===0 && isAnswered===2){
             checkSubmit = 'Ok';
@@ -164,8 +159,6 @@ $(document).ready(function () {
                 
             
         }
-        
-      
 
         //Cavabla - anket yenilendi ve yeni sual elave edildi 
         else{
@@ -198,7 +191,7 @@ $(document).ready(function () {
                 } else if (question.input_type === "textarea") {
                     optionsHtml = `
                         <div>
-                            <textarea rows="7" cols="10" class="form-control" name="question[${question.id}]" required></textarea>
+                            <textarea rows="6" cols="10" class="form-control" name="question[${question.id}]" required style="resize: none;"></textarea>
                         </div>
                     `;
                 }
@@ -216,9 +209,6 @@ $(document).ready(function () {
                                     </div>
                                 </div>                     
                 `;
-
-
-
 
             });
 
@@ -254,7 +244,6 @@ $(document).ready(function () {
         Swal.fire({
             title: "Istifadeci Anketi",
             html: `
-
                     <div class="row">
                         ${answersHtml}                        
                     </div>
@@ -263,7 +252,6 @@ $(document).ready(function () {
                 `,
             showCancelButton: false,
             confirmButtonText: checkSubmit,
-
 
             cancelButtonText: "Cancel",
             allowOutsideClick: true,
@@ -341,12 +329,8 @@ $(document).ready(function () {
     }
 
 
-    // Cavabla 1
-    $(".surveyButton").on("click", function () {
-        const survey = $(this).data("survey");
-        
-        showSurveyPopup(survey, survey.priority === 0);
-    });
+   
+
 
     // Cavabla 2
     function showSurveyPopup(survey, canCancel) {
@@ -489,7 +473,7 @@ $(document).ready(function () {
             } else if (question.input_type === "textarea") {
                 optionsHtml = `
                   <div>
-                      <textarea rows="7" cols="10" class="form-control" name="question[${question.id}]" required></textarea>
+                      <textarea rows="6" cols="10" class="form-control" name="question[${question.id}]" required style="resize:none"></textarea>
                   </div>
               `;
             }
@@ -546,102 +530,6 @@ $(document).ready(function () {
       `;
     }
 
-
-    
-    // Cavablari gör 1
-    $(".showSurveyButton").on("click", function () {
-        const surveyId = $(this).data("survey-id");
-        fetchUserAnswers(surveyId);
-
-    });
-
-    // Cavablari gör 2
-    function fetchUserAnswers(surveyId) {
-        $.ajax({
-            url: `/employee/survey/answers/${surveyId}`,
-            method: 'GET',
-            success: function (response) {
-                // console.log('Response:', response);
-                const survey = surveys.find(s => s.id === surveyId);
-                if (survey) {
-                    showUserAnswersPopup(response, survey);
-                }
-            },
-            error: function (error) {
-                console.error("Failed to fetch user answers:", error);
-            }
-        });
-    }
-    
-    // Cavablari gör 3
-    function showUserAnswersPopup(answers, survey) {
-        let answersHtml = '';
-    
-        survey.surveys_questions.forEach((question, index) => {
-            const questionId = question.id;
-            const questionType = question.input_type; // Determine the question type (checkbox, radio, textarea)
-    
-            // Get the list of user's answers for this question
-            const answerList = answers[questionId] || []; // Adjust based on the response structure
-    
-            answersHtml += `<div class="col-xl-6 col-12">                        
-                <div class="card mb-4">
-                    <div class="card-header w-100 d-flex justify-content-center align-items-center">
-                        <h3 class="m-0">${index + 1}.</h3>
-                        <h3 class="m-0">${question.question}</h3>
-                    </div>
-                    <div class="card-body">`;
-    
-            if (questionType === 'textarea') {
-                // Display the textarea with the user's answer
-                const textareaAnswer = answerList[0] ? answerList[0].answer : ''; // Adjust based on response structure
-            answersHtml += `<textarea disabled  rows="10" style='box-sizing:border-box; width: 100%;resize: "none" '>${textareaAnswer}</textarea>`;
-            } else {
-                // Display the options with user answers marked as checked
-                answersHtml += `<ul class="list-group-custom">`;
-                question.answers.forEach((option) => {
-                    // Determine if this option should be checked
-                    const isChecked = answerList.some(answer => answer.answer === option.name);
-    
-                    answersHtml += `<li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between  w-100 py-2">
-                            <div class="d-flex align-items-center justify-content-center">                                                
-                                <input type="${questionType}" disabled ${isChecked ? 'checked' : ''} class="rounded" style="width: 20px; height: 20px" />
-                            </div>
-                            <div class="d-flex align-items-center justify-content-center  w-100 pl-3">
-                                <label class="text-justify">
-                                    ${option.name}
-                                </label>
-                            </div>
-                        </div>
-                    </li>`;
-                });
-                answersHtml += `</ul>`;
-            }
-    
-            answersHtml += `</div>
-                </div>
-            </div>`;
-        });
-    
-        Swal.fire({
-            title: "User Answers",
-            html: `
-                <div class="row mb-4 w-100">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row">
-                                    ${answersHtml}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>`,
-            showCancelButton: false,
-            confirmButtonText: "Ok",
-        });
-    }
 
 
 
