@@ -11,10 +11,11 @@ $(document).ready(function () {
         } else if (meeting.type === 2) {
             meetingTitle = "Bron";
         }
+
         let participationButtons;
         if (is_answered === true) {
             participationButtons = `
-                <button class="btn btn-danger btn-lg participation-button" value="0" data-meeting-id="${meeting.id}">
+                <button class="answerPopup btn btn-danger btn-lg participation-button" value="0" data-meeting-id="${meeting.id}">
                     İştirak etməyəcəm
                 </button>`;
         } else if (is_answered === false) {
@@ -27,7 +28,7 @@ $(document).ready(function () {
                 <button class="btn btn-info btn-lg participation-button" value="1" data-meeting-id="${meeting.id}">
                     İştirak edəcəm
                 </button>
-                <button class="btn btn-danger btn-lg participation-button" value="0" data-meeting-id="${meeting.id}">
+                <button class="answerPopup btn btn-danger btn-lg participation-button" value="0" data-meeting-id="${meeting.id}">
                     İştirak etməyəcəm
                 </button>`;
         }
@@ -117,35 +118,91 @@ $(document).ready(function () {
         const participationStatus = $(this).val();
         const meetingId = $(this).data("meeting-id");
 
-        $.ajax({
-            url: window.participationStatusUrl,
-            method: "POST",
-            data: {
-                _token: window.csrfToken,
-                meeting_id: meetingId,
-                participation_status: participationStatus,
-            },
-            success: function (response) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Cavabınız qeyd olundu!",
-                    showConfirmButton: false,
-                    customClass: {
-                        popup: "swal2-popup",
-                        container: "employeeMeetingModal",
-                    },
-                    timer: 1500,
-                }).then(() => {
-                    location.reload();
-                });
-            },
-            error: function (xhr, status, error) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Xəta baş verdi!",
-                    text: "Cavabınız qeyd edilərkən xəta baş verdi. Zəhmət olmasa bir daha cəhd edin.",
-                });
-            },
-        });
+        if (participationStatus == 0) {
+            // If "İştirak etməyəcəm" is clicked
+            Swal.fire({
+                title: "İştirak etməmə səbəbi",
+                input: "textarea",
+                inputPlaceholder: "Səbəbinizi daxil edin...",
+                showCancelButton: true,
+                confirmButtonText: "Göndər",
+                cancelButtonText: "Ləğv et",
+                preConfirm: (reason) => {
+                    if (!reason) {
+                        Swal.showValidationMessage(
+                            "Zəhmət olmasa səbəbinizi daxil edin"
+                        );
+                    }
+                    return { reason: reason };
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send the reason with AJAX
+                    $.ajax({
+                        url: window.participationStatusUrl,
+                        method: "POST",
+                        data: {
+                            _token: window.csrfToken,
+                            meeting_id: meetingId,
+                            participation_status: participationStatus,
+                            reason: result.value.reason, // Include the reason
+                        },
+                        success: function (response) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Cavabınız qeyd olundu!",
+                                showConfirmButton: false,
+                                customClass: {
+                                    popup: "swal2-popup",
+                                    container: "employeeMeetingModal",
+                                },
+                                timer: 1500,
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Xəta baş verdi!",
+                                text: "Cavabınız qeyd edilərkən xəta baş verdi. Zəhmət olmasa bir daha cəhd edin.",
+                            });
+                        },
+                    });
+                }
+            });
+        } else {
+            // Handle "İştirak edəcəm"
+            $.ajax({
+                url: window.participationStatusUrl,
+                method: "POST",
+                data: {
+                    _token: window.csrfToken,
+                    meeting_id: meetingId,
+                    participation_status: participationStatus,
+                },
+                success: function (response) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Cavabınız qeyd olundu!",
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: "swal2-popup",
+                            container: "employeeMeetingModal",
+                        },
+                        timer: 1500,
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Xəta baş verdi!",
+                        text: "Cavabınız qeyd edilərkən xəta baş verdi. Zəhmət olmasa bir daha cəhd edin.",
+                    });
+                },
+            });
+        }
     });
 });

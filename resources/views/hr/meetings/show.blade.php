@@ -3,6 +3,10 @@
     #list-item {
         list-style: none;
     }
+
+    .swal2-html-container {
+        overflow-x: hidden !important;
+    }
 </style>
 @section('content')
 <div class="row mb-4">
@@ -158,7 +162,11 @@
 
                                         <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
                                             @foreach($users as $index => $user)
-                                                <h5 class="text-info mt-1 mb-1 mt-md-0 mb-md-0">{{ $user->name }}</h5>
+                                                <h5 style="cursor:pointer"
+                                                    class="meetingCause text-info mt-1 mb-1 mt-md-0 mb-md-0"
+                                                    data-user-name="{{ $user->name }}">
+                                                    {{ $user->name }}
+                                                </h5>
                                                 {{ $index < count($users) - 1 ? ', ' : '' }}
                                             @endforeach
                                         </div>
@@ -229,6 +237,44 @@
                 }
             })
         })
+
+        $(document).on("click", ".meetingCause", function () {
+            const user = $(this).data("user-name");
+
+            let answersHtml = '';
+
+
+            answersHtml += `
+                <p>Salam</p>
+       `;
+
+
+
+            Swal.fire({
+                title: `${user}`,
+                html: `
+                <div class="row"  >
+                    <div class="col-md-12">
+                        <div class="card">
+                        <div class="card-header">İştirak etməmə səbəbi</div>
+                            <div class="card-body">
+                                    ${answersHtml}
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+İştirak edir                            </div>
+                        </div>
+                    </div>
+        </div >`,
+                showCancelButton: false,
+                confirmButtonText: "Ok",
+                customClass: {
+                    popup: 'swal2-popup',
+                    container: 'employeeAnswerModal'
+                }
+            });
+        });
     })
 </script>
 @endsection
