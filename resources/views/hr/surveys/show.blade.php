@@ -322,10 +322,9 @@
 
                 if (questionType === 'textarea') {
                     const textareaAnswer = answerList[0] ? answerList[0].answer : '';
+                    
                     answersHtml += `
-                        <textarea disabled rows="10" style="box-sizing: border-box; width: 100%; resize: none;">
-                            ${textareaAnswer}
-                        </textarea>`;
+                        <textarea disabled rows="10"  class="form-control" style="box-sizing: border-box; width: 100%; resize: none;">${textareaAnswer}</textarea>`;
                 } else {
                     answersHtml += `<ul class="list-group-custom">`;
                     question.answers.forEach((option) => {

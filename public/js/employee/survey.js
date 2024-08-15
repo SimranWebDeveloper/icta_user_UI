@@ -7,9 +7,10 @@ $(document).ready(function () {
     function openNextSurvey() {
         const completedSurveys =
             JSON.parse(localStorage.getItem("completedSurveys")) || [];
+
         const nextSurvey = surveys.find(
             (survey) =>
-                survey.priority === 1 && !completedSurveys.includes(survey.id)
+                survey.priority === 1  && !completedSurveys.includes(survey.id)
         );
 
         if (nextSurvey) {
@@ -78,7 +79,7 @@ $(document).ready(function () {
             
             if (questionType === 'textarea') {
                 const textareaAnswer = answerList[(questionId).toString()][0].answer || []; // Adjust based on response structure
-            answersHtml += `<textarea disabled  rows="6" style='box-sizing:border-box; width: 100%; resize:none '>${textareaAnswer}</textarea>`;
+            answersHtml += `<textarea disabled  rows="6" class='p-2' style='box-sizing:border-box; width: 100%; resize:none '>${textareaAnswer}</textarea>`;
             } 
             else {
                 // Display the options with user answers marked as checked
@@ -116,7 +117,7 @@ $(document).ready(function () {
         });
 
 
-        // Cavab ver olan hisse--------------------------------------------------------------------------------------------------------  
+        // Cavabla ve Anket yenilendi olan hisse--------------------------------------------------------------------------------------------------------  
         let checkSubmit = 'Ok';
         let questionsHtml = "";      
         const showNewQuestion = allData.filter(question => !keysArray.includes(question.id.toString()));
@@ -148,7 +149,7 @@ $(document).ready(function () {
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <p>Anket yenilendi ve yeni sual elave edilmedi</p>
+                                    <p class="p-3 text-center w-100">Anket yeniləndi və heç bir yeni sual əlavə edilmədi</p>
                                 </div>
                             </div>
                         </div>
@@ -303,13 +304,18 @@ $(document).ready(function () {
                         let completedSurveys = JSON.parse(localStorage.getItem("completedSurveys")) || [];
                         completedSurveys.push(surveyObj.id);
                         localStorage.setItem("completedSurveys", JSON.stringify(completedSurveys));
-        
+                        
                         // Formu gönder
+
                         form.submit();
         
                         // novbeti anketi aç
-                        const nextSurvey = surveys.find(s => s.priority === 1 && !completedSurveys.includes(s.id));
+                        
+                        const nextSurvey = surveys.find(s => s.priority === 1  && !completedSurveys.includes(s.id));
+                        console.log(nextSurvey,'nextSurvey');
+                        
                         if (nextSurvey) {
+                            
                             // novbeti anketin açılmasını 1 saniye gecikdirmek ucun, belelikle form gönderildikden sonra açılacaq
                             setTimeout(() => {
                                 showSurveyPopup(nextSurvey, false);
@@ -417,7 +423,7 @@ $(document).ready(function () {
         });
     }
 
-    // Cavabla 3
+ 
     function showError(input) {
         const errorText = document.createElement("span");
         errorText.className = "error-text";
@@ -430,7 +436,7 @@ $(document).ready(function () {
         }
     }
 
-    // Cavabla 4
+
     function removeError(input) {
         const parent = input.closest(".card-body");
         const errorText = parent.querySelector(".error-text");
@@ -473,7 +479,7 @@ $(document).ready(function () {
             } else if (question.input_type === "textarea") {
                 optionsHtml = `
                   <div>
-                      <textarea rows="6" cols="10" class="form-control" name="question[${question.id}]" required style="resize:none"></textarea>
+                      <textarea rows="6" cols="10" class="p-2" name="question[${question.id}]" required style="resize:none"></textarea>
                   </div>
               `;
             }
