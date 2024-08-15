@@ -15,6 +15,7 @@ use App\Models\Announcements;
 use App\Models\Surveys;
 use App\Models\UsersAnswers;
 use Illuminate\Support\Arr;
+use Carbon\Carbon;
 
 
 
@@ -131,28 +132,57 @@ class EmployeeController extends Controller
     }
 
     public function updateParticipationStatus(Request $request)
-    {
-        $userId = Auth::id();
-        $meetingId = $request->meeting_id;
-        $participationStatus = $request->participation_status;
-        $reason = $request->reason;
+{
+    $userId = Auth::id();
+    $meetingId = $request->meeting_id;
+    $participationStatus = $request->participation_status;
+    $reason = $request->reason;
 
-        // Find the existing entry in the meetings_users table
-        $meetingUser = MeetingsUsers::where('users_id', $userId)
-            ->where('meetings_id', $meetingId)
-            ->first();
+    // Find the existing entry in the meetings_users table
+    $meetingUser = MeetingsUsers::where('users_id', $userId)
+        ->where('meetings_id', $meetingId)
+        ->first();
 
-        if ($meetingUser) {
-            // Update the participation status
-            $meetingUser->participation_status = $participationStatus;
-            $meetingUser->reason = $reason;
-            $meetingUser->save();
+    if ($meetingUser) {
+        if ($participationStatus == 1) {
+            $meeting = Meetings::find($meetingId);
+            $startDateTime = Carbon::parse($meeting->start_date_time);
+            $endDateTime = $startDateTime->copy()->addMinutes($meeting->duration);
 
-            return response()->json(['success' => true]);
-        } else {
-            return response()->json(['success' => false], 404);
+            $conflictingMeetings = MeetingsUsers::join('meetings', 'meetings.id', '=', 'meetings_users.meetings_id')
+                ->where('meetings_users.users_id', $userId)
+                ->where('meetings.id', '<>', $meetingId) 
+                ->where('meetings.rooms_id', '<>', $meeting->rooms_id) 
+                ->where('meetings.status', 1) 
+                ->where(function ($query) use ($startDateTime, $endDateTime) {
+                    $query->whereBetween('meetings.start_date_time', [$startDateTime, $endDateTime])
+                        ->orWhereRaw('DATE_ADD(meetings.start_date_time, INTERVAL meetings.duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
+                        ->orWhere(function ($subQuery) use ($startDateTime, $endDateTime) {
+                            $subQuery->where('meetings.start_date_time', '<', $startDateTime)
+                                ->whereRaw('DATE_ADD(meetings.start_date_time, INTERVAL meetings.duration MINUTE) > ?', [$endDateTime]);
+                        });
+                })
+                ->exists();
+
+            if ($conflictingMeetings) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Siz bu vaxtda başqa bir otaqda görüşdə iştirak edirsiniz.'
+                ], 409);
+            }
         }
+
+        $meetingUser->participation_status = $participationStatus;
+        $meetingUser->reason = $reason;
+        $meetingUser->save();
+
+        return response()->json(['success' => true]);
+    } else {
+        return response()->json(['success' => false], 404);
     }
+}
+
+
 
     public function getUserAnswers($surveyId)
     {
