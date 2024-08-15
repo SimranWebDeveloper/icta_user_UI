@@ -162,9 +162,12 @@
 
                                         <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
                                             @foreach($users as $index => $user)
+                                            @php 
+                                                $participant_status = $user->participation_status == 1 ? 'text-success' : 'text-danger';
+                                            @endphp
                                                 <h5 style="cursor:pointer"
-                                                    class="meetingCause text-info mt-1 mb-1 mt-md-0 mb-md-0"
-                                                    data-user-name="{{ $user->name }}">
+                                                    class="meetingCause {{ $participant_status }} mt-1 mb-1 mt-md-0 mb-md-0"
+                                                    data-user-name="{{ $user->name }}" data-user-reason="{{$user->reason}}">
                                                     {{ $user->name }}
                                                 </h5>
                                                 {{ $index < count($users) - 1 ? ', ' : '' }}
@@ -240,13 +243,15 @@
 
         $(document).on("click", ".meetingCause", function () {
             const user = $(this).data("user-name");
+            const reason = $(this).data("user-reason");
 
             let answersHtml = '';
 
-
-            answersHtml += `
-                <p>Salam</p>
-       `;
+            if (!reason || reason === '') {
+                answersHtml += `<p class="text-success">${user} iştirakını təsdiqlədi.</p>`;
+            } else {
+                answersHtml += `<p class="text-danger">İştirak etməmə səbəbi: ${reason}</p>`;
+            }
 
 
 
@@ -256,15 +261,12 @@
                 <div class="row"  >
                     <div class="col-md-12">
                         <div class="card">
-                        <div class="card-header">İştirak etməmə səbəbi</div>
+                        <div class="card-header">İştirak Statusu</div>
                             <div class="card-body">
                                     ${answersHtml}
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-body">
-İştirak edir                            </div>
-                        </div>
+                     </div>
                     </div>
         </div >`,
                 showCancelButton: false,

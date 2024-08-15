@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('surveys', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name',255);
             $table->boolean('is_anonym')->default(false);
             $table->integer('status')->default(1);
             $table->integer('priority');

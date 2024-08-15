@@ -13,7 +13,7 @@ class AnnouncementsController extends Controller
     
     public function index()
 {
-    $now = Carbon::now()->addHours(4);  //son
+    $now = Carbon::now()->addHours(4);  
    
     
     Announcements::where('end_date', '<=' , $now->format('Y-m-d H:i:s'))
