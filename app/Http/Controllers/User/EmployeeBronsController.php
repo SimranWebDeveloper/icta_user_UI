@@ -16,23 +16,12 @@ class EmployeeBronsController extends Controller
 {
     public function index()
     {
-        $now = Carbon::now()->subHours(4);
-        $meetings = Meetings::with('rooms')->where('status', 1)->where('type', 2)->get();
-
-        foreach ($meetings as $meeting) {
-            $startDateTime = Carbon::parse($meeting->start_date_time)->subHours(4);
-            $duration = $meeting->duration;
-            $endDateTime = $startDateTime->copy()->addMinutes($duration);
-
-            if ($endDateTime->lessThanOrEqualTo($now)) {
-                $meeting->update(['status' => 0]);
-            }
-        }
-
+        $meetings = Meetings::with('rooms')->where('type', 2)->get();
+        
         foreach ($meetings as $meeting) {
             $meeting->participants = MeetingsUsers::where('meetings_id', $meeting->id)
                 ->join('users', 'meetings_users.users_id', '=', 'users.id')
-                ->select('users.*')
+                ->select('users.*', 'meetings_users.participation_status', 'meetings_users.reason')
                 ->get();
         }
 
