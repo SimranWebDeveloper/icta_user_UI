@@ -370,6 +370,7 @@
             input.value = '';
             
         } else {
+            list.removeChild(list.firstElementChild);
             todoContent.classList.remove('disabled-div');
         }
 
