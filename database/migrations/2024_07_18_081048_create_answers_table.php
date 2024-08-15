@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('answers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('surveys_questions_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('name');
+            $table->string('name', 255);
             $table->integer('status');
             $table->timestamps();
         });

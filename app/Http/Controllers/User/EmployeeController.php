@@ -27,21 +27,17 @@ class EmployeeController extends Controller
 {
     $user = Auth::user();
 
-    // Retrieve announcements
     $announcements = Announcements::where('status', 1)->get();
 
-    // Retrieve meetings for the user
     $meetings_users = MeetingsUsers::where('users_id', $user->id)->get();
     $meetings_ids = $meetings_users->pluck('meetings_id');
     $meetings = Meetings::whereIn('id', $meetings_ids)->where('status', 1)->with('rooms')->get();
 
 
-    // Retrieve surveys and related data
     $surveys_users = SurveysUsers::with('surveys')->where('users_id', $user->id)->get();
     $surveyIds = Arr::flatten($surveys_users->pluck('surveys.id'));
     $surveys = Surveys::whereIn('id', $surveyIds)->where('status', 1)->with('surveys_questions.answers')->get();
 
-    // Retrieve user answers
     $userAnswers = UsersAnswers::where('users_id', $user->id)
                                 ->whereIn('surveys_id', $surveyIds)
                                 ->get()
@@ -138,7 +134,6 @@ class EmployeeController extends Controller
     $participationStatus = $request->participation_status;
     $reason = $request->reason;
 
-    // Find the existing entry in the meetings_users table
     $meetingUser = MeetingsUsers::where('users_id', $userId)
         ->where('meetings_id', $meetingId)
         ->first();
@@ -188,7 +183,6 @@ class EmployeeController extends Controller
     {
         $userId = Auth::id();
 
-        // Fetch user answers for the given survey
         $answers = UsersAnswers::where('users_id', $userId)
             ->where('surveys_id', $surveyId)
             ->get()
@@ -197,7 +191,7 @@ class EmployeeController extends Controller
         $formattedAnswers = $answers->map(function($answersGroup) {
             return $answersGroup->map(function($answer) {
                 return [
-                    'answer' => $answer->answer, // Adjust based on how you store answers
+                    'answer' => $answer->answer, 
                 ];
             });
         });
@@ -215,7 +209,7 @@ class EmployeeController extends Controller
     $formattedAnswers = $answers->map(function($answersGroup) {
         return $answersGroup->map(function($answer) {
             return [
-                'answer' => $answer->answer, // Adjust based on how you store answers
+                'answer' => $answer->answer, 
             ];
         });
     });

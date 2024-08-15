@@ -122,7 +122,7 @@ public function show(string $id)
         $user_departments = User::whereIn('id', $surveys_users)->pluck('departments_id') ->toArray();
         $user_branches = User::whereIn('id', $surveys_users)->pluck('branches_id')->toArray();
 
-        return view('hr.surveys.edit', compact('data', 'departments', 'branches', 'users', 'user_departments', 'user_branches', 'surveys_users', )); 
+        return view('hr.surveys.edit', compact('data', 'departments', 'branches', 'users', 'user_departments', 'user_branches', 'surveys_users' )); 
     }
 
     public function update(Request $request, $id)
@@ -196,20 +196,6 @@ public function show(string $id)
 
         return redirect()->route('hr.surveys.index')->with('success', 'Anket müvəffəqiyyətlə yeniləndi');
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     public function destroy($id) 
