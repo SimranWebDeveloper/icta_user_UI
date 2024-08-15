@@ -103,7 +103,7 @@ class MeetingsController extends Controller
 
         $participants = MeetingsUsers::where('meetings_id', $meeting->id)
             ->join('users', 'meetings_users.users_id', '=', 'users.id')
-            ->select('users.*')
+            ->select('users.*', 'meetings_users.participation_status', 'meetings_users.reason')
             ->get();
         $departments = Departments::pluck('name', 'id');
         $branches = Branches::pluck('name', 'id');

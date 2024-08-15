@@ -15,6 +15,7 @@ class MeetingsUsers extends Model
         'meetings_id',
         'users_id',
         'participation_status',
+        'reason',
     ];
 
     public function rooms()

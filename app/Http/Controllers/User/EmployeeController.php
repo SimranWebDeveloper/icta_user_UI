@@ -135,6 +135,7 @@ class EmployeeController extends Controller
         $userId = Auth::id();
         $meetingId = $request->meeting_id;
         $participationStatus = $request->participation_status;
+        $reason = $request->reason;
 
         // Find the existing entry in the meetings_users table
         $meetingUser = MeetingsUsers::where('users_id', $userId)
@@ -144,6 +145,7 @@ class EmployeeController extends Controller
         if ($meetingUser) {
             // Update the participation status
             $meetingUser->participation_status = $participationStatus;
+            $meetingUser->reason = $reason;
             $meetingUser->save();
 
             return response()->json(['success' => true]);

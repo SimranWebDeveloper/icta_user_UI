@@ -180,6 +180,7 @@ $(document).ready(function () {
                     _token: window.csrfToken,
                     meeting_id: meetingId,
                     participation_status: participationStatus,
+                    
                 },
                 success: function (response) {
                     Swal.fire({
