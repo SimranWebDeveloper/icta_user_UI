@@ -93,7 +93,9 @@
                         <h3 class="col-xl-2 m-0">${group.department}</h3>
                         <h4 class="col-xl-2 mb-0 mt-2 mt-md-0">${group.branch}</h4>
                         <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
-                            ${group.users.map(user => `<h5 class="mt-1 mb-1 mt-md-0 mb-md-0">${user}</h5>`).join(', ')}
+                            ${group.users.map(user => `<h5 style="cursor:pointer" class="text-info bronCause mt-1 mb-1 mt-md-0 mb-md-0"
+                                data-user-name="guller"
+                                >${user}</h5>`).join(', ')}
                         </div>
                         </div>`;
                 }).join('<hr class="hr" />');
@@ -259,18 +261,45 @@ customClass: {
                 ],
 
                 timeFormat: 'HH:mm',
-
-                // dayRender: function (date, cell) {
-                //     let newDate = $.fullCalendar.formatDate(date, 'DD-MM-YYYY');
-                //     if (newDate == '07-08-2024') {
-                //         cell.css('background', "yellow")
-                //     }
-                //     else if (newDate == '09-08-2024') {
-                //         cell.css('background', "red")
-                //     }
-                // }
-        }
+            }
         );
+        $(document).on("click", ".bronCause", function () {
+            const user = $(this).data("user-name");
+
+            let answersHtml = '';
+
+
+            answersHtml += `
+                <p>Salam</p>
+       `;
+
+
+
+            Swal.fire({
+                title: `${user}`,
+                html: `
+                <div class="row"  >
+                    <div class="col-md-12">
+                        <div class="card">
+                        <div class="card-header">İştirak etməmə səbəbi</div>
+                            <div class="card-body">
+                                    ${answersHtml}
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+İştirak edir                            </div>
+                        </div>
+                    </div>
+        </div >`,
+                showCancelButton: false,
+                confirmButtonText: "Ok",
+                customClass: {
+                    popup: 'swal2-popup',
+                    container: 'employeeAnswerModal'
+                }
+            });
+        });
     }); 
 </script>
 @endsection

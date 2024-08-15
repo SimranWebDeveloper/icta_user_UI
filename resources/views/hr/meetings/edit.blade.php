@@ -260,6 +260,7 @@ submitBtn.addEventListener('click', function (event) {
             type: 'POST',
             data: formData,
             success: function (response) {
+            console.log(response.status);
                 if (response.status === 'error') {
                     Swal.fire({
                         title: "Xəta!",

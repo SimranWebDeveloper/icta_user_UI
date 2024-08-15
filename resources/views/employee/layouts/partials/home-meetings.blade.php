@@ -1,5 +1,5 @@
 <style>
-    .fixed-height {
+    .fix-height {
         height: 400px;
     }
 
