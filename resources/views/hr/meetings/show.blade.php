@@ -163,11 +163,13 @@
                                         <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
                                             @foreach($users as $index => $user)
                                             @php 
-                                                $participant_status = $user->participation_status == 1 ? 'text-success' : 'text-danger';
+                                                    $participant_status = 
+                                                    $user->participation_status === 1 ? 'text-success' : 
+                                                    ($user->participation_status === 0 ? 'text-danger' : 'text-warning');
                                             @endphp
                                                 <h5 style="cursor:pointer"
                                                     class="meetingCause {{ $participant_status }} mt-1 mb-1 mt-md-0 mb-md-0"
-                                                    data-user-name="{{ $user->name }}" data-user-reason="{{$user->reason}}">
+                                                    data-user-name="{{ $user->name }}" data-user-reason="{{$user->reason}}" data-status="{{$user->participation_status}}">
                                                     {{ $user->name }}
                                                 </h5>
                                                 {{ $index < count($users) - 1 ? ', ' : '' }}
@@ -244,14 +246,18 @@
         $(document).on("click", ".meetingCause", function () {
             const user = $(this).data("user-name");
             const reason = $(this).data("user-reason");
+            const participant_status = $(this).data("status");
+            console.log(participant_status)
 
             let answersHtml = '';
 
-            if (!reason || reason === '') {
-                answersHtml += `<p class="text-success">${user} iştirakını təsdiqlədi.</p>`;
-            } else {
+            if ((!reason || reason === '') && participant_status === 1) {
+                answersHtml += `<p class="text-success">${user} iştirak status təsdiqlənib.</p>`;
+            } else if (participant_status === 0) {
                 answersHtml += `<p class="text-danger">İştirak etməmə səbəbi: ${reason}</p>`;
+            } else { answersHtml += `<p class="text-warning">${user} iştirak status gözləmədədir.</p>`;
             }
+
 
 
 

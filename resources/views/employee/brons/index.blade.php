@@ -99,10 +99,12 @@
                         <h4 class="col-xl-2 mb-0 mt-2 mt-md-0">${group.branch}</h4>
                         <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
                             ${group.users.map(user => {
-                                let statusClass = user.participation_status === 1 ? 'text-success' : 'text-danger';
+                                let statusClass = 
+                                user.participation_status === 1 ? 'text-success' : 
+                                (user.participation_status === 0 ? 'text-danger' : 'text-warning');
                                 let reasonText = user.reason ? `İştirak etməmə səbəbi: ${user.reason}` : '';
                                 return `<h5 style="cursor:pointer" class="${statusClass} bronCause mt-1 mb-1 mt-md-0 mb-md-0"
-                                    data-user-name="${user.name}" data-user-reason="${user.reason}">
+                                    data-user-name="${user.name}" data-user-reason="${user.reason}" data-user-status="${user.participation_status}">
                                     ${user.name}
                                 </h5>`;
                             }).join(', ')}
@@ -273,14 +275,16 @@
         $(document).on("click", ".bronCause", function () {
             const user = $(this).data("user-name");
             const reason = $(this).data("user-reason") || '';
-            const statusClass = $(this).hasClass('text-success') ? 'text-success' : 'text-danger';
+            const participantStatus = $(this).data("user-status");
 
             let answersHtml = '';
 
-            if (statusClass === 'text-success') {
-                answersHtml += `<p class="text-success">${user} iştirakını təsdiqlədi.</p>`;
-            } else {
+            if ((!reason || reason === '') && participantStatus === 1) {
+                answersHtml += `<p class="text-success">${user} iştirak status təsdiqlənib.</p>`;
+            } else if (participantStatus === 0) {
                 answersHtml += `<p class="text-danger">İştirak etməmə səbəbi: ${reason}</p>`;
+            } else {
+                answersHtml += `<p class="text-warning">${user} iştirak status gözləmədədir.</p>`;
             }
 
             Swal.fire({
