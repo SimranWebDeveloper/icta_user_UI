@@ -149,6 +149,7 @@ class EmployeeController extends Controller
                 ->where('meetings.id', '<>', $meetingId) 
                 ->where('meetings.rooms_id', '<>', $meeting->rooms_id) 
                 ->where('meetings.status', 1) 
+                ->where('meetings_users.participation_status', 1)
                 ->where(function ($query) use ($startDateTime, $endDateTime) {
                     $query->whereBetween('meetings.start_date_time', [$startDateTime, $endDateTime])
                         ->orWhereRaw('DATE_ADD(meetings.start_date_time, INTERVAL meetings.duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
@@ -176,6 +177,7 @@ class EmployeeController extends Controller
         return response()->json(['success' => false], 404);
     }
 }
+
 
 
 
