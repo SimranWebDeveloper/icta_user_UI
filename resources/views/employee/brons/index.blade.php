@@ -101,11 +101,11 @@
                             ${group.users.map(user => {
                                 let statusClass = 
                                 user.participation_status === 1 ? 'text-success' : 
-                                (user.participation_status === 0 ? 'text-danger' : 'text-warning');
+                                (user.participation_status === 0 ? 'text-danger' : null);
                                 let reasonText = user.reason ? `İştirak etməmə səbəbi: ${user.reason}` : '';
                                 return `<h5 style="cursor:pointer" class="${statusClass} bronCause mt-1 mb-1 mt-md-0 mb-md-0"
                                     data-user-name="${user.name}" data-user-reason="${user.reason}" data-user-status="${user.participation_status}">
-                                    ${user.name}
+                                   <u>${user.name}</u> 
                                 </h5>`;
                             }).join(', ')}
                         </div>
@@ -280,11 +280,11 @@
             let answersHtml = '';
 
             if ((!reason || reason === '') && participantStatus === 1) {
-                answersHtml += `<p class="text-success">${user} iştirak status təsdiqlənib.</p>`;
+                answersHtml += `<p>${user} iştirakını təsdiqlədi.</p>`;
             } else if (participantStatus === 0) {
-                answersHtml += `<p class="text-danger">İştirak etməmə səbəbi: ${reason}</p>`;
+                answersHtml += `<p class="font-weight-bold">İştirak etməmə səbəbi: <span class="font-weight-normal">${reason}</span></p>`;
             } else {
-                answersHtml += `<p class="text-warning">${user} iştirak status gözləmədədir.</p>`;
+                answersHtml += `<p>${user} iştirakının təsdiqlənməsi gözlənilir.</p>`;
             }
 
             Swal.fire({

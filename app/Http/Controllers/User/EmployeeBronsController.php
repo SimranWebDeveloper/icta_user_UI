@@ -17,7 +17,7 @@ class EmployeeBronsController extends Controller
     public function index()
     {
         $meetings = Meetings::with('rooms')->where('type', 2)->get();
-        
+
         foreach ($meetings as $meeting) {
             $meeting->participants = MeetingsUsers::where('meetings_id', $meeting->id)
                 ->join('users', 'meetings_users.users_id', '=', 'users.id')
@@ -50,7 +50,7 @@ class EmployeeBronsController extends Controller
         $endDateTime = $startDateTime->copy()->addMinutes($duration);
         $roomId = $data['rooms_id'];
 
-        $overlappingMeeting = Meetings::where('rooms_id', $roomId) ->where('status', 1)
+        $overlappingMeeting = Meetings::where('rooms_id', $roomId)->where('status', 1)
             ->where(function ($query) use ($startDateTime, $endDateTime) {
                 $query->whereBetween('start_date_time', [$startDateTime, $endDateTime])
                     ->orWhereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
@@ -61,19 +61,21 @@ class EmployeeBronsController extends Controller
             })
             ->exists();
 
-            if ($overlappingMeeting) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Seçilmiş otaq artıq seçilmiş vaxt üçün bron edilib.'
-                ]);
-            }
+        if ($overlappingMeeting) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Seçilmiş otaq artıq seçilmiş vaxt üçün bron edilib.'
+            ]);
+        }
         $meeting = Meetings::create($data);
 
         if ($request->has('w_user_id')) {
             foreach ($request->input('w_user_id') as $userId) {
-                if (!MeetingsUsers::where('meetings_id', $meeting->id)
-                                ->where('users_id', $userId)
-                                ->exists()) {
+                if (
+                    !MeetingsUsers::where('meetings_id', $meeting->id)
+                        ->where('users_id', $userId)
+                        ->exists()
+                ) {
                     MeetingsUsers::create([
                         'meetings_id' => $meeting->id,
                         'users_id' => $userId,
@@ -81,8 +83,12 @@ class EmployeeBronsController extends Controller
                 }
             }
         }
-        $text =  'Bron müvəffəqiyyətlə yaradıldı';
-        return redirect()->route('employee.brons.index')->with('success', $text);
+        $text = 'Bron müvəffəqiyyətlə yaradıldı';
+        return response()->json([
+            'status' => 'success',
+            'message' => $text,
+            'route' => route('employee.brons.index')
+        ]);
     }
 
     public function show(string $id)
@@ -128,24 +134,24 @@ class EmployeeBronsController extends Controller
         $duration = $data['duration'];
         $endDateTime = $startDateTime->copy()->addMinutes($duration);
         $roomId = $data['rooms_id'];
-      
-            $overlappingMeeting = Meetings::where('rooms_id', $roomId)
-                ->where('status', 1)
-                ->where('id', '!=', $id)
-                ->where(function ($query) use ($startDateTime, $endDateTime) {
-                    $query->where(function ($subQuery) use ($startDateTime, $endDateTime) {
-                        $subQuery->where('start_date_time', '<', $endDateTime)
-                            ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$startDateTime]);
-                    });
-                })
-                ->exists();
 
-            if ($overlappingMeeting) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Seçilmiş otaq artıq seçilmiş vaxt üçün bron edilib.'
-                ]);
-            }
+        $overlappingMeeting = Meetings::where('rooms_id', $roomId)
+            ->where('status', 1)
+            ->where('id', '!=', $id)
+            ->where(function ($query) use ($startDateTime, $endDateTime) {
+                $query->where(function ($subQuery) use ($startDateTime, $endDateTime) {
+                    $subQuery->where('start_date_time', '<', $endDateTime)
+                        ->whereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) > ?', [$startDateTime]);
+                });
+            })
+            ->exists();
+
+        if ($overlappingMeeting) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Seçilmiş otaq artıq seçilmiş vaxt üçün bron edilib.'
+            ]);
+        }
         $meeting->update($data);
         MeetingsUsers::where('meetings_id', $meeting->id)->delete();
 
@@ -158,8 +164,11 @@ class EmployeeBronsController extends Controller
             }
         }
         $text = 'Bron müvəffəqiyyətlə dəyişdirildi';
-        return redirect()->route('employee.brons.index')->with('success', $text);
-
+        return response()->json([
+            'status' => 'success',
+            'message' => $text,
+            'route' => route('employee.brons.index')
+        ]);
     }
 
 

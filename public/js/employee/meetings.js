@@ -104,10 +104,10 @@ $(document).ready(function () {
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer">
+                        </div>
+                        <div class="mt-5">
                             ${participationButtons}
                         </div>
-                    </div>
                 </div>
             </div> `,
             showConfirmButton: false,
@@ -119,7 +119,6 @@ $(document).ready(function () {
         const meetingId = $(this).data("meeting-id");
 
         if (participationStatus == 0) {
-            // If "İştirak etməyəcəm" is clicked
             Swal.fire({
                 title: "İştirak etməmə səbəbi",
                 input: "textarea",
@@ -127,6 +126,10 @@ $(document).ready(function () {
                 showCancelButton: true,
                 confirmButtonText: "Göndər",
                 cancelButtonText: "Ləğv et",
+                customClass: {
+                    popup: "notEmployee-popup",
+                    container: "notEmployee",
+                },
                 preConfirm: (reason) => {
                     if (!reason) {
                         Swal.showValidationMessage(
@@ -180,7 +183,6 @@ $(document).ready(function () {
                     _token: window.csrfToken,
                     meeting_id: meetingId,
                     participation_status: participationStatus,
-                    
                 },
                 success: function (response) {
                     Swal.fire({
