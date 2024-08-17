@@ -18,12 +18,13 @@ class SurveysController extends Controller
     
     public function index()
     {
-        $now = Carbon::now();
+        $now = Carbon::now()->subHours(4); 
         Surveys::where('expired_at', '<', $now->format('Y-m-d'))->where('status', '!=', 0)->update(['status' => 0]);
+        
         $surveys = Surveys::with('users')->get();
-
         return view('hr.surveys.index', compact('surveys'));
     }
+    
 
     public function create()
     {
