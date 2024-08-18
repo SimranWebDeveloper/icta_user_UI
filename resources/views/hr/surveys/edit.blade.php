@@ -67,8 +67,11 @@
                             </div>
                             <!-- Elanin is_anonym -->
                             <div class="col-md-6 col-lg-4 col-xl-3 form-group mb-3">
+                                <input type="hidden" value="{{ $data->is_anonym }}" name="is_anonym">
                                 <label for="subtitle" class="form-label">Görünmə <span class="text-danger">*</span></label>
-                                <select name="is_anonym" required id="is_anonym" title="" class="form-control ">
+                                <select name="is_anonym" required id="is_anonym" title="" class="form-control "
+                                {{ $data->is_anonym == '1' ? 'disabled' : '' }}
+                                >
                                     <option value="" selected disabled>Elanın Görünməsini seçin</option>
                                     <option value="0" {{ $data->is_anonym == '0' ? 'selected' : '' }}>Açıq</option>
                                     <option value="1" {{ $data->is_anonym == '1' ? 'selected' : '' }}>Gizli</option>
@@ -364,7 +367,7 @@
             allowInput: true,
             enableTime: true,
             dateFormat: "Y-m-d H:i",
-            minDate: "today",
+            minDate: new Date().fp_incr(7), 
             time_24hr: true,
             lang: "az",
             minTime: new Date().toTimeString().slice(0, 5),
@@ -402,6 +405,7 @@ if (questionType.value === 'textarea') {
     input.value = '';
     
 } else {
+    list.removeChild(list.firstElementChild);
     todoContent.classList.remove('disabled-div');
 }
 

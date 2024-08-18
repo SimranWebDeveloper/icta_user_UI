@@ -143,7 +143,8 @@
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
-                confirmButtonText: "Sil!"
+                confirmButtonText: "Sil",
+                cancelButtonText: "Ləğv et"
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({

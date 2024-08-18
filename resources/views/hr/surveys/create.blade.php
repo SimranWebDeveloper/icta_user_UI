@@ -329,7 +329,8 @@
             allowInput: true,
             enableTime: true,
             dateFormat: "Y-m-d H:i",
-            minDate: "today",
+            minDate: new Date().fp_incr(7), 
+            defaultDate: new Date().fp_incr(7), 
             time_24hr: true,
             lang: "az",
             minTime: new Date().toTimeString().slice(0, 5),
@@ -369,6 +370,7 @@
             input.value = '';
             
         } else {
+            list.removeChild(list.firstElementChild);
             todoContent.classList.remove('disabled-div');
         }
 

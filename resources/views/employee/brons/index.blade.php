@@ -72,7 +72,13 @@
                 $groupedParticipants[$meeting->id][] = [
                     'department' => $department,
                     'branch' => $branch,
-                    'users' => $users->pluck('name')->toArray()
+                    'users' => $users->map(function ($user) {
+                        return [
+                            'name' => $user->name,
+                            'participation_status' => $user->participation_status,
+                            'reason' => $user->reason
+                        ];
+                    })->toArray()
                 ];
             }
         }
@@ -80,25 +86,33 @@
     let groupedParticipants = @json($groupedParticipants);
 
     $(document).ready(function () {
-        $('#calendar').fullCalendar(
-            {
-                monthNames: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'],
-                monthNamesShort: ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'İyun', 'İyul', 'Avq', 'Sen', 'Okt', 'Noy', 'Dek'],
-                dayNames: ['Bazar', 'Bazar ertəsi', 'Çərşənbə axşamı', 'Çərşənbə', 'Cümə axşamı', 'Cümə', 'Şənbə'],
-                dayNamesShort: ['B.', 'B.E', 'Ç.A', 'Ç.', 'C.A', 'C.', 'Ş.'],
-                    eventClick: function (event) {
-                    let participants = groupedParticipants[event.id] || [];
-                   let  participantsHtml = participants.map(group => {
+        $('#calendar').fullCalendar({
+            monthNames: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'],
+            monthNamesShort: ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'İyun', 'İyul', 'Avq', 'Sen', 'Okt', 'Noy', 'Dek'],
+            dayNames: ['Bazar', 'Bazar ertəsi', 'Çərşənbə axşamı', 'Çərşənbə', 'Cümə axşamı', 'Cümə', 'Şənbə'],
+            dayNamesShort: ['B.', 'B.E', 'Ç.A', 'Ç.', 'C.A', 'C.', 'Ş.'],
+            eventClick: function (event) {
+                let participants = groupedParticipants[event.id] || [];
+                let participantsHtml = participants.map(group => {
                     return `<div class="d-xl-flex mt-3 align-items-start">
                         <h3 class="col-xl-2 m-0">${group.department}</h3>
                         <h4 class="col-xl-2 mb-0 mt-2 mt-md-0">${group.branch}</h4>
                         <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
-                            ${group.users.map(user => `<h5 class="mt-1 mb-1 mt-md-0 mb-md-0">${user}</h5>`).join(', ')}
+                            ${group.users.map(user => {
+                                let statusClass = 
+                                user.participation_status === 1 ? 'text-success' : 
+                                (user.participation_status === 0 ? 'text-danger' : null);
+                                let reasonText = user.reason ? `İştirak etməmə səbəbi: ${user.reason}` : '';
+                                return `<h5 style="cursor:pointer" class="${statusClass} bronCause mt-1 mb-1 mt-md-0 mb-md-0"
+                                    data-user-name="${user.name}" data-user-reason="${user.reason}" data-user-status="${user.participation_status}">
+                                   <u>${user.name}</u> 
+                                </h5>`;
+                            }).join(', ')}
                         </div>
-                        </div>`;
+                    </div>`;
                 }).join('<hr class="hr" />');
-                    Swal.fire({
-                        html: `<div class="row">
+                Swal.fire({
+                    html: `<div class="row">
     <div class="col-md-12 mb-4">
         <div class="card">
             <div class="card-header">
@@ -108,12 +122,9 @@
                                 class="text-lowercase">
                                 haqqında bron
                             </span>
-
-
                         </h3>
                     </div>
                 </div>
-
             </div>
             <div class="card-body">
                 <div class="row">
@@ -190,87 +201,113 @@
                             </div>
                             <div class="card-body">
                                ${participantsHtml}
+                            </div>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>`,
-customClass: {
-                    popup: 'swal2-popup', // Ensures that only this modal has the specific width
-                    container: 'showModal' // Custom class to differentiate this modal
-                },
-                        showCancelButton: true,
-                        confirmButtonText: 'Redaktə et',
-                        cancelButtonText: 'Sil',
-                        cancelButtonColor: 'red'
-                    }).then((result) => {
-    if (result.isConfirmed) {
-        window.location.href = `{{ route('employee.brons.edit', ['bron' => ':id']) }}`.replace(':id', event.id);
-    } else if (result.dismiss === Swal.DismissReason.cancel) {
-        $.ajax({
-            url: "/employee/brons/" + event.id,
-            type: "DELETE",
-            data: {
-                "_token": "{{ csrf_token() }}"
-            },
-            success: function (response) {
-                Swal.fire(response.message).then((result) => {
+                    customClass: {
+                        popup: 'swal2-popup', // Ensures that only this modal has the specific width
+                        container: 'showModal' // Custom class to differentiate this modal
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Redaktə et',
+                    cancelButtonText: 'Sil',
+                    cancelButtonColor: 'red'
+                }).then((result) => {
                     if (result.isConfirmed) {
-                        location.reload();
+                        window.location.href = `{{ route('employee.brons.edit', ['bron' => ':id']) }}`.replace(':id', event.id);
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        $.ajax({
+                            url: "/employee/brons/" + event.id,
+                            type: "DELETE",
+                            data: {
+                                "_token": "{{ csrf_token() }}"
+                            },
+                            success: function (response) {
+                                Swal.fire(response.message).then((result) => {
+                                    if (result.isConfirmed) {
+                                        location.reload();
+                                    }
+                                });
+                            },
+                        });
                     }
                 });
             },
+            header: {
+                left: 'month,agendaWeek,agendaDay,list',
+                center: 'title',
+                right: 'prev,today,next'
+            },
+            buttonText: {
+                month: "Ay",
+                week: "Həftə",
+                day: "Gün",
+                list: "List",
+                today: "Bu gün"
+            },
+            events: [
+                @foreach ($meetings as $meeting)
+                {
+                    title: "{{ $meeting->subject }}",
+                    start: "{{ $meeting->start_date_time }}",
+                    end: moment("{{ $meeting->start_date_time }}").add({{ $meeting->duration }}, 'minutes').format('YYYY-MM-DDTHH:mm'),
+                    color: 'green',
+                    textColor: 'white',
+                    subject: "{{ $meeting->subject }}",
+                    content: "{{ $meeting->content }}",
+                    room_number: "{{ $meeting->rooms->name ?? 'Bilinmeyen Otaq' }}",
+                    duration: "{{ $meeting->duration }}",
+                    participants: {!! json_encode($meeting->participants->pluck('name')->toArray()) !!},
+                    department: "{{ $meeting->department->name ?? 'Bilinmeyen Departament' }}",
+                    branch: "{{ $meeting->branch->name ?? 'Bilinmeyen Branch' }}",
+                    id: "{{ $meeting->id }}"
+                },
+                @endforeach
+            ],
+            timeFormat: 'HH:mm',
         });
-    }
-});
-                },
-                header: {
-                    left: 'month,agendaWeek,agendaDay,list',
-                    center: 'title',
-                    right: 'prev,today,next'
-                },
-                buttonText: {
-                    month: "Ay",
-                    week: "Həftə",
-                    day: "Gün",
-                    list: "List",
-                    today: "Bu gün"
-                },
-                events: [
-                    @foreach ($meetings as $meeting)
-                                    {
-                                        title: "{{ $meeting->subject }}",
-                                        start: "{{ $meeting->start_date_time }}",
-                            end: moment("{{ $meeting->start_date_time }}").add({{ $meeting->duration }}, 'minutes').format('YYYY-MM-DDTHH:mm'),
-                                color: 'green',
-                                    textColor: 'white',
-                                        subject: "{{ $meeting->subject }}",
-                                            content: "{{ $meeting->content }}",
-                                                room_number: "{{ $meeting->rooms->name ?? 'Bilinmeyen Otaq' }}",
-                                                    duration: "{{ $meeting->duration }}",
-                                                        participants: {!! json_encode($meeting->participants->pluck('name')->toArray()) !!},
-                                                            department: "{{ $meeting->department->name ?? 'Bilinmeyen Departament' }}",
-                                                                branch: "{{ $meeting->branch->name ?? 'Bilinmeyen Branch' }}",
-                                        id: "{{ $meeting->id }}"
-                        },
-                    @endforeach
-                ],
 
-                timeFormat: 'HH:mm',
+        $(document).on("click", ".bronCause", function () {
+            const user = $(this).data("user-name");
+            const reason = $(this).data("user-reason") || '';
+            const participantStatus = $(this).data("user-status");
 
-                // dayRender: function (date, cell) {
-                //     let newDate = $.fullCalendar.formatDate(date, 'DD-MM-YYYY');
-                //     if (newDate == '07-08-2024') {
-                //         cell.css('background', "yellow")
-                //     }
-                //     else if (newDate == '09-08-2024') {
-                //         cell.css('background', "red")
-                //     }
-                // }
-        }
-        );
-    }); 
+            let answersHtml = '';
+
+            if ((!reason || reason === '') && participantStatus === 1) {
+                answersHtml += `<p>${user} iştirakını təsdiqlədi.</p>`;
+            } else if (participantStatus === 0) {
+                answersHtml += `<p class="font-weight-bold">İştirak etməmə səbəbi: <span class="font-weight-normal">${reason}</span></p>`;
+            } else {
+                answersHtml += `<p>${user} iştirakının təsdiqlənməsi gözlənilir.</p>`;
+            }
+
+            Swal.fire({
+                title: `${user}`,
+                html: `
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">İştirak Statusu</div>
+                            <div class="card-body">
+                                ${answersHtml}
+                            </div>
+                        </div>
+                    </div>
+                </div>`,
+                showCancelButton: false,
+                confirmButtonText: "Ok",
+                customClass: {
+                    popup: 'swal2-popup',
+                    container: 'employeeAnswerModal'
+                }
+            });
+        });
+    });
 </script>
 @endsection

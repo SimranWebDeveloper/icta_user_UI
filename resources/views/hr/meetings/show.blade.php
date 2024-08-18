@@ -3,6 +3,10 @@
     #list-item {
         list-style: none;
     }
+
+    .swal2-html-container {
+        overflow-x: hidden !important;
+    }
 </style>
 @section('content')
 <div class="row mb-4">
@@ -28,14 +32,7 @@
                                 @endif
                             </li>
                         </ul>
-                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">{{ $meeting->subject }} <span
-                                class="text-lowercase">
-                                haqqında
-                                {{ $meeting->type == 0 ? 'İclas' : ($meeting->type == 1 ? 'Tədbir' : 'Rezerv') }}
-                            </span>
-
-
-                        </h3>
+                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">{{ $meeting->subject }}</h3>
                     </div>
                     <a href="{{route('hr.meetings.index')}}">
                         <button class="btn btn-danger">
@@ -86,7 +83,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                        {{ $meeting->type == 0 ? 'İclas' : ($meeting->type == 1 ? 'Tədbir' : 'Rezerv') }}
+                                        {{ $meeting->type == 0 ? 'İclas' : 'Tədbir' }}
                                     </li>
                                 </ul>
                             </div>
@@ -158,7 +155,16 @@
 
                                         <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
                                             @foreach($users as $index => $user)
-                                                <h5 class="mt-1 mb-1 mt-md-0 mb-md-0">{{ $user->name }}</h5>
+                                            @php 
+                                                    $participant_status = 
+                                                    $user->participation_status === 1 ? 'text-success' : 
+                                                    ($user->participation_status === 0 ? 'text-danger' : null);
+                                            @endphp
+                                                <h5 style="cursor:pointer"
+                                                    class="meetingCause {{ $participant_status }} mt-1 mb-1 mt-md-0 mb-md-0"
+                                                    data-user-name="{{ $user->name }}" data-user-reason="{{$user->reason}}" data-status="{{$user->participation_status}}">
+                                                    {{ $user->name }}
+                                                </h5>
                                                 {{ $index < count($users) - 1 ? ', ' : '' }}
                                             @endforeach
                                         </div>
@@ -229,6 +235,49 @@
                 }
             })
         })
+
+        $(document).on("click", ".meetingCause", function () {
+            const user = $(this).data("user-name");
+            const reason = $(this).data("user-reason") || '';
+            const status = $(this).data("status");
+            console.log(status);
+            let answersHtml = '';
+
+
+            if (status === 1) {
+                answersHtml += `<p>${user} iştirakını təsdiqlədi.</p>`;
+            } else if (status === 0) {
+                answersHtml += `<p class="font-weight-bold">İştirak etməmə səbəbi: <span class="font-weight-normal">${reason}</span></p>`;
+            } else {
+                answersHtml += `<p>${user} iştirakının təsdiqlənməsi gözlənilir.</p>`;
+            }
+
+
+
+
+
+            Swal.fire({
+                title: `${user}`,
+                html: `
+                <div class="row"  >
+                    <div class="col-md-12">
+                        <div class="card">
+                        <div class="card-header">İştirak Statusu</div>
+                            <div class="card-body">
+                                    ${answersHtml}
+                            </div>
+                        </div>
+                     </div>
+                    </div>
+        </div >`,
+                showCancelButton: false,
+                confirmButtonText: "Ok",
+                customClass: {
+                    popup: 'swal2-popup',
+                    container: 'employeeAnswerModal'
+                }
+            });
+        });
     })
 </script>
 @endsection

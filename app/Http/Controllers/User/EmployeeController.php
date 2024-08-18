@@ -15,6 +15,7 @@ use App\Models\Announcements;
 use App\Models\Surveys;
 use App\Models\UsersAnswers;
 use Illuminate\Support\Arr;
+use Carbon\Carbon;
 
 
 
@@ -26,21 +27,17 @@ class EmployeeController extends Controller
 {
     $user = Auth::user();
 
-    // Retrieve announcements
     $announcements = Announcements::where('status', 1)->get();
 
-    // Retrieve meetings for the user
     $meetings_users = MeetingsUsers::where('users_id', $user->id)->get();
     $meetings_ids = $meetings_users->pluck('meetings_id');
     $meetings = Meetings::whereIn('id', $meetings_ids)->where('status', 1)->with('rooms')->get();
 
 
-    // Retrieve surveys and related data
     $surveys_users = SurveysUsers::with('surveys')->where('users_id', $user->id)->get();
     $surveyIds = Arr::flatten($surveys_users->pluck('surveys.id'));
     $surveys = Surveys::whereIn('id', $surveyIds)->where('status', 1)->with('surveys_questions.answers')->get();
 
-    // Retrieve user answers
     $userAnswers = UsersAnswers::where('users_id', $user->id)
                                 ->whereIn('surveys_id', $surveyIds)
                                 ->get()
@@ -131,32 +128,63 @@ class EmployeeController extends Controller
     }
 
     public function updateParticipationStatus(Request $request)
-    {
-        $userId = Auth::id();
-        $meetingId = $request->meeting_id;
-        $participationStatus = $request->participation_status;
+{
+    $userId = Auth::id();
+    $meetingId = $request->meeting_id;
+    $participationStatus = $request->participation_status;
+    $reason = $request->reason;
 
-        // Find the existing entry in the meetings_users table
-        $meetingUser = MeetingsUsers::where('users_id', $userId)
-            ->where('meetings_id', $meetingId)
-            ->first();
+    $meetingUser = MeetingsUsers::where('users_id', $userId)
+        ->where('meetings_id', $meetingId)
+        ->first();
 
-        if ($meetingUser) {
-            // Update the participation status
-            $meetingUser->participation_status = $participationStatus;
-            $meetingUser->save();
+    if ($meetingUser) {
+        if ($participationStatus == 1) {
+            $meeting = Meetings::find($meetingId);
+            $startDateTime = Carbon::parse($meeting->start_date_time);
+            $endDateTime = $startDateTime->copy()->addMinutes($meeting->duration);
 
-            return response()->json(['success' => true]);
-        } else {
-            return response()->json(['success' => false], 404);
+            $conflictingMeetings = MeetingsUsers::join('meetings', 'meetings.id', '=', 'meetings_users.meetings_id')
+                ->where('meetings_users.users_id', $userId)
+                ->where('meetings.id', '<>', $meetingId) 
+                ->where('meetings.rooms_id', '<>', $meeting->rooms_id) 
+                ->where('meetings.status', 1) 
+                ->where('meetings_users.participation_status', 1)
+                ->where(function ($query) use ($startDateTime, $endDateTime) {
+                    $query->whereBetween('meetings.start_date_time', [$startDateTime, $endDateTime])
+                        ->orWhereRaw('DATE_ADD(meetings.start_date_time, INTERVAL meetings.duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
+                        ->orWhere(function ($subQuery) use ($startDateTime, $endDateTime) {
+                            $subQuery->where('meetings.start_date_time', '<', $startDateTime)
+                                ->whereRaw('DATE_ADD(meetings.start_date_time, INTERVAL meetings.duration MINUTE) > ?', [$endDateTime]);
+                        });
+                })
+                ->exists();
+
+            if ($conflictingMeetings) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Siz bu vaxtda başqa bir otaqda görüşdə iştirak edirsiniz.'
+                ], 409);
+            }
         }
+
+        $meetingUser->participation_status = $participationStatus;
+        $meetingUser->reason = $reason;
+        $meetingUser->save();
+
+        return response()->json(['success' => true]);
+    } else {
+        return response()->json(['success' => false], 404);
     }
+}
+
+
+
 
     public function getUserAnswers($surveyId)
     {
         $userId = Auth::id();
 
-        // Fetch user answers for the given survey
         $answers = UsersAnswers::where('users_id', $userId)
             ->where('surveys_id', $surveyId)
             ->get()
@@ -165,7 +193,7 @@ class EmployeeController extends Controller
         $formattedAnswers = $answers->map(function($answersGroup) {
             return $answersGroup->map(function($answer) {
                 return [
-                    'answer' => $answer->answer, // Adjust based on how you store answers
+                    'answer' => $answer->answer, 
                 ];
             });
         });
@@ -183,7 +211,7 @@ class EmployeeController extends Controller
     $formattedAnswers = $answers->map(function($answersGroup) {
         return $answersGroup->map(function($answer) {
             return [
-                'answer' => $answer->answer, // Adjust based on how you store answers
+                'answer' => $answer->answer, 
             ];
         });
     });

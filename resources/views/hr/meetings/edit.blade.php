@@ -40,8 +40,6 @@
                                 </option>
                                 <option value="1" {{ old('type', $meeting->type) == '1' ? 'selected' : '' }}>Tədbir
                                 </option>
-                                <option value="2" {{ old('type', $meeting->type) == '2' ? 'selected' : '' }}>Rezerv
-                                </option>
                             </select>
                             @error('type')
                                 <span class="text-danger">{{ $message }}</span>
@@ -240,25 +238,57 @@ submitBtn.addEventListener('click', function (event) {
             }
         }
     });
-
     $('#form').on('submit', function (e) {
-        @if($errors->any())
-            Swal.fire({
-                title: "Xəta!",
-                text: "{{ implode(', ', $errors->all()) }}",
-                icon: "error"
-            });
-            e.preventDefault(); 
-        @endif
+        e.preventDefault();
 
         if ($('.report-users:checked').length === 0) {
             Swal.fire({
                 title: "Xəta!",
                 text: "Ən azı 1 iştirakçı seçin",
-                icon: "warning"
+                icon: "warning",
+                confirmButtonText: "Tamam"
             });
-            e.preventDefault();
+            return;
         }
+
+        var formData = $(this).serialize();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+            console.log(response.status);
+                if (response.status === 'error') {
+                    Swal.fire({
+                        title: "Xəta!",
+                        text: response.message,
+                        icon: "error",
+                        confirmButtonText: "Tamam"
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Uğurlu!",
+                        text: response.message,
+                        icon: "success",
+                        confirmButtonText: "Tamam"
+                    }).then((result) => {
+                        console.log(result);
+                        if (result.isConfirmed) {
+                            window.location.href = "/hr/meetings";
+                        }
+                    });
+                }
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    title: "Xəta!",
+                    text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                    icon: "error",
+                    confirmButtonText: "Tamam"
+                });
+            }
+        });
     });
 
     $('.report-departments').on('change', function () {
