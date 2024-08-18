@@ -141,7 +141,7 @@ $(document).ready(function () {
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="name-date-wrapper ">
                                         <h3 class="ml-3 mt-0 mb-0 mr-0 w-100 text-center ">
-                                            Anketə  əlavə olunmuş yeni sual və ya suallar
+                                            Anketə əlavə olunmuş yeni sual və ya suallar
                                         </h3>
                                         
                                     </div>
@@ -163,8 +163,8 @@ $(document).ready(function () {
 
         //Cavabla - anket yenilendi ve yeni sual elave edildi 
         else{
-            checkSubmit = 'Submit';
-            console.log('anket yenilendi showNewQuestion:', showNewQuestion);
+            checkSubmit = 'Göndər';
+            console.log('anket yeniləndi showNewQuestion:', showNewQuestion);
             
             let newQuestionHtml='';
 
@@ -192,7 +192,7 @@ $(document).ready(function () {
                 } else if (question.input_type === "textarea") {
                     optionsHtml = `
                         <div>
-                            <textarea rows="6" cols="10" class="form-control" name="question[${question.id}]" required style="resize: none;"></textarea>
+                            <textarea rows="6" cols="10" class="form-control" name="question[${question.id}]" required style="width:100%;resize: none;"></textarea>
                         </div>
                     `;
                 }
@@ -223,9 +223,8 @@ $(document).ready(function () {
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="name-date-wrapper ">
                                         <h3 class="ml-3 mt-0 mb-0 mr-0 w-100 text-center ">
-                                            Anketə  əlavə olunmuş yeni sual və ya suallar
+                                            Anketə əlavə olunmuş yeni sual və ya suallar
                                         </h3>
-                                        
                                     </div>
                                 </div>
                             </div>
@@ -243,7 +242,7 @@ $(document).ready(function () {
             
         }
         Swal.fire({
-            title: "Istifadeci Anketi",
+            title: "İstifadəçi Anketi",
             html: `
                     <div class="row">
                         ${answersHtml}                        
@@ -479,7 +478,7 @@ $(document).ready(function () {
             } else if (question.input_type === "textarea") {
                 optionsHtml = `
                   <div>
-                      <textarea rows="6" cols="10" class="p-2" name="question[${question.id}]" required style="resize:none"></textarea>
+                      <textarea rows="6" cols="10" class="p-2" name="question[${question.id}]" required style="width:100%; resize:none"></textarea>
                   </div>
               `;
             }

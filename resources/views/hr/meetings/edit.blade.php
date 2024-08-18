@@ -40,8 +40,6 @@
                                 </option>
                                 <option value="1" {{ old('type', $meeting->type) == '1' ? 'selected' : '' }}>Tədbir
                                 </option>
-                                <option value="2" {{ old('type', $meeting->type) == '2' ? 'selected' : '' }}>Rezerv
-                                </option>
                             </select>
                             @error('type')
                                 <span class="text-danger">{{ $message }}</span>

@@ -55,7 +55,7 @@ class MeetingsController extends Controller
         $endDateTime = $startDateTime->copy()->addMinutes($duration);
         $roomId = $data['rooms_id'];
 
-        $overlappingMeeting = Meetings::where('rooms_id', $roomId) ->where('status', 1)
+        $overlappingMeeting = Meetings::where('rooms_id', $roomId)->where('status', 1)
             ->where(function ($query) use ($startDateTime, $endDateTime) {
                 $query->whereBetween('start_date_time', [$startDateTime, $endDateTime])
                     ->orWhereRaw('DATE_ADD(start_date_time, INTERVAL duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
@@ -67,7 +67,10 @@ class MeetingsController extends Controller
             ->exists();
 
         if ($overlappingMeeting) {
-            return redirect()->back()->with('error', 'Göstərilən vaxtda bu otaq artıq doludur.');
+            return response()->json([
+                'status' => 'error',
+                'message' => "Göstərilən vaxtda bu otaq artıq doludur."
+            ]);
         }
 
         $meeting = Meetings::create($data);
@@ -87,8 +90,13 @@ class MeetingsController extends Controller
             }
         }
 
-        $text = $request->input('type') == 0 ? 'Görüş uğurla yaradıldı' : 'Tədbir uğurla yaradıldı';
-        return redirect()->route('hr.meetings.index')->with('success', $text);
+
+        $text = $request->input('type') == 0 ? 'İclas uğurla yaradıldı' : 'Tədbir uğurla yaradıldı';
+        return response()->json([
+            'status' => 'success',
+            'message' => $text,
+            'route' => route('hr.meetings.index')
+        ]);
     }
 
 
@@ -170,7 +178,11 @@ class MeetingsController extends Controller
         }
 
         $text = $data['type'] == 0 ? 'İclas məlumatları müvəffəqiyyətlə dəyişdirildi' : 'Tədbir məlumatları müvəffəqiyyətlə dəyişdirildi';
-        return redirect()->route('hr.meetings.index')->with('success', $text);
+        return response()->json([
+            'status' => 'success',
+            'message' => $text,
+            'route' => route('hr.meetings.index')
+        ]);
     }
 
     public function destroy(string $id)
