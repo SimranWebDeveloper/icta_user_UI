@@ -3,6 +3,44 @@ $(document).ready(function () {
     const surveyStoreUrl = window.surveyStoreUrl;
     const csrfToken = window.csrfToken;
 
+
+    
+    
+    function handleSurveyButtonClick(button) {
+        
+
+        const surveyId = $(button).data("survey-id");
+        const surveyObj = $(button).data("survey");
+        const isAnswered = $(button).data("is-answered");
+    
+        $.ajax({
+            url: `/employee/survey/answers/${surveyId}`,
+            method: 'GET',
+            success: function (response) {
+                const survey = surveys.find(s => s.id === surveyId);
+
+                const keysArray = Object.keys(response);    
+        
+                const showOldQuestion = (survey.surveys_questions).filter(question => !keysArray.includes(question.id.toString()));
+                console.log('keysArray: ', keysArray);
+                console.log('showOldQuestion: ', showOldQuestion);
+                
+                
+                if (isAnswered == 2 && showOldQuestion.length) {
+                    showAllSurveys(response, survey.surveys_questions, surveyObj, isAnswered);
+                }
+            },
+            error: function (error) {
+                console.error("Failed to fetch user answers:", error);
+            }
+        });
+    }
+    
+    // Loop through all buttons with the class "allSurveysButton" on page load
+    $(".allSurveysButton").each(function () {
+        handleSurveyButtonClick(this);
+    });
+
     // user anketi daha evvel cavabladi mı yoxlamaq
     function openNextSurvey() {
         const completedSurveys =
@@ -119,7 +157,14 @@ $(document).ready(function () {
 
         // Cavabla ve Anket yenilendi olan hisse--------------------------------------------------------------------------------------------------------  
         let checkSubmit = 'Ok';
-        let questionsHtml = "";      
+        let questionsHtml = "";  
+            // Butun data filterlenir ve  gelen cavab arrayinin icersinide o id yoxdursa demeli bu yeni sualdi
+            console.log('allData',allData);
+            console.log('checkedAnswers',checkedAnswers);
+            console.log('keysArray',keysArray);
+            
+            
+            
         const showNewQuestion = allData.filter(question => !keysArray.includes(question.id.toString()));
 
         // cavabi gor 
