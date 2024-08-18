@@ -32,14 +32,7 @@
                                 @endif
                             </li>
                         </ul>
-                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">{{ $meeting->subject }} <span
-                                class="text-lowercase">
-                                haqqında
-                                {{ $meeting->type == 0 ? 'İclas' : ($meeting->type == 1 ? 'Tədbir' : 'Rezerv') }}
-                            </span>
-
-
-                        </h3>
+                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">{{ $meeting->subject }}</h3>
                     </div>
                     <a href="{{route('hr.meetings.index')}}">
                         <button class="btn btn-danger">
@@ -90,7 +83,7 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
-                                        {{ $meeting->type == 0 ? 'İclas' : ($meeting->type == 1 ? 'Tədbir' : 'Rezerv') }}
+                                        {{ $meeting->type == 0 ? 'İclas' : 'Tədbir' }}
                                     </li>
                                 </ul>
                             </div>
@@ -165,7 +158,7 @@
                                             @php 
                                                     $participant_status = 
                                                     $user->participation_status === 1 ? 'text-success' : 
-                                                    ($user->participation_status === 0 ? 'text-danger' : 'text-warning');
+                                                    ($user->participation_status === 0 ? 'text-danger' : null);
                                             @endphp
                                                 <h5 style="cursor:pointer"
                                                     class="meetingCause {{ $participant_status }} mt-1 mb-1 mt-md-0 mb-md-0"
@@ -245,18 +238,20 @@
 
         $(document).on("click", ".meetingCause", function () {
             const user = $(this).data("user-name");
-            const reason = $(this).data("user-reason");
-            const participant_status = $(this).data("status");
-            console.log(participant_status)
-
+            const reason = $(this).data("user-reason") || '';
+            const status = $(this).data("status");
+            console.log(status);
             let answersHtml = '';
 
-            if ((!reason || reason === '') && participant_status === 1) {
-                answersHtml += `<p class="text-success">${user} iştirak status təsdiqlənib.</p>`;
-            } else if (participant_status === 0) {
-                answersHtml += `<p class="text-danger">İştirak etməmə səbəbi: ${reason}</p>`;
-            } else { answersHtml += `<p class="text-warning">${user} iştirak status gözləmədədir.</p>`;
+
+            if (status === 1) {
+                answersHtml += `<p>${user} iştirakını təsdiqlədi.</p>`;
+            } else if (status === 0) {
+                answersHtml += `<p class="font-weight-bold">İştirak etməmə səbəbi: <span class="font-weight-normal">${reason}</span></p>`;
+            } else {
+                answersHtml += `<p>${user} iştirakının təsdiqlənməsi gözlənilir.</p>`;
             }
+
 
 
 

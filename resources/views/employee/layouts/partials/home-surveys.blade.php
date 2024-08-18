@@ -40,7 +40,6 @@
         height: 400px;
     }
 
-
     .no-survey {
         display: flex;
         justify-content: center;
@@ -50,6 +49,14 @@
         font-size: 1.2rem;
         color: #666;
         text-align: center;
+    }
+
+    #survey-hover {
+        transition: .4s;
+    }
+
+    #survey-hover:hover {
+        scale: 1.05;
     }
 </style>
 <link rel="stylesheet" href="/css/surveys/surveys_cu.css">
@@ -61,60 +68,47 @@
             @if($surveys->isEmpty())
                 <p class="no-survey">Hal-hazırda aktiv anket yoxdur</p>
             @else
-                    <div class="row">
-                        @foreach($surveys as $survey)
-                                    @php
-                                        $surveyUser = $surveys_users->firstWhere('surveys_id', $survey->id);
-                                    @endphp
-                                    <div class="col-6 mt-4">
-                                        <div class="card">
-                                            <div class="card-header text-center name">{{ $survey->name }}</div>
-                                            <div class="card-body">
-                                                <div>
-                                                    <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
-                                                    <p class="m-0">
-                                                        {{ \Carbon\Carbon::parse($survey->expired_at)->format('d-m-Y H:i') }}
-                                                    </p>
-                                                </div>
-                                                <div class="mt-3">
-                                                    @if ($survey->priority == 1)
-                                                        <p class="important">Önəmli</p>
-                                                    @else
-                                                        <p class="normal">Normal</p>
-                                                    @endif
-                                                </div>
-
-
-
-
-
-                                                <button class="btn btn-success btn-md mt-3 allSurveysButton"
-                                                    data-is-answered='{{$surveyUser->is_answered}}' data-survey-id='{{$survey->id}}'
-                                                    data-survey='@json($survey)' data-is-answered="true">
-                                                    @if ($surveyUser && $surveyUser->is_answered == 0) Cavabla
-                                                    @elseif ($surveyUser && $surveyUser->is_answered == 1) Cavablari gör
-                                                    @elseif ($surveyUser && $surveyUser->is_answered == 2) Anket Yenilendi
-                                                    @endif
-                                                </button>
-
-
-
-
-                                            </div>
-                                        </div>
+                <div class="row">
+                    @foreach($surveys->sortByDesc('created_at') as $survey)
+                        @php
+                            $surveyUser = $surveys_users->firstWhere('surveys_id', $survey->id);
+                        @endphp
+                        <div class="col-6 mt-4">
+                            <div class="card" id="survey-hover">
+                                <div class="card-header text-center name">{{ $survey->name }}</div>
+                                <div class="card-body">
+                                    <div>
+                                        <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
+                                        <p class="m-0">
+                                            {{ \Carbon\Carbon::parse($survey->expired_at)->format('d-m-Y H:i') }}
+                                        </p>
                                     </div>
-                        @endforeach
-                    </div>
+                                    <div class="mt-3">
+                                        @if ($survey->priority == 1)
+                                            <p class="important">Önəmli</p>
+                                        @else
+                                            <p class="normal">Normal</p>
+                                        @endif
+                                    </div>
+                                    <button class="btn btn-success btn-md mt-3 allSurveysButton"
+                                        data-is-answered='{{$surveyUser->is_answered}}' data-survey-id='{{$survey->id}}'
+                                        data-survey='@json($survey)' data-is-answered="true">
+                                        @if ($surveyUser && $surveyUser->is_answered == 0) Cavabla
+                                        @elseif ($surveyUser && $surveyUser->is_answered == 1) Cavabları gör
+                                        @elseif ($surveyUser && $surveyUser->is_answered == 2) Anket Yeniləndi
+                                        @endif
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             @endif
         </div>
     </div>
 </div>
 
-
-
-
 <script>
-
     const csrfToken = '{{ csrf_token() }}';
 
     function showNecessarySurvey() {
@@ -122,9 +116,8 @@
     }
 
     window.addEventListener("DOMContentLoaded", showNecessarySurvey());
-
 </script>
 <script>
-    window.surveyStoreUrl = "{{route('employee.employee-submitSurvey') }}";
+    window.surveyStoreUrl = "{{ route('employee.employee-submitSurvey') }}";
     window.csrfToken = "{{ csrf_token() }}";
 </script>
