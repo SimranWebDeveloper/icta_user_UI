@@ -117,7 +117,8 @@ h4 {
 const csrfToken = '{{ csrf_token() }}';
 
 function showNecessarySurvey() {
-    window.surveyData = @json($surveys);
+    window.surveyUser = @json(isset($survey) ? $survey : null);
+
 }
 
 window.addEventListener("DOMContentLoaded", showNecessarySurvey());
