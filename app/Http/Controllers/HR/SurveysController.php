@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Surveys;
 use App\Models\Departments;
 use App\Models\User;
+use App\Models\UsersAnswers;
 use App\Models\Branches;
 use App\Models\SurveysUsers;
 use Carbon\Carbon;
@@ -87,11 +88,9 @@ class SurveysController extends Controller
 
 
    
-public function show(string $id) 
+public function show(string $id)
 {
-    $survey = Surveys::with([
-        'surveys_questions.answers', 
-    ])->findOrFail($id);
+    $survey = Surveys::with(['surveys_questions.answers'])->findOrFail($id);
 
     $departments = Departments::pluck('name', 'id');
     $branches = Branches::pluck('name', 'id');
@@ -108,9 +107,38 @@ public function show(string $id)
             ->value('is_answered');
     }
 
-    return view('hr.surveys.show', compact('survey', 'departments', 'branches', 'users', 'is_answered'));
+    $userAnswers = UsersAnswers::where('surveys_id', $survey->id)->get();
+
+    $questionPercentages = [];
+
+    foreach ($survey->surveys_questions as $question) {
+        $questionId = $question->id;
+
+        $answersForQuestion = $userAnswers->where('surveys_questions_id', $questionId);
+
+        $answersArray = $answersForQuestion->map(function($answer) {
+            return $answer->answer;
+        });
+
+        $answerCounts = $answersArray->countBy();
+
+        $totalAnswers = $answersArray->count();
+
+        $percentages = $answerCounts->mapWithKeys(function($count, $answerValue) use ($totalAnswers) {
+            $percentage = $totalAnswers > 0 ? ($count / $totalAnswers) * 100 : 0;
+            return [$answerValue => $percentage];
+        });
+
+        $questionPercentages[$questionId] = [
+            'questionText' => $question->text,
+            'percentages' => $percentages
+        ];
+    }
+
+    return view('hr.surveys.show', compact('survey', 'departments', 'branches', 'users', 'is_answered', 'questionPercentages'));
 }
-    
+
+
     public function edit($id) 
     {
         $data = Surveys::with('surveys_questions.answers')->findOrFail($id);
