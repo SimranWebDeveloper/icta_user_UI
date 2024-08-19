@@ -110,11 +110,15 @@ h4 {
     </div>
 </div>
 
+
+
+
 <script>
 const csrfToken = '{{ csrf_token() }}';
 
 function showNecessarySurvey() {
-    window.surveyData = @json($surveys);
+    window.surveyUser = @json(isset($survey) ? $survey : null);
+
 }
 
 window.addEventListener("DOMContentLoaded", showNecessarySurvey());
