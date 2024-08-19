@@ -125,7 +125,6 @@
                                 <option value="" selected disabled>Elanın statusunu seçin!</option>
                                 <option value="1" {{ old('status', $announcement->status) == '1' ? 'selected' : '' }}>Aktiv</option>
                                 <option value="0" {{ old('status', $announcement->status) == '0' ? 'selected' : '' }}>Deaktiv</option>
-                                <option value="2" {{ old('status', $announcement->status) == '2' ? 'selected' : '' }}>Gözləmə</option>
                             </select>
                             @if($errors->has('status'))
                                 <span class="text-danger">{{ $errors->first('status') }}</span>

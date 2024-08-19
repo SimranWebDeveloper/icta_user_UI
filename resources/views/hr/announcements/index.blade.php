@@ -47,8 +47,6 @@
                                             <button class="btn btn-sm btn-success text-white">Aktiv</button>
                                         @elseif($announcement->status == 0)
                                             <button class="btn btn-sm btn-danger text-white">Deaktiv</button>
-                                        @elseif($announcement->status == 2)
-                                            <button class="btn btn-sm btn-warning text-white">Gözləyir</button>
                                         @endif
                                     </td>
                                     <td>

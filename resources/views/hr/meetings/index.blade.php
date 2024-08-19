@@ -62,10 +62,6 @@
                                             <button class="btn btn-sm btn-success">
                                                 Aktiv
                                             </button>
-                                        @else
-                                            <button class="btn btn-sm btn-warning text-white">
-                                                Gözləmə
-                                            </button>
                                         @endif
                                     </td>
                                     <td>
