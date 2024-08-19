@@ -25,10 +25,6 @@
                                     <button class="btn btn-success text-white">
                                         Aktiv
                                     </button>
-                                @elseif ($meeting->status == 2)
-                                    <button class="btn btn-warning text-white">
-                                        Gözləmə
-                                    </button>
                                 @endif
                             </li>
                         </ul>

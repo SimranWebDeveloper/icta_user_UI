@@ -58,7 +58,6 @@
                                         seçin</option>
                                     <option value="1" {{ $data->status == '1' ? 'selected' : '' }} class="">Aktiv</option>
                                     <option value="0" {{ $data->status == '0' ? 'selected' : '' }} class="">Deaktiv</option>
-                                    <option value="2" {{ $data->status == '2' ? 'selected' : '' }} class="">Gözləmə</option>
                                 </select>
 
                                 @if($errors->has('status'))

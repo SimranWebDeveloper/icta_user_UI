@@ -140,7 +140,6 @@ $(document).ready(function () {
                 },
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Send the reason with AJAX
                     $.ajax({
                         url: window.participationStatusUrl,
                         method: "POST",
@@ -148,7 +147,7 @@ $(document).ready(function () {
                             _token: window.csrfToken,
                             meeting_id: meetingId,
                             participation_status: participationStatus,
-                            reason: result.value.reason, // Include the reason
+                            reason: result.value.reason,
                         },
                         success: function (response) {
                             Swal.fire({
@@ -164,7 +163,7 @@ $(document).ready(function () {
                                 location.reload();
                             });
                         },
-                        error: function (xhr, status, error) {
+                        error: function (response) {
                             Swal.fire({
                                 icon: "error",
                                 title: "Xəta baş verdi!",
@@ -185,18 +184,31 @@ $(document).ready(function () {
                     participation_status: participationStatus,
                 },
                 success: function (response) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Cavabınız qeyd olundu!",
-                        showConfirmButton: false,
-                        customClass: {
-                            popup: "swal2-popup",
-                            container: "employeeMeetingModal",
-                        },
-                        timer: 1500,
-                    }).then(() => {
-                        location.reload();
-                    });
+                    if (response.status === "error") {
+                        Swal.fire({
+                            title: "Xəta!",
+                            text: response.message,
+                            icon: "error",
+                            confirmButtonText: "Tamam",
+                            customClass: {
+                                popup: "swal2-popup",
+                                container: "employeeMeetingModal",
+                            },
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Cavabınız qeyd olundu!",
+                            showConfirmButton: false,
+                            customClass: {
+                                popup: "swal2-popup",
+                                container: "employeeMeetingModal",
+                            },
+                            timer: 1500,
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
                 },
                 error: function (xhr, status, error) {
                     Swal.fire({

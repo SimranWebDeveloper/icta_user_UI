@@ -30,10 +30,6 @@
                                     <button class="btn btn-success text-white">
                                         Aktiv
                                     </button>
-                                @elseif ($announcement->status == 2)
-                                    <button class="btn btn-warning text-white">
-                                        Gözləmə
-                                    </button>
                                 @endif
                             </li>
                         </ul>
