@@ -24,30 +24,30 @@ use Carbon\Carbon;
 class EmployeeController extends Controller
 {
     public function index()
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    $announcements = Announcements::where('status', 1)->get();
+        $announcements = Announcements::where('status', 1)->get();
 
-    $meetings_users = MeetingsUsers::where('users_id', $user->id)->get();
-    $meetings_ids = $meetings_users->pluck('meetings_id');
-    $meetings = Meetings::whereIn('id', $meetings_ids)->where('status', 1)->with('rooms')->get();
+        $meetings_users = MeetingsUsers::where('users_id', $user->id)->get();
+        $meetings_ids = $meetings_users->pluck('meetings_id');
+        $meetings = Meetings::whereIn('id', $meetings_ids)->where('status', 1)->with('rooms')->get();
 
 
-    $surveys_users = SurveysUsers::with('surveys')->where('users_id', $user->id)->get();
-    $surveyIds = Arr::flatten($surveys_users->pluck('surveys.id'));
-    $surveys = Surveys::whereIn('id', $surveyIds)->where('status', 1)->with('surveys_questions.answers')->get();
+        $surveys_users = SurveysUsers::with('surveys')->where('users_id', $user->id)->get();
+        $surveyIds = Arr::flatten($surveys_users->pluck('surveys.id'));
+        $surveys = Surveys::whereIn('id', $surveyIds)->where('status', 1)->with('surveys_questions.answers')->get();
 
-    $userAnswers = UsersAnswers::where('users_id', $user->id)
-                                ->whereIn('surveys_id', $surveyIds)
-                                ->get()
-                                ->groupBy('surveys_id')
-                                ->mapWithKeys(function ($answers, $surveyId) {
-                                    return [$surveyId => $answers->keyBy('surveys_questions_id')];
-                                });
+        $userAnswers = UsersAnswers::where('users_id', $user->id)
+            ->whereIn('surveys_id', $surveyIds)
+            ->get()
+            ->groupBy('surveys_id')
+            ->mapWithKeys(function ($answers, $surveyId) {
+                return [$surveyId => $answers->keyBy('surveys_questions_id')];
+            });
 
-    return view('employee.home', compact('announcements', 'meetings', 'surveys', 'surveys_users', 'userAnswers', 'meetings_users'));
-}
+        return view('employee.home', compact('announcements', 'meetings', 'surveys', 'surveys_users', 'userAnswers', 'meetings_users'));
+    }
 
 
 
@@ -91,7 +91,7 @@ class EmployeeController extends Controller
 
     public function submitSurvey(Request $request)
     {
-       
+
         $userId = auth()->user()->id;
 
         foreach ($request->question as $question_key => $question) {
@@ -128,55 +128,55 @@ class EmployeeController extends Controller
     }
 
     public function updateParticipationStatus(Request $request)
-{
-    $userId = Auth::id();
-    $meetingId = $request->meeting_id;
-    $participationStatus = $request->participation_status;
-    $reason = $request->reason;
+    {
+        $userId = Auth::id();
+        $meetingId = $request->meeting_id;
+        $participationStatus = $request->participation_status;
+        $reason = $request->reason;
 
-    $meetingUser = MeetingsUsers::where('users_id', $userId)
-        ->where('meetings_id', $meetingId)
-        ->first();
+        $meetingUser = MeetingsUsers::where('users_id', $userId)
+            ->where('meetings_id', $meetingId)
+            ->first();
 
-    if ($meetingUser) {
-        if ($participationStatus == 1) {
-            $meeting = Meetings::find($meetingId);
-            $startDateTime = Carbon::parse($meeting->start_date_time);
-            $endDateTime = $startDateTime->copy()->addMinutes($meeting->duration);
+        if ($meetingUser) {
+            if ($participationStatus == 1) {
+                $meeting = Meetings::find($meetingId);
+                $startDateTime = Carbon::parse($meeting->start_date_time);
+                $endDateTime = $startDateTime->copy()->addMinutes($meeting->duration);
 
-            $conflictingMeetings = MeetingsUsers::join('meetings', 'meetings.id', '=', 'meetings_users.meetings_id')
-                ->where('meetings_users.users_id', $userId)
-                ->where('meetings.id', '<>', $meetingId) 
-                ->where('meetings.rooms_id', '<>', $meeting->rooms_id) 
-                ->where('meetings.status', 1) 
-                ->where('meetings_users.participation_status', 1)
-                ->where(function ($query) use ($startDateTime, $endDateTime) {
-                    $query->whereBetween('meetings.start_date_time', [$startDateTime, $endDateTime])
-                        ->orWhereRaw('DATE_ADD(meetings.start_date_time, INTERVAL meetings.duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
-                        ->orWhere(function ($subQuery) use ($startDateTime, $endDateTime) {
-                            $subQuery->where('meetings.start_date_time', '<', $startDateTime)
-                                ->whereRaw('DATE_ADD(meetings.start_date_time, INTERVAL meetings.duration MINUTE) > ?', [$endDateTime]);
-                        });
-                })
-                ->exists();
+                $conflictingMeetings = MeetingsUsers::join('meetings', 'meetings.id', '=', 'meetings_users.meetings_id')
+                    ->where('meetings_users.users_id', $userId)
+                    ->where('meetings.id', '<>', $meetingId)
+                    ->where('meetings.rooms_id', '<>', $meeting->rooms_id)
+                    ->where('meetings.status', 1)
+                    ->where('meetings_users.participation_status', 1)
+                    ->where(function ($query) use ($startDateTime, $endDateTime) {
+                        $query->whereBetween('meetings.start_date_time', [$startDateTime, $endDateTime])
+                            ->orWhereRaw('DATE_ADD(meetings.start_date_time, INTERVAL meetings.duration MINUTE) BETWEEN ? AND ?', [$startDateTime, $endDateTime])
+                            ->orWhere(function ($subQuery) use ($startDateTime, $endDateTime) {
+                                $subQuery->where('meetings.start_date_time', '<', $startDateTime)
+                                    ->whereRaw('DATE_ADD(meetings.start_date_time, INTERVAL meetings.duration MINUTE) > ?', [$endDateTime]);
+                            });
+                    })
+                    ->exists();
 
-            if ($conflictingMeetings) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Siz bu vaxtda başqa bir otaqda görüşdə iştirak edirsiniz.'
-                ], 409);
+                if ($conflictingMeetings) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Siz bu vaxtda başqa bir otaqda görüşdə iştirak edirsiniz.'
+                    ]);
+                }
             }
+
+            $meetingUser->participation_status = $participationStatus;
+            $meetingUser->reason = $reason;
+            $meetingUser->save();
+
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false], 404);
         }
-
-        $meetingUser->participation_status = $participationStatus;
-        $meetingUser->reason = $reason;
-        $meetingUser->save();
-
-        return response()->json(['success' => true]);
-    } else {
-        return response()->json(['success' => false], 404);
     }
-}
 
 
 
@@ -190,10 +190,10 @@ class EmployeeController extends Controller
             ->get()
             ->groupBy('surveys_questions_id');
 
-        $formattedAnswers = $answers->map(function($answersGroup) {
-            return $answersGroup->map(function($answer) {
+        $formattedAnswers = $answers->map(function ($answersGroup) {
+            return $answersGroup->map(function ($answer) {
                 return [
-                    'answer' => $answer->answer, 
+                    'answer' => $answer->answer,
                 ];
             });
         });
@@ -202,23 +202,23 @@ class EmployeeController extends Controller
     }
 
     public function getUserAnswersByHR($surveyId, $userId)
-{
-    $answers = UsersAnswers::where('users_id', $userId)
-        ->where('surveys_id', $surveyId)
-        ->get()
-        ->groupBy('surveys_questions_id');
+    {
+        $answers = UsersAnswers::where('users_id', $userId)
+            ->where('surveys_id', $surveyId)
+            ->get()
+            ->groupBy('surveys_questions_id');
 
-    $formattedAnswers = $answers->map(function($answersGroup) {
-        return $answersGroup->map(function($answer) {
-            return [
-                'answer' => $answer->answer, 
-            ];
+        $formattedAnswers = $answers->map(function ($answersGroup) {
+            return $answersGroup->map(function ($answer) {
+                return [
+                    'answer' => $answer->answer,
+                ];
+            });
         });
-    });
 
-    return response()->json($formattedAnswers);
-}
+        return response()->json($formattedAnswers);
+    }
 
 
- 
+
 }
