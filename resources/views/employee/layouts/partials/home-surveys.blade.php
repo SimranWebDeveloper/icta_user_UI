@@ -133,6 +133,5 @@
     window.surveyStoreUrl = "{{route('employee.employee-submitSurvey') }}";
     window.csrfToken = "{{ csrf_token() }}";
 
-    window.surveyUser = @json($survey);
-
+    window.surveyUser = @json(isset($survey) ? $survey : null);
 </script>
