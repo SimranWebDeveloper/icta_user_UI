@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Surveys;
 use App\Models\Departments;
 use App\Models\User;
+use App\Models\UsersAnswers;
 use App\Models\Branches;
 use App\Models\SurveysUsers;
 use Carbon\Carbon;
@@ -87,20 +88,22 @@ class SurveysController extends Controller
 
 
    
-public function show(string $id) 
+public function show(string $id)
 {
-    $survey = Surveys::with([
-        'surveys_questions.answers', 
-    ])->findOrFail($id);
+    // Найдите анкету по ID с вопросами и ответами
+    $survey = Surveys::with(['surveys_questions.answers'])->findOrFail($id);
 
+    // Получите все отделы и филиалы
     $departments = Departments::pluck('name', 'id');
     $branches = Branches::pluck('name', 'id');
 
+    // Получите всех пользователей, связанных с анкетой
     $users = SurveysUsers::where('surveys_id', $survey->id)
         ->join('users', 'surveys_users.users_id', '=', 'users.id')
         ->select('users.*')
         ->get();
 
+    // Определите, ответили ли пользователи на анкету
     $is_answered = [];
     foreach ($users as $user) {
         $is_answered[$user->id] = SurveysUsers::where('users_id', $user->id)
@@ -108,9 +111,47 @@ public function show(string $id)
             ->value('is_answered');
     }
 
-    return view('hr.surveys.show', compact('survey', 'departments', 'branches', 'users', 'is_answered'));
+    // Получите все ответы на анкету
+    $userAnswers = UsersAnswers::where('surveys_id', $survey->id)->get();
+
+    // Инициализируем массив для хранения результатов по каждому вопросу
+    $questionPercentages = [];
+
+    foreach ($survey->surveys_questions as $question) {
+        $questionId = $question->id;
+
+        // Получите все ответы на этот вопрос
+        $answersForQuestion = $userAnswers->where('surveys_questions_id', $questionId);
+
+        // Соберите все ответы в массив
+        $answersArray = $answersForQuestion->map(function($answer) {
+            return $answer->answer;
+        });
+
+        // Подсчитайте количество ответов для каждого варианта
+        $answerCounts = $answersArray->countBy();
+
+        // Подсчитайте общее количество ответов на вопрос
+        $totalAnswers = $answersArray->count();
+
+        // Рассчитайте процентное содержание для каждого варианта ответа
+        $percentages = $answerCounts->mapWithKeys(function($count, $answerValue) use ($totalAnswers) {
+            $percentage = $totalAnswers > 0 ? ($count / $totalAnswers) * 100 : 0;
+            return [$answerValue => $percentage];
+        });
+
+        // Добавляем текст вопроса
+        $questionPercentages[$questionId] = [
+            'questionText' => $question->text,
+            'percentages' => $percentages
+        ];
+    }
+
+    // Передайте результаты в представление
+    return view('hr.surveys.show', compact('survey', 'departments', 'branches', 'users', 'is_answered', 'questionPercentages'));
 }
-    
+
+
     public function edit($id) 
     {
         $data = Surveys::with('surveys_questions.answers')->findOrFail($id);

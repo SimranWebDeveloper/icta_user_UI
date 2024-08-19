@@ -91,67 +91,70 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            @foreach ($survey->surveys_questions as $question)
-                                <div class="col-md-6 col-sm-12">
-                                    <div class="card mb-4">
-                                        <div class="card-header w-100 d-flex justify-content-center align-items-center">
-                                            <h3 class="m-0">{{ $loop->iteration }}.</h3>
-                                            <h3 class="m-0">{{ $question->question }}</h3>
-                                        </div>
-                                        <div class="card-body">
-                                            @if ($question->input_type == 'checkbox')
-                                                <ul class="list-group-custom">
-                                                    @foreach ($question->answers as $answer)
-                                                        <li
-                                                            class="d-flex my-3 align-items-center w-100 justify-content-between">
-                                                            <div class="checkbox-wrapper d-flex">
-                                                                <!-- <input type="checkbox" disabled> -->
-                                                                <!-- <i class="fa-light fa-square-check "                           style="color: #000000;"></i> -->
-                                                                <!-- <i class="fa-duotone fa-solid fa-square-check text-50"></i> -->
-                                                                <i class="fa-thin fa-square-check"
-                                                                    style='font-size: 40px; color:#C7C8CC'></i>
-                                                                <!-- <i class="fa-thin fa-square-check text-50" style="color: #000000;"></i> -->
-                                                            </div>
-                                                            <div class="label-wrapper w-100 text-center"
-                                                                style="border-radius: 2.25rem;">
-                                                                <label
-                                                                    class="d-flex justify-content-center align-items-center">
-                                                                    {{ $answer->name }}
-                                                                </label>
-                                                            </div>
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                            @elseif($question->input_type == 'radio')
-                                                <ul class="list-group-custom">
-                                                    @foreach ($question->answers as $answer)
-                                                        <li
-                                                            class="d-flex my-3 align-items-center w-100 justify-content-between">
-                                                            <div class="checkbox-wrapper d-flex">
-                                                                <i class="fa-sharp fa-thin fa-circle-dot"
-                                                                    style='font-size: 40px; color:#C7C8CC'></i>
-                                                                <!-- <i class="fa-sharp-duotone fa-solid fa-circle-dot text-50"></i> -->
-                                                                <!-- <input type="radio" disabled name="question_{{ $question->id }}"> -->
-                                                            </div>
-                                                            <div class="label-wrapper w-100 text-center"
-                                                                style="border-radius: 2.25rem;">
-                                                                <label
-                                                                    class="d-flex justify-content-center align-items-center">
-                                                                    {{ $answer->name }}
-                                                                </label>
-                                                            </div>
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                            @elseif($question->input_type == 'textarea')
-                                                <div class="form-floating">
-                                                    <textarea rows="7" cols="10" class="form-control" disabled></textarea>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
+                        @foreach ($survey->surveys_questions as $question)
+    <div class="col-md-6 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                <h3 class="m-0">{{ $loop->iteration }}.</h3>
+                <h3 class="m-0">{{ $question->question }}</h3>
+            </div>
+            <div class="card-body">
+                @php
+                    $percentages = $questionPercentages[$question->id]['percentages'] ?? [];
+                @endphp
+
+                @if ($question->input_type == 'checkbox')
+                    <ul class="list-group-custom">
+                        @foreach ($question->answers as $answer)
+                            @php
+                                $percentage = $percentages[$answer->name] ?? 0;
+                            @endphp
+                            <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                <div class="checkbox-wrapper d-flex">
+                                    <i class="fa-thin fa-square-check" style='font-size: 40px; color:#C7C8CC'></i>
                                 </div>
-                            @endforeach
+                                <div class="label-wrapper w-100 text-center" style="border-radius: 2.25rem;">
+                                    <label class="d-flex justify-content-center align-items-center">
+                                        {{ $answer->name }}
+                                    </label>
+                                    <span class="percentage-badge" style="margin-left: 10px; font-weight: bold;">
+                                        {{ number_format($percentage, 2) }}%
+                                    </span>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @elseif($question->input_type == 'radio')
+                    <ul class="list-group-custom">
+                        @foreach ($question->answers as $answer)
+                            @php
+                                $percentage = $percentages[$answer->name] ?? 0;
+                            @endphp
+                            <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                <div class="checkbox-wrapper d-flex">
+                                    <i class="fa-sharp fa-thin fa-circle-dot" style='font-size: 40px; color:#C7C8CC'></i>
+                                </div>
+                                <div class="label-wrapper w-100 text-center" style="border-radius: 2.25rem;">
+                                    <label class="d-flex justify-content-center align-items-center">
+                                        {{ $answer->name }}
+                                    </label>
+                                    <span class="percentage-badge" style="margin-left: 10px; font-weight: bold;">
+                                        {{ number_format($percentage, 2) }}%
+                                    </span>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @elseif($question->input_type == 'textarea')
+                    <div class="form-floating">
+                        <textarea rows="7" cols="10" class="form-control" disabled></textarea>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+@endforeach
+
                         </div>
 
                         <div class="row">
