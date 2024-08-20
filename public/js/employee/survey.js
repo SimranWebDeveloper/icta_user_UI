@@ -41,7 +41,7 @@ $(document).ready(function () {
 
     // user anketi daha evvel cavabladi mı yoxlamaq
     function openNextSurvey() {
-        debugger
+        
         const completedSurveys = JSON.parse(localStorage.getItem("completedSurveys")) || [];
 
         const nextSurvey = surveys.find( (survey) =>  survey.priority === 1  && !completedSurveys.includes(survey.id) );
