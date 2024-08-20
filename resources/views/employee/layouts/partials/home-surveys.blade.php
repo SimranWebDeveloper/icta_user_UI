@@ -69,7 +69,7 @@
                                     <div class="col-6 mt-4">
                                         <div class="card">
                                             <div class="card-header text-center name">{{ $survey->name }}</div>
-                                            <div class="card-body">
+                                            <div class="card-body ">
                                                 <div>
                                                     <p class="m-0" style="font-weight:bold">Silinmə tarixi:</p>
                                                     <p class="m-0">
@@ -87,7 +87,7 @@
 
 
 
-
+                                                <div class="d-flex justify-content-center">
                                                 <button class="btn btn-success btn-md mt-3 allSurveysButton"
                                                     data-is-answered='{{$surveyUser->is_answered}}' 
                                                     data-survey-id='{{$survey->id}}'
@@ -101,6 +101,7 @@
                                                     @elseif ($surveyUser && $surveyUser->is_answered == 2) Anket Yeniləndi
                                                     @endif
                                             </button>
+                                            </div>
 
 
 
