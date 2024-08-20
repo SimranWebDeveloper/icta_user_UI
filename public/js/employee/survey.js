@@ -242,7 +242,7 @@ $(document).ready(function () {
                 }
 
                 newQuestionHtml+=`
-                <div class="col-xl-6 col-12">
+                <div class="col-xl-6 col-12 mb-3">
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-center">
                                             <h4>${index + 1}.</h4>
