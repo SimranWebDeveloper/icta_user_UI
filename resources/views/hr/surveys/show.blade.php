@@ -5,12 +5,22 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-
-
         }
 
         .employeeAnswerModal .swal2-popup {
             width: 80%;
+        }
+
+        .chartModal .swal2-chart {
+            width: 50%;
+        }
+        @media screen and (max-width:900px) {
+            .employeeAnswerModal .swal2-popup {
+            width: 95%;
+        }
+            .chartModal .swal2-chart {
+            width: 95%;
+        }
         }
 
         #list-item {
@@ -18,7 +28,6 @@
         }
 
         .custom-container {
-            /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
             background-color: transparent;
         }
 
@@ -40,7 +49,6 @@
             width: 40px;
             height: 40px;
             border: 1px solid #C7C8CC;
-
         }
 
         .label-wrapper {
@@ -49,11 +57,31 @@
 
         .label-wrapper label {
             height: 37px;
-            /* width: 300px; */
         }
 
         textarea {
             resize: none;
+        }
+
+        /* Hide the icon when a textarea is present within the same container */
+        .chart {
+            position: relative; /* Ensure positioning context for absolute child */
+        }
+
+        .chart .fa-chart-pie {
+            display: block; /* Ensure icon is displayed by default */
+            position: absolute;
+            left: 15px;
+        }
+
+        .chart.has-textarea .fa-chart-pie {
+            display: none; /* Hide the icon if the parent container has the .has-textarea class */
+        }
+        .chartIcon{
+            transition-duration: .5s;
+        }
+        .chartIcon:hover{
+scale: 1.25;
         }
     </style>
 
@@ -91,70 +119,72 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                        @foreach ($survey->surveys_questions as $question)
-    <div class="col-md-6 col-sm-12">
-        <div class="card mb-4">
-            <div class="card-header w-100 d-flex justify-content-center align-items-center">
-                <h3 class="m-0">{{ $loop->iteration }}.</h3>
-                <h3 class="m-0">{{ $question->question }}</h3>
-            </div>
-            <div class="card-body">
-                @php
-                    $percentages = $questionPercentages[$question->id]['percentages'] ?? [];
-                @endphp
+                            @foreach ($survey->surveys_questions as $question)
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="card mb-4 chart">
+                                        <div class="card-header w-100 d-flex justify-content-center align-items-center">
+                                            <!-- <i class="fa-thin chartIcon cursor-pointer fa-chart-pie display-5"></i> -->
+                                            <i class="fa-duotone fa-solid fa-chart-pie chartIcon cursor-pointer" style=" font-size:25px"></i>
+                                            <!-- <i class="fa-thin chartIcon cursor-pointer fa-chart-pie" style="color: #252bd4; font-size:25px"></i> -->
+                                            <h3 class="m-0">{{ $loop->iteration }}.</h3>
+                                            <h3 class="m-0">{{ $question->question }}</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            @php
+                                                $percentages = $questionPercentages[$question->id]['percentages'] ?? [];
+                                            @endphp
 
-                @if ($question->input_type == 'checkbox')
-                    <ul class="list-group-custom">
-                        @foreach ($question->answers as $answer)
-                            @php
-                                $percentage = $percentages[$answer->name] ?? 0;
-                            @endphp
-                            <li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                                <div class="checkbox-wrapper d-flex">
-                                    <i class="fa-thin fa-square-check" style='font-size: 40px; color:#C7C8CC'></i>
+                                            @if ($question->input_type == 'checkbox')
+                                                <ul class="list-group-custom">
+                                                    @foreach ($question->answers as $answer)
+                                                        @php
+                                                            $percentage = $percentages[$answer->name] ?? 0;
+                                                        @endphp
+                                                        <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                                            <div class="checkbox-wrapper d-flex">
+                                                                <i class="fa-thin fa-square-check" style='font-size: 40px; color:#C7C8CC'></i>
+                                                            </div>
+                                                            <div class="label-wrapper w-100 text-center" style="border-radius: 2.25rem;">
+                                                                <label class="d-flex justify-content-center align-items-center">
+                                                                    {{ $answer->name }}
+                                                                </label>
+                                                                <span class="percentage-badge" style="margin-left: 10px; font-weight: bold;">
+                                                                    {{ number_format($percentage, 2) }}%
+                                                                </span>
+                                                            </div>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            @elseif($question->input_type == 'radio')
+                                                <ul class="list-group-custom">
+                                                    @foreach ($question->answers as $answer)
+                                                        @php
+                                                            $percentage = $percentages[$answer->name] ?? 0;
+                                                        @endphp
+                                                        <li class="d-flex my-3 align-items-center w-100 justify-content-between">
+                                                            <div class="checkbox-wrapper d-flex">
+                                                                <i class="fa-sharp fa-thin fa-circle-dot" style='font-size: 40px; color:#C7C8CC'></i>
+                                                            </div>
+                                                            <div class="label-wrapper w-100 text-center" style="border-radius: 2.25rem;">
+                                                                <label class="d-flex justify-content-center align-items-center">
+                                                                    {{ $answer->name }}
+                                                                </label>
+                                                                <span class="percentage-badge" style="margin-left: 10px; font-weight: bold;">
+                                                                    {{ number_format($percentage, 2) }}%
+                                                                </span>
+                                                            </div>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            @elseif($question->input_type == 'textarea')
+                                                <div class="form-floating">
+                                                    <textarea rows="7" cols="10" class="form-control textarea-answer" disabled></textarea>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="label-wrapper w-100 text-center" style="border-radius: 2.25rem;">
-                                    <label class="d-flex justify-content-center align-items-center">
-                                        {{ $answer->name }}
-                                    </label>
-                                    <span class="percentage-badge" style="margin-left: 10px; font-weight: bold;">
-                                        {{ number_format($percentage, 2) }}%
-                                    </span>
-                                </div>
-                            </li>
-                        @endforeach
-                    </ul>
-                @elseif($question->input_type == 'radio')
-                    <ul class="list-group-custom">
-                        @foreach ($question->answers as $answer)
-                            @php
-                                $percentage = $percentages[$answer->name] ?? 0;
-                            @endphp
-                            <li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                                <div class="checkbox-wrapper d-flex">
-                                    <i class="fa-sharp fa-thin fa-circle-dot" style='font-size: 40px; color:#C7C8CC'></i>
-                                </div>
-                                <div class="label-wrapper w-100 text-center" style="border-radius: 2.25rem;">
-                                    <label class="d-flex justify-content-center align-items-center">
-                                        {{ $answer->name }}
-                                    </label>
-                                    <span class="percentage-badge" style="margin-left: 10px; font-weight: bold;">
-                                        {{ number_format($percentage, 2) }}%
-                                    </span>
-                                </div>
-                            </li>
-                        @endforeach
-                    </ul>
-                @elseif($question->input_type == 'textarea')
-                    <div class="form-floating">
-                        <textarea rows="7" cols="10" class="form-control" disabled></textarea>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-@endforeach
-
+                            @endforeach
                         </div>
 
                         <div class="row">
@@ -192,7 +222,6 @@
                                                             <u>{{ $survey->is_anonym ? 'Anonim istifadəçi ' . $index + 1 : $user->name }}</u>
                                                         </h5>,
                                                     @endforeach
-
                                                 </div>
                                             </div>
                                             @if (!$loop->last)
@@ -208,7 +237,7 @@
                     <div class="card-footer">
                         <a href="{{ route('hr.surveys.edit', $survey->id) }}">
                             <button class="btn btn-info btn-lg">
-                                <span class="me-2 ">
+                                <span class="me-2">
                                     <i class="nav-icon i-Pen-2 font-weight-bold"></i>
                                 </span>
                                 Düzəliş et
@@ -228,9 +257,68 @@
         </div>
     </div>
 @endsection
+
 @section('js')
     <script>
         $(document).ready(function() {
+
+            $(document).on("click", ".chartIcon", function() {
+    const isTextarea = $(this).find('.textarea-answer').length > 0;
+
+    if (!isTextarea) {
+        Swal.fire({
+            html: `
+             <div class="d-flex justify-content-center"> 
+                 <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+             </div>`,
+            showCancelButton: false,
+            confirmButtonText: "Ok",
+            customClass: {
+                popup: 'swal2-chart',
+                container: 'chartModal'
+            },
+            didOpen: () => {
+                // Delay chart rendering to ensure the canvas is properly loaded
+                setTimeout(() => {
+                    // Chart.js code to initialize the chart
+                    var xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
+                    var yValues = [55, 49, 44, 24, 15];
+                    var barColors = [
+                        "#b91d47",
+                        "#00aba9",
+                        "#2b5797",
+                        "#e8c3b9",
+                        "#1e7145"
+                    ];
+
+                    new Chart("myChart", {
+                        type: "doughnut",
+                        data: {
+                            datasets: [{
+                                backgroundColor: barColors,
+                                data: yValues
+                            }]
+                        },
+                        options: {
+                            title: {
+                                display: true,
+                                text: "World Wide Wine Production 2018"
+                            }
+                        }
+                    });
+                }, 100); // Delay time in milliseconds
+            }
+        });
+    }
+});
+
+            // Check each .chart div and add class if textarea is present
+            $('.chart').each(function() {
+                if ($(this).find('textarea').length > 0) {
+                    $(this).addClass('has-textarea');
+                }
+            });
+
             // Handle delete button click
             $(document).on("click", ".delete-item", function() {
                 const item_id = $(this).data('id');
@@ -316,12 +404,11 @@
 
                         answersHtml +=
                             `
-                        <textarea disabled rows="10"  class="form-control" style="box-sizing: border-box; width: 100%; resize: none;">${textareaAnswer}</textarea>`;
+                        <textarea disabled rows="10" class="form-control" style="box-sizing: border-box; width: 100%; resize: none;">${textareaAnswer}</textarea>`;
                     } else {
                         answersHtml += `<ul class="list-group-custom">`;
                         question.answers.forEach((option) => {
-                            const isChecked = answerList.some(answer => answer.answer === option
-                                .name);
+                            const isChecked = answerList.some(answer => answer.answer === option.name);
 
                             answersHtml += `
                             <li class="d-flex my-3 align-items-center w-100 justify-content-between">
@@ -348,7 +435,7 @@
                 Swal.fire({
                     title: `${survey.is_anonym ? 'Anonim istifadəçi' : user} Cavabları`,
                     html: `
-                    <div class="row mb-4 w-100">
+                    <div class="row mb-4 w-100 ml-0 mt-0 mr-0">
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
