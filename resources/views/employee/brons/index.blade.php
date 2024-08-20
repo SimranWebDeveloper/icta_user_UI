@@ -3,7 +3,10 @@
     .showModal .swal2-popup {
         width: 80%;
     }
-
+    .bron-content{
+        height: 200px;
+        overflow-y: auto;
+    }
     #swal2-html-container {
         overflow: hidden;
     }
@@ -20,7 +23,12 @@
         overflow-y: auto;
         height: 100px;
     }
-
+    .bronCause {
+        transition-duration: .5s;
+    }
+    .bronCause:hover {
+        color: blue
+    }
     @media screen and (max-width: 768px) {
         .swal2-popup {
             width: 99%;
@@ -95,8 +103,8 @@
                 let participants = groupedParticipants[event.id] || [];
                 let participantsHtml = participants.map(group => {
                     return `<div class="d-xl-flex mt-3 align-items-start">
-                        <h3 class="col-xl-2 m-0">${group.department}</h3>
-                        <h4 class="col-xl-2 mb-0 mt-2 mt-md-0">${group.branch}</h4>
+                        <h3 class="col-xl-2 m-0" style="text-align: start;">${group.department}</h3>
+                        <h4 class="col-xl-2 mb-0 mt-2 mt-md-0" style="text-align: start;">${group.branch}</h4>
                         <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
                             ${group.users.map(user => {
                                 let statusClass = 
@@ -105,7 +113,7 @@
                                 let reasonText = user.reason ? `İştirak etməmə səbəbi: ${user.reason}` : '';
                                 return `<h5 style="cursor:pointer" class="${statusClass} bronCause mt-1 mb-1 mt-md-0 mb-md-0"
                                     data-user-name="${user.name}" data-user-reason="${user.reason}" data-user-status="${user.participation_status}">
-                                   <u>${user.name}</u> 
+                                   ${user.name}
                                 </h5>`;
                             }).join(', ')}
                         </div>
@@ -116,19 +124,13 @@
     <div class="col-md-12 mb-4">
         <div class="card">
             <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">${event.subject} <span
-                                class="text-lowercase">
-                                haqqında bron
-                            </span>
-                        </h3>
-                    </div>
+                <div class="d-flex justify-content-center align-items-center">
+                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">Otaq bronu</h3>
                 </div>
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6 col-sm-12">
+                    <div class="col-md-12 col-sm-12">
                         <div class="card">
                             <div class="card-header">
                                 <h3>Mövzu</h3>
@@ -142,8 +144,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-sm-12">
-                        <div class="card mt-4 mt-md-0">
+                    <div class="col-md-4 col-sm-12">
+                        <div class="card mt-4">
                             <div class="card-header">
                                 <h3>Otaq nömrəsi</h3>
                             </div>
@@ -156,7 +158,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-sm-12">
+                    <div class="col-md-4 col-sm-12">
                         <div class="card mt-4">
                             <div class="card-header">
                                 <h3>Başlama tarixi</h3>
@@ -170,10 +172,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-sm-12">
+                    <div class="col-md-4 col-sm-12">
                         <div class="card mt-4">
                             <div class="card-header">
-                                <h3>Müddət (dəq)</h3>
+                                <h3>Müddət</h3>
                             </div>
                             <div class="card-body">
                                 <ul class="list-group">
@@ -189,7 +191,7 @@
                             <div class="card-header">
                                 <h3>Məzmun</h3>
                             </div>
-                            <div class="card-body" style="text-align:start">
+                            <div class="card-body bron-content" style="text-align:start">
                                         ${event.content}
                             </div>
                         </div>

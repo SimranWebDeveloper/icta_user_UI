@@ -3,7 +3,10 @@
     #list-item {
         list-style: none;
     }
-
+.textarea-show{
+    overflow-y: auto;
+    height: 230px;
+}
     .sticky-col {
         position: -webkit-sticky;
         /* Safari */
@@ -110,7 +113,7 @@
                                     <h3>Məzmun</h3>
                                 </div>
                                 <div class="card-body">
-                                    <div class="textarea">
+                                    <div class="textarea-show">
                                         {{ $announcement->content }}
                                     </div>
                                 </div>

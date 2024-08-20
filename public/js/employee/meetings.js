@@ -93,12 +93,8 @@ $(document).ready(function () {
                                         <div class="card-header">
                                             <h3>Məzmun</h3>
                                         </div>
-                                        <div class="card-body">
-                                            <ul class="list-group">
-                                                <li class="list-group-item">
-                                                    ${meeting.content}
-                                                </li>
-                                            </ul>
+                                        <div class="card-body meeting-content" style="text-align:start">
+                                        ${meeting.content}
                                         </div>
                                     </div>
                                 </div>
