@@ -34,7 +34,7 @@
                     <div class="row">
                         <div class="col-md-6 form-group mb-3">
                             <div class="select_label ui sub header">Mövzu</div>
-                            <input required type="text" name="subject" value="{{ old('subject', $meeting->subject) }}"
+                            <input required type="text" id="subject" name="subject" value="{{ old('subject', $meeting->subject) }}"
                                 class="form-control">
                             @error('subject')
                                 <span class="text-danger">{{ $message }}</span>
@@ -216,7 +216,18 @@
 
     $('#form').on('submit', function (e) {
         e.preventDefault();
+        const subjectInput = document.getElementById('subject');
 
+        if (subjectInput.value.length > 125) {
+            event.preventDefault();
+            Swal.fire({
+                title: "Xəta!",
+                text: "Mövzu 125 simvoldan uzun ola bilməz",
+                icon: "warning",
+                confirmButtonText: "Tamam"
+            });
+            return;
+        }
         if ($('.report-users:checked').length === 0) {
             Swal.fire({
                 title: "Xəta!",

@@ -7,6 +7,19 @@
     .swal2-html-container {
         overflow-x: hidden !important;
     }
+
+    .meetingCause {
+        transition-duration: .5s;
+    }
+
+    .meetingCause:hover {
+        color: blue
+    }
+
+    .meeting-content {
+        height: 200px;
+        overflow-y: auto;
+    }
 </style>
 @section('content')
 <div class="row mb-4">
@@ -28,7 +41,8 @@
                                 @endif
                             </li>
                         </ul>
-                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize">{{ $meeting->subject }}</h3>
+                        <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize"> {{ $meeting->type == 0 ? 'İclas' : 'Tədbir' }}
+                        </h3>
                     </div>
                     <a href="{{route('hr.meetings.index')}}">
                         <button class="btn btn-danger">
@@ -43,7 +57,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4 col-sm-12">
+                    <div class="col-md-12 col-sm-12">
                         <div class="card">
                             <div class="card-header">
                                 <h3>Mövzu</h3>
@@ -57,8 +71,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 col-sm-12">
-                        <div class="card mt-4 mt-md-0">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="card mt-4">
                             <div class="card-header">
                                 <h3>Otaq nömrəsi</h3>
                             </div>
@@ -71,8 +85,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 col-sm-12">
-                        <div class="card mt-4 mt-md-0">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="card mt-4">
                             <div class="card-header">
                                 <h3>Növ</h3>
                             </div>
@@ -102,7 +116,7 @@
                     <div class="col-md-6 col-sm-12">
                         <div class="card mt-4">
                             <div class="card-header">
-                                <h3>Müddət (dəq)</h3>
+                                <h3>Müddət</h3>
                             </div>
                             <div class="card-body">
                                 <ul class="list-group">
@@ -118,12 +132,8 @@
                             <div class="card-header">
                                 <h3>Məzmun</h3>
                             </div>
-                            <div class="card-body">
-                                <ul class="list-group">
-                                    <li class="list-group-item">
-                                        {{ $meeting->content }}
-                                    </li>
-                                </ul>
+                            <div class="card-body meeting-content">
+                                {{ $meeting->content }}
                             </div>
                         </div>
                     </div>
@@ -140,34 +150,35 @@
                                 @endphp
 
                                 @foreach($groupedParticipants as $group => $users)
-                                    <div class="d-xl-flex mt-3 align-items-start">
-                                        <h3 class="col-xl-2 m-0">
-                                            {{ $departments[$users->first()->departments_id] ?? 'Bilinməyən departament' }}
-                                        </h3>
+                                                        <div class="d-xl-flex mt-3 align-items-start">
+                                                            <h3 class="col-xl-2 m-0">
+                                                                {{ $departments[$users->first()->departments_id] ?? 'Bilinməyən departament' }}
+                                                            </h3>
 
-                                        <h4 class="col-xl-2 mb-0 mt-2 mt-md-0">
-                                            {{ $branches[$users->first()->branches_id] ?? 'Bilinməyən şöbə' }}
-                                        </h4>
+                                                            <h4 class="col-xl-2 mb-0 mt-2 mt-md-0">
+                                                                {{ $branches[$users->first()->branches_id] ?? 'Bilinməyən şöbə' }}
+                                                            </h4>
 
-                                        <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
-                                            @foreach($users as $index => $user)
-                                            @php 
-                                                    $participant_status = 
-                                                    $user->participation_status === 1 ? 'text-success' : 
-                                                    ($user->participation_status === 0 ? 'text-danger' : null);
-                                            @endphp
-                                                <h5 style="cursor:pointer"
-                                                    class="meetingCause {{ $participant_status }} mt-1 mb-1 mt-md-0 mb-md-0"
-                                                    data-user-name="{{ $user->name }}" data-user-reason="{{$user->reason}}" data-status="{{$user->participation_status}}">
-                                                    {{ $user->name }}
-                                                </h5>
-                                                {{ $index < count($users) - 1 ? ', ' : '' }}
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                    @if (!$loop->last)
-                                        <hr class="hr" />
-                                    @endif
+                                                            <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
+                                                                @foreach($users as $index => $user)
+                                                                                                @php 
+                                                                                                                                                                                                                                                                                                                            $participant_status =
+                                                                                                    $user->participation_status === 1 ? 'text-success' :
+                                                                                                    ($user->participation_status === 0 ? 'text-danger' : null);
+                                                                                                @endphp
+                                                                                                <h5 style="cursor:pointer"
+                                                                                                    class="meetingCause {{ $participant_status }} mt-1 mb-1 mt-md-0 mb-md-0"
+                                                                                                    data-user-name="{{ $user->name }}" data-user-reason="{{$user->reason}}"
+                                                                                                    data-status="{{$user->participation_status}}">
+                                                                                                    {{ $user->name }}
+                                                                                                </h5>
+                                                                                                {{ $index < count($users) - 1 ? ', ' : '' }}
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                        @if (!$loop->last)
+                                                            <hr class="hr" />
+                                                        @endif
                                 @endforeach
                             </div>
 

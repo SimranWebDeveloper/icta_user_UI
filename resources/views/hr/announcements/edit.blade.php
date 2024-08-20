@@ -76,12 +76,9 @@
         height: 100%;
     }
 
-    /* Ensure no CSS rule is hiding the input */
     #start_date {
         display: block;
-        /* Ensure the input is displayed as block element */
         visibility: visible;
-        /* Ensure the input is visible */
     }
 </style>
 
@@ -101,10 +98,11 @@
         </div>
     </div>
     <div class="container-fluid mt-4">
-        <form id="announcementForm" method="POST" action="{{ route('hr.announcements.update', $announcement->id) }}" enctype="multipart/form-data">
+        <form id="announcementForm" method="POST" action="{{ route('hr.announcements.update', $announcement->id) }}"
+            enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            
+
             <!-- Hidden input to track image deletion -->
             <input type="hidden" name="delete_image" id="delete_image" value="0">
 
@@ -114,17 +112,21 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="title" class="form-label">Başlıq <span class="text-danger">*</span></label>
-                            <input type="text" name="title" required id="title" class="form-control" placeholder="Başlığı daxil edin!" value="{{ old('title', $announcement->title) }}">
+                            <input type="text" name="title" required id="title" class="form-control"
+                                placeholder="Başlığı daxil edin!" value="{{ old('title', $announcement->title) }}">
                             @if($errors->has('title'))
                                 <span class="text-danger">{{ $errors->first('title') }}</span>
                             @endif
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-                            <select id="status" name="status" required class="form-control ui fluid search dropdown create_form_dropdown">
+                            <select id="status" name="status" required
+                                class="form-control ui fluid search dropdown create_form_dropdown">
                                 <option value="" selected disabled>Elanın statusunu seçin!</option>
-                                <option value="1" {{ old('status', $announcement->status) == '1' ? 'selected' : '' }}>Aktiv</option>
-                                <option value="0" {{ old('status', $announcement->status) == '0' ? 'selected' : '' }}>Deaktiv</option>
+                                <option value="1" {{ old('status', $announcement->status) == '1' ? 'selected' : '' }}>
+                                    Aktiv</option>
+                                <option value="0" {{ old('status', $announcement->status) == '0' ? 'selected' : '' }}>
+                                    Deaktiv</option>
                             </select>
                             @if($errors->has('status'))
                                 <span class="text-danger">{{ $errors->first('status') }}</span>
@@ -132,16 +134,22 @@
                         </div>
 
                         <div class="col-md-6 form-group date-duration-field mb-3">
-                            <label for="start_date" class="form-label">Başlama tarixi <span class="text-danger">*</span></label>
-                            <input type="date" name="start_date" id="start_date" class="form-control" style="background:#f8f9fa" required value="{{ old('start_date', \Carbon\Carbon::parse($announcement->start_date)->format('Y-m-d')) }}">
+                            <label for="start_date" class="form-label">Başlama tarixi <span
+                                    class="text-danger">*</span></label>
+                            <input type="date" name="start_date" id="start_date" class="form-control"
+                                style="background:#f8f9fa" required
+                                value="{{ old('start_date', \Carbon\Carbon::parse($announcement->start_date)->format('Y-m-d')) }}">
                             @if($errors->has('start_date'))
                                 <span class="text-danger">{{ $errors->first('start_date') }}</span>
                             @endif
                         </div>
 
                         <div class="col-md-6 form-group date-duration-field mb-3">
-                            <label for="end_date" class="form-label">Bitmə tarixi <span class="text-danger">*</span></label>
-                            <input type="text" name="end_date" id="end_date" style="background:#f8f9fa" class="form-control" required min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" value="{{ old('end_date', \Carbon\Carbon::parse($announcement->end_date)->format('Y-m-d')) }}">
+                            <label for="end_date" class="form-label">Bitmə tarixi <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" name="end_date" id="end_date" style="background:#f8f9fa"
+                                class="form-control" required min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
+                                value="{{ old('end_date', \Carbon\Carbon::parse($announcement->end_date)->format('Y-m-d')) }}">
                             @if($errors->has('end_date'))
                                 <span class="text-danger">{{ $errors->first('end_date') }}</span>
                             @endif
@@ -151,7 +159,8 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="contentTextarea">Mövzu <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="content" name="content" rows="9" required placeholder="Zəhmət olmasa mövzunu daxil edin!">{{ old('content', $announcement->content) }}</textarea>
+                                <textarea class="form-control" id="content" name="content" rows="9" required
+                                    placeholder="Zəhmət olmasa mövzunu daxil edin!">{{ old('content', $announcement->content) }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -164,9 +173,12 @@
                         <div class="dropzone d-flex justify-content-center align-items-center flex-column">
                             <label for="files" class="dropzone-label d-flex flex-column align-items-center">
                                 <div id="preview-container" class="file-icon mb-3">
-                                    <img id="image-preview" src="{{ $announcement->image ? asset('assets/images/announcements/' . $announcement->image) : '' }}" alt="Image Preview" class="{{ $announcement->image ? '' : 'd-none' }}">
+                                    <img id="image-preview"
+                                        src="{{ $announcement->image ? asset('assets/images/announcements/' . $announcement->image) : '' }}"
+                                        alt="Image Preview" class="{{ $announcement->image ? '' : 'd-none' }}">
                                     <div class="separator mb-2">
-                                        <i id="upload-icon" class="fa-solid fa-upload text-primary {{ $announcement->image ? 'd-none' : '' }}"></i>
+                                        <i id="upload-icon"
+                                            class="fa-solid fa-upload text-primary {{ $announcement->image ? 'd-none' : '' }}"></i>
                                         <input id="files" name="image" type="file" class="file-input d-none" />
                                     </div>
                                     <div id="actions" class="{{ $announcement->image ? '' : 'd-none' }}">
@@ -180,7 +192,8 @@
                 </div>
 
                 <div class="col-md-12 d-flex justify-content-start my-1">
-                    <button type="submit" form="announcementForm" class="btn btn-info btn-lg">
+                    <button type="submit" form="announcementForm" class="btn btn-info btn-lg"
+                        onclick="validateForm(event)">
                         <span class="me-2">
                             <i class="nav-icon i-Pen-2 font-weight-bold"></i>
                         </span>
@@ -195,6 +208,20 @@
 
 @section('js')
 <script>
+    function validateForm(event) {
+        const titleInput = document.getElementById('title');
+
+        if (titleInput.value.length > 125) {
+            event.preventDefault();
+            Swal.fire({
+                title: "Xəta!",
+                text: "Başlıq 125 simvoldan uzun ola bilməz",
+                icon: "warning",
+                confirmButtonText: "Tamam"
+            });
+        } 
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const fileInput = document.getElementById('files');
         const imagePreview = document.getElementById('image-preview');
@@ -213,7 +240,7 @@
                     imagePreview.classList.remove('d-none');
                     uploadIcon.classList.add('d-none');
                     actions.classList.remove('d-none');
-                    deleteImageInput.value = '0'; // Reset the delete_image input when a new file is selected
+                    deleteImageInput.value = '0';
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -224,7 +251,7 @@
         trashIcon.addEventListener('click', function (event) {
             event.preventDefault();
             resetImagePreview();
-            deleteImageInput.value = '1'; 
+            deleteImageInput.value = '1';
         });
 
         changeIcon.addEventListener('click', function (event) {
@@ -238,7 +265,7 @@
             imagePreview.classList.add('d-none');
             uploadIcon.classList.remove('d-none');
             actions.classList.add('d-none');
-            deleteImageInput.value = '0'; 
+            deleteImageInput.value = '0';
         }
 
         flatpickr('#start_date', {
@@ -270,7 +297,7 @@
             const startDate = new Date(document.getElementById('start_date').value);
             const endDate = new Date(this.value);
             if (endDate < startDate) {
-                alert('End date cannot be earlier than start date.');
+                alert('');
                 this.value = '';
             }
         });

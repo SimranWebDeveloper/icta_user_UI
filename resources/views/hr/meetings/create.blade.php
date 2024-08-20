@@ -25,6 +25,8 @@
                             <div class="select_label ui sub header">Mövzu <span class="text-danger">*</span></div>
                             <input type="text" name="subject" required id="subject" class="form-control"
                                 placeholder="Mövzu daxil edin">
+                            <span id="title-error" class="text-danger d-none">Başlıq 255 simvoldan uzun ola
+                                bilməz.</span>
                             @error('subject')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -184,34 +186,47 @@
 
 @section('js')
 <script>
-    const submitBtn = document.getElementById('submitBtn');
 
-    submitBtn.addEventListener('click', function (event) {
-        const inputs = document.querySelectorAll('input[required]');
-        inputs.forEach(input => {
-            if (input.value) {
-                input.setCustomValidity("");
-            } else {
-                input.setCustomValidity("Zəhmət olmazsa xananı doldurun");
-            }
-        });
-        const selects = document.querySelectorAll('select[required]');
-        selects.forEach(select => {
-            if (select.value) {
-                select.setCustomValidity("");
-            } else {
-                select.setCustomValidity("Zəhmət olmazsa xananı doldurun");
-            }
-        });
-        const texts = document.querySelectorAll('textarea[required]');
-        texts.forEach(text => {
-            if (text.value) {
-                text.setCustomValidity("");
-            } else {
-                text.setCustomValidity("Zəhmət olmazsa xananı doldurun");
-            }
-        });
-    })
+    document.getElementById('submitBtn').addEventListener('click', function (event) {
+        const subjectInput = document.getElementById('subject');
+
+        if (subjectInput.value.length > 125) {
+            event.preventDefault();
+            Swal.fire({
+                title: "Xəta!",
+                text: "Mövzu 125 simvoldan uzun ola bilməz",
+                icon: "warning",
+                confirmButtonText: "Tamam"
+            });
+        }
+        else {
+            const inputs = document.querySelectorAll('input[required]');
+            inputs.forEach(input => {
+                if (input.value) {
+                    input.setCustomValidity("");
+                } else {
+                    input.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+                }
+            });
+            const selects = document.querySelectorAll('select[required]');
+            selects.forEach(select => {
+                if (select.value) {
+                    select.setCustomValidity("");
+                } else {
+                    select.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+                }
+            });
+            const texts = document.querySelectorAll('textarea[required]');
+            texts.forEach(text => {
+                if (text.value) {
+                    text.setCustomValidity("");
+                } else {
+                    text.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+                }
+            });
+        }
+    });
+
     $('#room').change(function () {
         if ($(this).val()) {
             $('.none-field').show();

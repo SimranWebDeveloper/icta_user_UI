@@ -180,6 +180,7 @@
     const contentTextarea = document.getElementById('content');
 
     submitBtn.addEventListener('click', function (event) {
+        
         if (!contentTextarea.value) {
             contentTextarea.value = subjectInput.value;
         }
@@ -241,7 +242,16 @@
 
     $('#form').on('submit', function (e) {
         e.preventDefault();
-
+        if (subjectInput.value.length > 125) {
+            e.preventDefault();
+            Swal.fire({
+                title: "Xəta!",
+                text: "Mövzu 125 simvoldan uzun ola bilməz",
+                icon: "warning",
+                confirmButtonText: "Tamam"
+            });
+            return;
+        }
         if ($('.report-users:checked').length === 0) {
             Swal.fire({
                 title: "Xəta!",
