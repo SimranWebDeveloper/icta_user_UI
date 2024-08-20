@@ -37,22 +37,21 @@ $(document).ready(function () {
     }
     
     // Loop through all buttons with the class "allSurveysButton" on page load
-    $(".allSurveysButton").each(function () {
-        handleSurveyButtonClick(this);
-    });
+
 
     // user anketi daha evvel cavabladi mı yoxlamaq
     function openNextSurvey() {
-        const completedSurveys =
-            JSON.parse(localStorage.getItem("completedSurveys")) || [];
+        debugger
+        const completedSurveys = JSON.parse(localStorage.getItem("completedSurveys")) || [];
 
-        const nextSurvey = surveys.find(
-            (survey) =>
-                survey.priority === 1  && !completedSurveys.includes(survey.id)
-        );
+        const nextSurvey = surveys.find( (survey) =>  survey.priority === 1  && !completedSurveys.includes(survey.id) );
 
-        if (nextSurvey) {
-            showSurveyPopup(nextSurvey, false);
+        if (nextSurvey) {   showSurveyPopup(nextSurvey, false);  }
+
+        else if (true) {
+            $(".allSurveysButton").each(function () {
+                handleSurveyButtonClick(this);
+            });
         }
     }
 
@@ -243,7 +242,7 @@ $(document).ready(function () {
                 }
 
                 newQuestionHtml+=`
-                <div class="col-md-6 col-sm-12 mb-4">
+                <div class="col-xl-6 col-12">
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-center">
                                             <h4>${index + 1}.</h4>
@@ -379,9 +378,6 @@ $(document).ready(function () {
     }
 
 
-   
-
-
     // Cavabla 2
     function showSurveyPopup(survey, canCancel) {
         Swal.fire({
@@ -489,7 +485,6 @@ $(document).ready(function () {
         }
     }
 
-    // Cavabla 5
     function generateSurveyHtml(survey) {
         if (
             !survey ||
@@ -523,7 +518,8 @@ $(document).ready(function () {
             } else if (question.input_type === "textarea") {
                 optionsHtml = `
                   <div>
-                      <textarea rows="6" cols="10" class="p-2" name="question[${question.id}]" required style="width:100%; resize:none"></textarea>
+                    <textarea rows="6" cols="10" class="form-control" name="question[${question.id}]" required style="width:100%;resize: none;"></textarea>
+
                   </div>
               `;
             }
@@ -586,6 +582,27 @@ $(document).ready(function () {
 
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
