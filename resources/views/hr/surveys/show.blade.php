@@ -52,7 +52,7 @@
         }
 
         .label-wrapper {
-            border: 1px solid #C7C8CC;
+            /* border: 1px solid #C7C8CC; */
         }
 
         .label-wrapper label {
@@ -82,6 +82,65 @@
         }
         .chartIcon:hover{
 scale: 1.25;
+        }
+    </style>
+
+
+        <style>
+        .progress-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-label {
+            width: 150px;
+            padding: 4px 8px;
+            background-color: #e0f7fa;
+            border-radius: 12px;
+            margin-right: 10px;
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .progress {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #f3f3f3;
+            /* border-radius: 10px; */
+        }
+
+        .progress-bar {
+            height: 100%;
+            /* border-radius: 10px; */
+            transition: width 0.3s ease;
+        }
+        .progress-bar.red {
+            background-color: #F62700;
+        }
+
+        .progress-bar.yellow {
+            background-color: #F8AA00;
+        }
+
+        .progress-bar.green {
+            background-color: #00CE00;
+        }
+
+
+
+        .progress-bar.transparent {
+            background-color: transparent;
+        }
+
+        .progress-percent {
+            width: 80px;
+            text-align: center;
+            /* margin-left: 10px; */
+            font-size: 14px;
+            color: #333;
         }
     </style>
 
@@ -139,20 +198,40 @@ scale: 1.25;
                                                     @foreach ($question->answers as $answer)
                                                         @php
                                                             $percentage = $percentages[$answer->name] ?? 0;
+                                                            switch (true) {
+                                                            case ($percentage > 66):
+                                                                $color = 'green';
+                                                                break;
+                                                            case ($percentage > 33):
+                                                                $color = 'yellow';
+                                                                break;
+                                                            case ($percentage > 0):
+                                                                $color = 'red';
+                                                                break;
+                                                            default:
+                                                                $color = 'gray'; }
                                                         @endphp
-                                                        <li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                                                            <div class="checkbox-wrapper d-flex">
-                                                                <i class="fa-thin fa-square-check" style='font-size: 40px; color:#C7C8CC'></i>
-                                                            </div>
-                                                            <div class="label-wrapper w-100 text-center" style="border-radius: 2.25rem;">
-                                                                <label class="d-flex justify-content-center align-items-center">
-                                                                    {{ $answer->name }}
-                                                                </label>
-                                                                <span class="percentage-badge" style="margin-left: 10px; font-weight: bold;">
-                                                                    {{ number_format($percentage, 2) }}%
-                                                                </span>
-                                                            </div>
-                                                        </li>
+                                                    <li class="d-flex my-3 align-items-center w-100 justify-content-center align-items-center">
+                                                        <div class="checkbox-wrapper d-flex align-items-center  pb-2 ">
+                                                            <i class="fa-thin fa-square-check" style='font-size: 35px; color:#C7C8CC'></i>
+                                                        </div>
+                                                        <div class=" label-wrapper w-100 text-center " style="border:none">
+                                                            <label class="progress-container d-flex justify-content-center align-items-center">
+                                                            <div class="progress position-relative" style="border-radius: 2.25rem;">
+                                                            <p class=""><p class="w-100 position-absolute d-flex align-items-center justify-content-center h-100 text-nowrap " style="font-size: 14px;overflow-x:auto;">{{ $answer->name }}</p>
+                                                            </p>
+                                                            <div class="progress-bar   {{ $color }} "
+                                                                style="width: {{ number_format($percentage, 2) }}%;" >
+                                                                    
+                                                                    </div>
+                                                                </div>
+                                                                <div class="progress-percent">{{ number_format($percentage, 2) }}%</div>
+                                                                <!-- {{ $answer->name }} -->
+                                                            </label>
+                            
+
+                                                        </div>
+                                                    </li>
                                                     @endforeach
                                                 </ul>
                                             @elseif($question->input_type == 'radio')
@@ -160,18 +239,36 @@ scale: 1.25;
                                                     @foreach ($question->answers as $answer)
                                                         @php
                                                             $percentage = $percentages[$answer->name] ?? 0;
+                                                            switch (true) {
+                                                            case ($percentage > 66):
+                                                                $color = 'green';
+                                                                break;
+                                                            case ($percentage > 33):
+                                                                $color = 'yellow';
+                                                                break;
+                                                            case ($percentage > 0):
+                                                                $color = 'red';
+                                                                break;
+                                                            default:
+                                                                $color = 'gray'; 
+                            }
                                                         @endphp
                                                         <li class="d-flex my-3 align-items-center w-100 justify-content-between">
-                                                            <div class="checkbox-wrapper d-flex">
-                                                                <i class="fa-sharp fa-thin fa-circle-dot" style='font-size: 40px; color:#C7C8CC'></i>
+                                                            <div class="checkbox-wrapper d-flex align-items-center  pb-2">
+                                                                <i class="fa-sharp fa-thin fa-circle-dot" style='font-size: 35px; color:#C7C8CC'></i>
                                                             </div>
-                                                            <div class="label-wrapper w-100 text-center" style="border-radius: 2.25rem;">
-                                                                <label class="d-flex justify-content-center align-items-center">
-                                                                    {{ $answer->name }}
-                                                                </label>
-                                                                <span class="percentage-badge" style="margin-left: 10px; font-weight: bold;">
-                                                                    {{ number_format($percentage, 2) }}%
-                                                                </span>
+                                                            <div class="label-wrapper w-100 text-center" style="border:none;">
+                                                            <label class="progress-container d-flex justify-content-center align-items-center">
+                                                            <div class="progress position-relative" style="border-radius: 2.25rem;">
+                                                            <p class="w-100 position-absolute d-flex align-items-center justify-content-center h-100 text-nowrap" style="font-size: 14px;overflow-x:auto;"></p>
+                                                                <div class="progress-bar   {{ $color }} "
+                                                                style="width: {{ number_format($percentage, 2) }}%;color:#C7C8CC" >
+                                                                    
+                                                                    </div>
+                                                                </div>
+                                                                <div class="progress-percent">{{ number_format($percentage, 2) }}%</div>
+                                                                <!-- {{ $answer->name }} -->
+                                                            </label>
                                                             </div>
                                                         </li>
                                                     @endforeach
@@ -219,7 +316,7 @@ scale: 1.25;
                                                             data-survey-id="{{ $survey->id }}"
                                                             data-user-id="{{ $user->id }}"
                                                             data-user-name="{{ $user->name }}">
-                                                            <u>{{ $survey->is_anonym ? 'Anonim istifadəçi ' . $index + 1 : $user->name }}</u>
+                                                            {{ $survey->is_anonym ? 'Anonim istifadəçi ' . $index + 1 : $user->name }}
                                                         </h5>,
                                                     @endforeach
                                                 </div>
@@ -457,3 +554,23 @@ scale: 1.25;
         });
     </script>
 @endsection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
