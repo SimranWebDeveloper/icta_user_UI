@@ -62,7 +62,8 @@
                 <p class="no-survey">Hal-hazırda aktiv anket yoxdur</p>
             @else
                     <div class="row">
-                        @foreach($surveys as $survey)
+                    @foreach($surveys->sortByDesc('created_at') as $survey)
+                        
                                     @php
                                         $surveyUser = $surveys_users->firstWhere('surveys_id', $survey->id);
                                     @endphp

@@ -96,8 +96,6 @@
                             <label for="title" class="form-label">Başlıq <span class="text-danger">*</span></label>
                             <input type="text" name="title" required id="title" class="form-control"
                                 placeholder="Başlığı daxil edin">
-                            <span id="title-error" class="text-danger d-none">Başlıq 255 simvoldan uzun ola
-                                bilməz.</span>
 
                             @if($errors->has('title'))
                                 <span class="text-danger">{{ $errors->first('title') }}</span>
@@ -181,14 +179,16 @@
 
     function validateForm(event) {
         const titleInput = document.getElementById('title');
-        const titleError = document.getElementById('title-error');
 
-        if (titleInput.value.length > 255) {
+        if (titleInput.value.length > 125) {
             event.preventDefault();
-            titleError.classList.remove('d-none');
-        } else {
-            titleError.classList.add('d-none');
-        }
+            Swal.fire({
+                title: "Xəta!",
+                 text: "Başlıq 125 simvoldan uzun ola bilməz",
+                icon: "warning",
+                confirmButtonText: "Tamam"
+            });
+        } 
     }
     document.getElementById('files').addEventListener('change', function (event) {
         const file = event.target.files[0];

@@ -45,6 +45,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.meeting-content {
+        height: 200px;
+        overflow-y: auto;
+    }
 </style>
 <div class="col-lg-4 col-md-6 mt-4 mt-md-0">
     <div class="card">
