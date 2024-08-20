@@ -9,9 +9,11 @@
         width: 100%;
         cursor: pointer;
     }
+
     #end_date:disabled {
-    cursor: not-allowed;
-}
+        cursor: not-allowed;
+    }
+
     #preview-container {
         position: relative;
         width: 100%;
@@ -94,14 +96,16 @@
                             <label for="title" class="form-label">Başlıq <span class="text-danger">*</span></label>
                             <input type="text" name="title" required id="title" class="form-control"
                                 placeholder="Başlığı daxil edin">
+                            <span id="title-error" class="text-danger d-none">Başlıq 255 simvoldan uzun ola
+                                bilməz.</span>
+
                             @if($errors->has('title'))
                                 <span class="text-danger">{{ $errors->first('title') }}</span>
                             @endif
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-                            <select id="status" name="status" required
-                                class="form-control ui fluid ">
+                            <select id="status" name="status" required class="form-control ui fluid ">
                                 <option value="" disabled selected>Elanın statusunu seçin</option>
                                 <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Aktiv</option>
                                 <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Deaktiv</option>
@@ -113,8 +117,8 @@
                         <div class="col-md-6  form-group date-duration-field mb-3">
                             <label for="start_date" class="form-label">Başlama tarixi <span
                                     class="text-danger">*</span></label>
-                            <input type="text" name="start_date" style="background:#f8f9fa" id="start_date" class="form-control" required
-                                placeholder="Başlama tarixi seçin">
+                            <input type="text" name="start_date" style="background:#f8f9fa" id="start_date"
+                                class="form-control" required placeholder="Başlama tarixi seçin">
                             @if($errors->has('start_date'))
                                 <span class="text-danger">{{ $errors->first('start_date') }}</span>
                             @endif
@@ -122,7 +126,7 @@
                         <div class="col-md-6  form-group date-duration-field mb-3">
                             <label for="end_date" class="form-label">Bitmə tarixi <span
                                     class="text-danger">*</span></label>
-                                    <input type="text" name="end_date" id="end_date" style="background:#f8f9fa"
+                            <input type="text" name="end_date" id="end_date" style="background:#f8f9fa"
                                 class="form-control" required disabled placeholder="Bitmə tarixi seçin">
 
                             @if($errors->has('end_date'))
@@ -162,7 +166,8 @@
                     </div>
                 </div>
                 <div class="col-md-12 my-1">
-                    <button type="submit" form="announcementForm" class="btn btn-success btn-lg">Daxil
+                    <button type="submit" form="announcementForm" class="btn btn-success btn-lg"
+                        onclick="validateForm(event)">Daxil
                         edin</button>
                 </div>
             </div>
@@ -173,6 +178,18 @@
 
 @section('js')
 <script>
+
+    function validateForm(event) {
+        const titleInput = document.getElementById('title');
+        const titleError = document.getElementById('title-error');
+
+        if (titleInput.value.length > 255) {
+            event.preventDefault();
+            titleError.classList.remove('d-none');
+        } else {
+            titleError.classList.add('d-none');
+        }
+    }
     document.getElementById('files').addEventListener('change', function (event) {
         const file = event.target.files[0];
         const imagePreview = document.getElementById('image-preview');
@@ -231,7 +248,7 @@
     document.getElementById('start_date').setAttribute('min', getTodayDate());
 
     document.addEventListener('DOMContentLoaded', function () {
-        flatpickr('#start_date', { 
+        flatpickr('#start_date', {
             allowInput: true,
             dateFormat: 'Y-m-d',
             minDate: 'today',
