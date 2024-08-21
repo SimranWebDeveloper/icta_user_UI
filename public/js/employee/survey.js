@@ -283,7 +283,7 @@ $(document).ready(function () {
             
         }
         Swal.fire({
-            title: "İstifadəçi Anketi",
+            title: surveyObj.name,
             html: `
                     <div class="row">
                         ${answersHtml}                        
