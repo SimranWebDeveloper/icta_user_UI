@@ -306,50 +306,63 @@ scale: 1.25;
                         </div>
 
                         <div class="row">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3>İştirakçılar</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        @php
-                                            $groupedParticipants = $users->groupBy(function ($user) {
-                                                return $user->departments_id . '-' . $user->branches_id;
-                                            });
-                                        @endphp
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>İştirakçılar</h3>
+            </div>
+            <div class="card-body">
+                @php
+                    // Group participants by department and branch
+                    $groupedParticipants = $users->groupBy(function ($user) use ($survey) {
+                        // If survey is anonymous, only group by department
+                        return $survey->is_anonym ? $user->departments_id : $user->departments_id . '-' . $user->branches_id;
+                    });
+                @endphp
 
-                                        @foreach ($groupedParticipants as $group => $users)
-                                            <div class="d-xl-flex mt-3 align-items-start">
-                                                <h3 class="col-xl-2 m-0">
-                                                    {{ $departments[$users->first()->departments_id] ?? 'Bilinməyən departament' }}
-                                                </h3>
+                @foreach ($groupedParticipants as $groupKey => $users)
+                    @php
+                        // Split the group key into department and branch if necessary
+                        $keys = explode('-', $groupKey);
+                        $departmentId = $keys[0];
+                        $branchId = $keys[1] ?? null;
 
-                                                <h4 class="col-xl-2 mb-0 mt-2 mt-xl-0">
-                                                    {{ $branches[$users->first()->branches_id] ?? 'Bilinməyən şöbə' }}
-                                                </h4>
+                        // Shuffle users within each department/branch group
+                        $shuffledUsers = $users->shuffle();
+                    @endphp
 
-                                                <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-xl-0">
-                                                    @foreach ($users as $index => $user)
-                                                        <h5 style="cursor: pointer"
-                                                            class="surveysCause employeeAnswer mt-1 mb-1 mt-xl-0 mb-xl-0 
-                                                            @if (isset($is_answered[$user->id]) && $is_answered[$user->id] == 1) text-success @endif
-                                                            "
-                                                            data-survey-id="{{ $survey->id }}"
-                                                            data-user-id="{{ $user->id }}"
-                                                            data-user-name="{{ $user->name }}">
-                                                            {{ $survey->is_anonym ? 'Anonim istifadəçi ' . $index + 1 : $user->name }}
-                                                        </h5>,
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                            @if (!$loop->last)
-                                                <hr class="hr" />
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="d-xl-flex mt-3 align-items-start">
+                            <h3 class="col-xl-2 m-0">{{ $departments[$departmentId] ?? 'Bilinməyən departament' }}</h3>
+                            @if ($branchId && !$survey->is_anonym)
+                            <h4 class="col-xl-2 mb-0 mt-2 mt-xl-0">    
+                            {{ $branches[$branchId] ?? 'Bilinməyən şöbə' }}</h4>
+                            @endif
+
+                        <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-xl-0">
+                            @foreach ($shuffledUsers as $index => $user)
+                                <h5 style="cursor: pointer; margin-left:5px"
+                                    class="surveysCause employeeAnswer mt-1 mb-1 mt-xl-0 mb-xl-0
+                                    @if (isset($is_answered[$user->id]) && $is_answered[$user->id] == 1) text-success @endif"
+                                    data-survey-id="{{ $survey->id }}"
+                                    data-user-id="{{ $user->id }}"
+                                    data-user-name="{{ $user->name }}">
+                                    {{ $survey->is_anonym ? 'Anonim istifadəçi ' : $user->name }}
+                                </h5>
+                                @if (!$loop->last)
+                        ,
+                    @endif
+                            @endforeach
                         </div>
+                    </div>
+                    @if (!$loop->last)
+                        <hr class="hr" />
+                    @endif
+                @endforeach
+            </div>
+        </div>
+    </div>
+</div>
+
                     </div>
 
                     <div class="card-footer">
