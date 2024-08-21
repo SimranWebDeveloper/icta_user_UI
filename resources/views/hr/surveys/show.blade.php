@@ -83,6 +83,14 @@
         .chartIcon:hover{
 scale: 1.25;
         }
+
+        .surveysCause {
+        transition-duration: .5s;
+    }
+
+    .surveysCause:hover {
+        color: blue
+    }
     </style>
 
 
@@ -142,6 +150,7 @@ scale: 1.25;
             font-size: 14px;
             color: #333;
         }
+
     </style>
 
     <div class="pt-4 custom-container bg-white">
@@ -322,7 +331,7 @@ scale: 1.25;
                                                 <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-xl-0">
                                                     @foreach ($users as $index => $user)
                                                         <h5 style="cursor: pointer"
-                                                            class="employeeAnswer mt-1 mb-1 mt-xl-0 mb-xl-0 
+                                                            class="surveysCause employeeAnswer mt-1 mb-1 mt-xl-0 mb-xl-0 
                                                             @if (isset($is_answered[$user->id]) && $is_answered[$user->id] == 1) text-success @endif
                                                             "
                                                             data-survey-id="{{ $survey->id }}"
