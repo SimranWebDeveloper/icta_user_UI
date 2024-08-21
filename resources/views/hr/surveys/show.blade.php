@@ -56,7 +56,7 @@
         }
 
         .label-wrapper label {
-            height: 37px;
+            height: 47px;
         }
 
         textarea {
@@ -218,15 +218,22 @@ scale: 1.25;
                                                         <div class=" label-wrapper w-100 text-center " style="border:none">
                                                             <label class="progress-container d-flex justify-content-center align-items-center">
                                                             <div class="progress position-relative" style="border-radius: 2.25rem;">
-                                                            <p class=""><p class="w-100 position-absolute d-flex align-items-center justify-content-center h-100 text-nowrap " style="font-size: 14px;overflow-x:auto;">{{ $answer->name }}</p>
-                                                            </p>
+                                                            
+                                                            <div class="position-absolute w-100 d-flex align-items-center justify-content-center h-100">
+                                                                <p class="   text-nowrap p-2" style="width:95%;font-size: 14px;overflow-x:auto;">
+                                                                {{ $answer->name }}
+                                                                </p>
+                                                     
+                                                            </div>
+
+                                                        </p>
+                                                            
                                                             <div class="progress-bar   {{ $color }} "
                                                                 style="width: {{ number_format($percentage, 2) }}%;" >
                                                                     
                                                                     </div>
                                                                 </div>
                                                                 <div class="progress-percent">{{ number_format($percentage, 2) }}%</div>
-                                                                <!-- {{ $answer->name }} -->
                                                             </label>
                             
 
@@ -236,6 +243,7 @@ scale: 1.25;
                                                 </ul>
                                             @elseif($question->input_type == 'radio')
                                                 <ul class="list-group-custom">
+                                                    <!-- radio check -->
                                                     @foreach ($question->answers as $answer)
                                                         @php
                                                             $percentage = $percentages[$answer->name] ?? 0;
@@ -260,14 +268,18 @@ scale: 1.25;
                                                             <div class="label-wrapper w-100 text-center" style="border:none;">
                                                             <label class="progress-container d-flex justify-content-center align-items-center">
                                                             <div class="progress position-relative" style="border-radius: 2.25rem;">
-                                                            <p class="w-100 position-absolute d-flex align-items-center justify-content-center h-100 text-nowrap" style="font-size: 14px;overflow-x:auto;"></p>
+                                                            <div class="position-absolute w-100 d-flex align-items-center justify-content-center h-100">
+                                                                <p class="   text-nowrap p-2" style="width:95%;font-size: 14px;overflow-x:auto;">
+                                                                {{ $answer->name }}
+                                                                </p>
+                                                     
+                                                            </div>
                                                                 <div class="progress-bar   {{ $color }} "
                                                                 style="width: {{ number_format($percentage, 2) }}%;color:#C7C8CC" >
                                                                     
                                                                     </div>
                                                                 </div>
                                                                 <div class="progress-percent">{{ number_format($percentage, 2) }}%</div>
-                                                                <!-- {{ $answer->name }} -->
                                                             </label>
                                                             </div>
                                                         </li>
