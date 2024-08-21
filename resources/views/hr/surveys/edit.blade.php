@@ -297,13 +297,19 @@
 
         
         inputs.forEach(input => {
-            if (input.value) {                
-                input.setCustomValidity("");
-            } else {
-                input.setCustomValidity("Zəhmət olmasa xananı daxil edin");
-                requiredCondition=false
-            }
-        });
+    if (input.value) {
+        if (input.value.length > 125) {
+            input.setCustomValidity("125 simvoldan çox ola bilməz");
+            requiredCondition = false;
+        } else {
+            input.setCustomValidity("");
+        }
+    } else {
+        input.setCustomValidity("Zəhmət olmasa xananı daxil edin");
+        requiredCondition = false;
+    }
+});
+
         selects.forEach(input => {
             if (input.value) {                
                 input.setCustomValidity("");
