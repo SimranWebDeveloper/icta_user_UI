@@ -31,8 +31,11 @@
                                 <th>Sual sayı</th>
                                 <th>İştirak edənlərin sayı</th>
                                 <th>Bitmə tarixi</th>
+                                <th>Vaciblilik</th>
+                                <th>Görünmə statusu</th>
                                 <th>Status</th>
                                 <th>Əməliyyatlar</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -46,6 +49,19 @@
                                     <td>{{ $survey->surveys_questions->count() }}</td>
                                     <td>{{ $survey->users->count() }}</td>
                                     <td>{{ $survey->expired_at}}</td>
+                                    <td>
+                                        @if ($survey->priority == 0)
+                                            Normal
+                                        @elseif ($survey->priority == 1)
+                                            Önəmli
+                                        @endif
+                                    </td>
+                                    <td>@if($survey->is_anonym == 0)
+                                        Açıq
+                                    @elseif($survey->is_anonym == 1)
+                                        Gizli
+                                    @endif
+                                    </td>
                                     <td>
                                         @if ($survey->status == 0)
                                             <button class="btn btn-sm btn-danger">
