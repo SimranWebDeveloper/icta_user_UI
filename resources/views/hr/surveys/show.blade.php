@@ -372,84 +372,92 @@ scale: 1.25;
         $(document).ready(function() {
 
             $(document).on("click", ".chartIcon", function() {
-    const isTextarea = $(this).closest('.card').find('.textarea-answer').length > 0;
+    const surveyId = $(this).data('survey-id');
+    const questionId = $(this).data('question-id');
 
-    if (!isTextarea) {
-        let labels = [];
-        let data = [];
-        let backgroundColors = [];
+    $.ajax({
+        url: `/employee/survey/answersdetails/${surveyId}/${questionId}`,
+        method: 'GET',
+        success: function(response) {
+            let labels = [];
+            let data = [];
+            let backgroundColors = [];
+            let userListsHtml = '';
 
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
+            function getRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
             }
-            return color;
-        }
 
-        // Получаем ID опроса и вопроса из атрибутов или другого контекста
-        const surveyId = $(this).data('survey-id'); // Замените на ваш метод получения ID опроса
-        const questionId = $(this).data('question-id'); // Замените на ваш метод получения ID вопроса
+            // Обработка полученных данных
+            $.each(response, function(answer, details) {
+                labels.push(`${details.answer} (${details.count} человек)`); // Используем имя ответа и количество пользователей
+                data.push(details.count); // Количество пользователей, выбравших данный ответ
+                backgroundColors.push(getRandomColor()); // Генерируем случайный цвет для каждого ответа
 
-        // Выполняем AJAX-запрос для получения ответов
-        $.ajax({
-            url: `/employee/survey/answersdetails/${surveyId}/${questionId}`,
-            method: 'GET',
-            success: function(response) {
-                // Пример ответа сервера:
-                // { "Option A": { "answer": "Option A", "count": 5, "users": [1, 2, 3, 4, 5] }, "Option B": { "answer": "Option B", "count": 3, "users": [6, 7, 8] } }
+                // Формируем список пользователей для каждого ответа
+                userListsHtml += `
+                    <div>
+                        <h5>${details.answer} (${details.count} человек)</h5>
+                        <ul>
+                            ${details.users.map(user => `<li>${user}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
 
-                // Обработка данных ответа
-                $.each(response, function(index, answerData) {
-                    labels.push(`${answerData.answer} (${answerData.count} человек)`); // Добавляем метку с количеством людей
-                    data.push(parseFloat(answerData.count)); // Используем количество людей в качестве данных для диаграммы
-                    backgroundColors.push(getRandomColor()); // Генерируем случайный цвет для каждого ответа
-                });
-
-                // Отображение модального окна с диаграммой
-                Swal.fire({
-                    html: 
-            `<div class="d-flex justify-content-center"> 
-                <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
-            </div>`,
-                    showCancelButton: false,
-                    confirmButtonText: "Ok",
-                    customClass: {
-                        popup: 'swal2-chart',
-                        container: 'chartModal'
-                    },
-                    didOpen: () => {
-                        // Задержка для корректного рендеринга canvas
-                        setTimeout(() => {
-                            // Создание диаграммы с помощью Chart.js
-                            new Chart("myChart", {
-                                type: "doughnut", // Можно использовать также 'pie'
-                                data: {
-                                    labels: labels, // Метки ответов с количеством людей
-                                    datasets: [{
-                                        backgroundColor: backgroundColors, // Цвета сегментов
-                                        data: data // Количество людей
-                                    }]
+            // Отображение модального окна с диаграммой и списком пользователей
+            Swal.fire({
+                html: `
+                    <div class="d-flex justify-content-center"> 
+                        <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        ${userListsHtml}
+                    </div>
+                `,
+                showCancelButton: false,
+                confirmButtonText: "Ok",
+                customClass: {
+                    popup: 'swal2-chart',
+                    container: 'chartModal'
+                },
+                didOpen: () => {
+                    // Задержка для корректного рендеринга canvas
+                    setTimeout(() => {
+                        // Создание диаграммы с помощью Chart.js
+                        new Chart("myChart", {
+                            type: "doughnut", // Можно использовать также 'pie'
+                            data: {
+                                labels: labels, // Метки ответов с количеством людей
+                                datasets: [{
+                                    backgroundColor: backgroundColors, // Цвета сегментов
+                                    data: data // Количество людей
+                                }]
+                            },
+                            options: {
+                                title: {
+                                    display: true,
+                                    text: "Результаты вопроса"
                                 },
-                                options: {
-                                    title: {
-                                        display: true,
-                                        text: "Результаты вопроса"
-                                    },
-                                    responsive: true,
-                                }
-                            });
-                        }, 100); // Задержка
-                    }
-                });
-            },
-            error: function(error) {
-                console.error("Failed to fetch answer details:", error);
-            }
-        });
-    }
+                                responsive: true,
+                            }
+                        });
+                    }, 100); // Задержка
+                }
+            });
+        },
+        error: function(error) {
+            console.error("Failed to fetch answer details:", error);
+        }
+    });
 });
+
+
         // Check each .chart div and add class if textarea is present
             $('.chart').each(function() {
                 if ($(this).find('textarea').length > 0) {

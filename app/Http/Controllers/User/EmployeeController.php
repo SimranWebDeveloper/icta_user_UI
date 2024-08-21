@@ -221,27 +221,36 @@ class EmployeeController extends Controller
 
 
 
-public function getAnswersDetailsByQuestion($surveyId, $questionId)
-{
-    // Получение всех ответов по данному опросу и вопросу
-    $allAnswers = UsersAnswers::where('surveys_id', $surveyId)
-        ->where('surveys_questions_id', $questionId)
-        ->get();
-
-    // Группируем ответы по значению ответа
-    $answerGroups = $allAnswers->groupBy('answer');
-
-    // Формируем результат
-    $result = $answerGroups->map(function ($group, $answer) {
-        return [
-            'answer' => $answer,
-            'count' => $group->count(), // Количество пользователей, выбравших данный ответ
-            'users' => $group->pluck('users_id')->unique()->values() // Список уникальных пользователей, выбравших данный ответ
-        ];
-    });
-
-    return response()->json($result);
-}
+    public function getAnswersDetailsByQuestion($surveyId, $questionId)
+    {
+        // Получение всех ответов по данному опросу и вопросу
+        $allAnswers = UsersAnswers::where('surveys_id', $surveyId)
+            ->where('surveys_questions_id', $questionId)
+            ->get();
+    
+        // Группируем ответы по значению ответа
+        $answerGroups = $allAnswers->groupBy('answer');
+    
+        // Получаем уникальные user_ids из всех ответов
+        $userIds = $allAnswers->pluck('users_id')->unique();
+    
+        // Получаем данные о пользователях
+        $users = User::whereIn('id', $userIds)->pluck('name', 'id')->toArray();
+    
+        // Формируем результат
+        $result = $answerGroups->map(function ($group, $answer) use ($users) {
+            return [
+                'answer' => $answer,
+                'count' => $group->count(), // Количество пользователей, выбравших данный ответ
+                'users' => $group->pluck('users_id')->unique()->map(function ($userId) use ($users) {
+                    return $users[$userId] ?? 'Unknown'; // Имя пользователя или 'Unknown', если имя не найдено
+                })->values() // Список уникальных имен пользователей, выбравших данный ответ
+            ];
+        });
+    
+        return response()->json($result);
+    }
+    
 
     
 
