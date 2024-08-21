@@ -29,7 +29,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
                         <i class="fa-duotone fa-solid fa-chart-pie chartIcon cursor-pointer"
-                            style=" font-size:25px"></i>
+                            style=" font-size:25px" data-meeting-id="{{ $meeting->id }}"></i>
 
                         <ul class="m-0 p-0">
                             <li id="list-item">
@@ -217,12 +217,26 @@
 <script>
     $(document).ready(function () {
         $(document).on("click", ".chartIcon", function () {
+    var meetingId = $(this).data('meeting-id');
 
+    $.ajax({
+        url: '/employee/meeting/' + meetingId + '/participation-status',
+        method: 'GET',
+        success: function(response) {
             Swal.fire({
                 html: `
-             <div class="d-flex justify-content-center"> 
-                 <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
-             </div>`,
+                    <div class="d-flex justify-content-center"> 
+                        <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+                    </div>
+                    <div class="mt-4">
+                        <h5>İştirak edəcək:</h5>
+                        <ul>${response.status_one_users.map(user => `<li>${user}</li>`).join('')}</ul>
+                        <h5>İştirak etməyəcək:</h5>
+                        <ul>${response.status_zero_users.map(user => `<li>${user}</li>`).join('')}</ul>
+                        <h5>Cavab yoxdur:</h5>
+                        <ul>${response.status_null_users.map(user => `<li>${user}</li>`).join('')}</ul>
+                    </div>
+                `,
                 showCancelButton: false,
                 confirmButtonText: "Ok",
                 customClass: {
@@ -230,35 +244,38 @@
                     container: 'chartModal'
                 },
                 didOpen: () => {
-                    setTimeout(() => {
-                        var xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
-                        var yValues = [55, 49, 44, 24, 15];
-                        var barColors = [
-                            "#b91d47",
-                            "#00aba9",
-                            "#2b5797",
-                            "#e8c3b9",
-                            "#1e7145"
-                        ];
-                        new Chart("myChart", {
-                            type: "doughnut",
-                            data: {
-                                datasets: [{
-                                    backgroundColor: barColors,
-                                    data: yValues
-                                }]
-                            },
-                            options: {
-                                title: {
-                                    display: true,
-                                    text: "World Wide Wine Production 2018"
-                                }
+                    // AJAX cavabından gələn dinamik məlumatları chart üçün istifadə edirik
+                    var labels = ["İştirak edəcək", "İştirak etməyəcək", "Cavab yoxdur"];
+                    var yValues = [response.status_one_count, response.status_zero_count, response.status_null_count];
+                    var barColors = [
+                        "#4CAF50", 
+                        "#FF5252", 
+                        "#808080"  
+                    ];
+
+                    // Chart-ı yaratmaq
+                    new Chart("myChart", {
+                        type: "doughnut",
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                backgroundColor: barColors,
+                                data: yValues
+                            }]
+                        },
+                        options: {
+                            title: {
+                                display: true,
+                                text: "Görüş İştirak Statusu"
                             }
-                        });
-                    }, 100);
+                        }
+                    });
                 }
             });
-        })
+        }
+    });
+});
+
         $('.delete-item').on("click", function () {
             const item_id = $(this).data('id');
             Swal.fire({
