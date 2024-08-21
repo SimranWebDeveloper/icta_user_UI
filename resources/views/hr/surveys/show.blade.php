@@ -220,7 +220,7 @@ scale: 1.25;
                                                             <div class="progress position-relative" style="border-radius: 2.25rem;">
                                                             
                                                             <div class="position-absolute w-100 d-flex align-items-center justify-content-center h-100">
-                                                                <p class="   text-nowrap p-2" style="width:95%;font-size: 14px;overflow-x:auto;">
+                                                                <p class="chart-label text-nowrap p-2" style="width:95%;font-size: 14px;overflow-x:auto;">
                                                                 {{ $answer->name }}
                                                                 </p>
                                                      
@@ -269,7 +269,7 @@ scale: 1.25;
                                                             <label class="progress-container d-flex justify-content-center align-items-center">
                                                             <div class="progress position-relative" style="border-radius: 2.25rem;">
                                                             <div class="position-absolute w-100 d-flex align-items-center justify-content-center h-100">
-                                                                <p class="   text-nowrap p-2" style="width:95%;font-size: 14px;overflow-x:auto;">
+                                                                <p class=" chart-label  text-nowrap p-2" style="width:95%;font-size: 14px;overflow-x:auto;">
                                                                 {{ $answer->name }}
                                                                 </p>
                                                      
@@ -372,14 +372,47 @@ scale: 1.25;
         $(document).ready(function() {
 
             $(document).on("click", ".chartIcon", function() {
-    const isTextarea = $(this).find('.textarea-answer').length > 0;
+    const isTextarea = $(this).closest('.card').find('.textarea-answer').length > 0;
 
     if (!isTextarea) {
+        let labels = [];
+        let data = [];
+        let backgroundColors = [];
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        const answers = $(this).closest('.card').find('.progress-percent').map(function () {
+            return $(this).text().replace('%', '').trim(); 
+        }).get();
+
+
+        const answerLabels = $(this).closest('.card').find('.progress-bar').map(function () {
+            console.log('s',$(this).closest('label').find('.chart-label').text().trim()); 
+            
+            return $(this).closest('label').find('.chart-label').text().trim(); 
+        }).get();
+
+        for (let i = 0; i < answers.length; i++) {
+            labels.push(answerLabels[i]); 
+            data.push(parseFloat(answers[i])); // Faizlər
+            backgroundColors.push(getRandomColor()); // Random rənglər
+
+            console.log(answerLabels);
+            
+        }
+
         Swal.fire({
-            html: `
-             <div class="d-flex justify-content-center"> 
-                 <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
-             </div>`,
+            html: 
+    `<div class="d-flex justify-content-center"> 
+        <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+    </div>`,
             showCancelButton: false,
             confirmButtonText: "Ok",
             customClass: {
@@ -389,33 +422,25 @@ scale: 1.25;
             didOpen: () => {
                 // Delay chart rendering to ensure the canvas is properly loaded
                 setTimeout(() => {
-                    // Chart.js code to initialize the chart
-                    var xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
-                    var yValues = [55, 49, 44, 24, 15];
-                    var barColors = [
-                        "#b91d47",
-                        "#00aba9",
-                        "#2b5797",
-                        "#e8c3b9",
-                        "#1e7145"
-                    ];
-
+                    // Dinamik chart yaratmaq üçün Chart.js
                     new Chart("myChart", {
-                        type: "doughnut",
+                        type: "doughnut", // Ya da 'pie' chart istifadə edə bilərsiniz
                         data: {
+                            labels: labels, // Dinamik cavab adları
                             datasets: [{
-                                backgroundColor: barColors,
-                                data: yValues
+                                backgroundColor: backgroundColors, // Dinamik random rənglər
+                                data: data // Dinamik faiz dəyərləri
                             }]
                         },
                         options: {
                             title: {
                                 display: true,
-                                text: "World Wide Wine Production 2018"
-                            }
+                                text: "Sualın Nəticələri"
+                            },
+                            responsive: true,
                         }
                     });
-                }, 100); // Delay time in milliseconds
+                }, 100); // Gecikmə vaxtı
             }
         });
     }
