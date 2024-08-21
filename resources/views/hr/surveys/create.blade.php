@@ -361,7 +361,7 @@
     // ------------------------------ When chance question type -----------------------------
 
     function chanceQuestionType(cardId) {
-
+        
         const questionType = document.getElementById(`input_type-${cardId}`);
         const list = document.getElementById(`todo-list-${cardId}`);
         const todoContent = document.getElementById(`todo-content-${cardId}`);
@@ -502,36 +502,36 @@
     // --------------------------------todo Form---------------------------------
     function addTodo(cardId) {
 
-const todoContent = document.getElementById(`todo-content-${cardId}`);
-const list = document.getElementById(`todo-list-${cardId}`);
-const questionType = document.getElementById(`input_type-${cardId}`);
-const input = document.getElementById(`todo-input-${cardId}`);
+        const todoContent = document.getElementById(`todo-content-${cardId}`);
+        const list = document.getElementById(`todo-list-${cardId}`);
+        const questionType = document.getElementById(`input_type-${cardId}`);
+        const input = document.getElementById(`todo-input-${cardId}`);
 
-const text = input.value.trim();
+        const text = input.value.trim();
 
-if (text === '') return;
+        if (text === '') return;
 
-if (questionType.value === 'textarea') {
+        if (questionType.value === 'textarea') {
+        
+            todoContent.style.display = 'none';
+        
+        }
+        else {
+        
+            const li = document.createElement('li');
+            li.innerHTML = `
+                        <input type="text" name='answer_value[${cardId}][]' class="form-answer form-control" value="${text}"/>
+                        <button class="remove" onclick="removeSelf(this)" type="button">Delete</button>
+                    `;
+        
+            list.appendChild(li);
+            input.value = '';
+        
+        
+        }
 
-    todoContent.style.display = 'none';
-
-}
-else {
-
-    const li = document.createElement('li');
-    li.innerHTML = `
-                <input type="text" name='answer_value[${cardId}][]' class="form-answer form-control" value="${text}"/>
-                <button class="remove" onclick="removeSelf(this)" type="button">Delete</button>
-            `;
-
-    list.appendChild(li);
-    input.value = '';
-
-
-}
-
-list?.nextElementSibling?.remove()
-}
+        list?.nextElementSibling?.remove()
+    }
 
 function removeSelf(e) {
 e.parentElement.remove();

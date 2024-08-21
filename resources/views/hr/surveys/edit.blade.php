@@ -410,7 +410,7 @@ if (questionType.value === 'textarea') {
     input.value = '';
     
 } else {
-    list.removeChild(list.firstElementChild);
+    // list.removeChild(list.firstElementChild);
     todoContent.classList.remove('disabled-div');
 }
 
