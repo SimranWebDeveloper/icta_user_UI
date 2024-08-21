@@ -183,7 +183,7 @@ scale: 1.25;
                                     <div class="card mb-4 chart">
                                         <div class="card-header w-100 d-flex justify-content-center align-items-center">
                                             <!-- <i class="fa-thin chartIcon cursor-pointer fa-chart-pie display-5"></i> -->
-                                            <i class="fa-duotone fa-solid fa-chart-pie chartIcon cursor-pointer" style=" font-size:25px"></i>
+                                            <i class="fa-duotone fa-solid fa-chart-pie chartIcon cursor-pointer"  data-survey-id="{{ $survey->id }}"  data-question-id="{{ $question->id }}" style=" font-size:25px"></i>
                                             <!-- <i class="fa-thin chartIcon cursor-pointer fa-chart-pie" style="color: #252bd4; font-size:25px"></i> -->
                                             <h3 class="m-0">{{ $loop->iteration }}.</h3>
                                             <h3 class="m-0">{{ $question->question }}</h3>
@@ -388,65 +388,69 @@ scale: 1.25;
             return color;
         }
 
-        const answers = $(this).closest('.card').find('.progress-percent').map(function () {
-            return $(this).text().replace('%', '').trim(); 
-        }).get();
+        // Получаем ID опроса и вопроса из атрибутов или другого контекста
+        const surveyId = $(this).data('survey-id'); // Замените на ваш метод получения ID опроса
+        const questionId = $(this).data('question-id'); // Замените на ваш метод получения ID вопроса
 
+        // Выполняем AJAX-запрос для получения ответов
+        $.ajax({
+            url: `/employee/survey/answersdetails/${surveyId}/${questionId}`,
+            method: 'GET',
+            success: function(response) {
+                // Пример ответа сервера:
+                // { "Option A": { "answer": "Option A", "count": 5, "users": [1, 2, 3, 4, 5] }, "Option B": { "answer": "Option B", "count": 3, "users": [6, 7, 8] } }
 
-        const answerLabels = $(this).closest('.card').find('.progress-bar').map(function () {
-            console.log('s',$(this).closest('label').find('.chart-label').text().trim()); 
-            
-            return $(this).closest('label').find('.chart-label').text().trim(); 
-        }).get();
+                // Обработка данных ответа
+                $.each(response, function(index, answerData) {
+                    labels.push(`${answerData.answer} (${answerData.count} человек)`); // Добавляем метку с количеством людей
+                    data.push(parseFloat(answerData.count)); // Используем количество людей в качестве данных для диаграммы
+                    backgroundColors.push(getRandomColor()); // Генерируем случайный цвет для каждого ответа
+                });
 
-        for (let i = 0; i < answers.length; i++) {
-            labels.push(answerLabels[i]); 
-            data.push(parseFloat(answers[i])); // Faizlər
-            backgroundColors.push(getRandomColor()); // Random rənglər
-
-            console.log(answerLabels);
-            
-        }
-
-        Swal.fire({
-            html: 
-    `<div class="d-flex justify-content-center"> 
-        <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
-    </div>`,
-            showCancelButton: false,
-            confirmButtonText: "Ok",
-            customClass: {
-                popup: 'swal2-chart',
-                container: 'chartModal'
+                // Отображение модального окна с диаграммой
+                Swal.fire({
+                    html: 
+            `<div class="d-flex justify-content-center"> 
+                <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+            </div>`,
+                    showCancelButton: false,
+                    confirmButtonText: "Ok",
+                    customClass: {
+                        popup: 'swal2-chart',
+                        container: 'chartModal'
+                    },
+                    didOpen: () => {
+                        // Задержка для корректного рендеринга canvas
+                        setTimeout(() => {
+                            // Создание диаграммы с помощью Chart.js
+                            new Chart("myChart", {
+                                type: "doughnut", // Можно использовать также 'pie'
+                                data: {
+                                    labels: labels, // Метки ответов с количеством людей
+                                    datasets: [{
+                                        backgroundColor: backgroundColors, // Цвета сегментов
+                                        data: data // Количество людей
+                                    }]
+                                },
+                                options: {
+                                    title: {
+                                        display: true,
+                                        text: "Результаты вопроса"
+                                    },
+                                    responsive: true,
+                                }
+                            });
+                        }, 100); // Задержка
+                    }
+                });
             },
-            didOpen: () => {
-                // Delay chart rendering to ensure the canvas is properly loaded
-                setTimeout(() => {
-                    // Dinamik chart yaratmaq üçün Chart.js
-                    new Chart("myChart", {
-                        type: "doughnut", // Ya da 'pie' chart istifadə edə bilərsiniz
-                        data: {
-                            labels: labels, // Dinamik cavab adları
-                            datasets: [{
-                                backgroundColor: backgroundColors, // Dinamik random rənglər
-                                data: data // Dinamik faiz dəyərləri
-                            }]
-                        },
-                        options: {
-                            title: {
-                                display: true,
-                                text: "Sualın Nəticələri"
-                            },
-                            responsive: true,
-                        }
-                    });
-                }, 100); // Gecikmə vaxtı
+            error: function(error) {
+                console.error("Failed to fetch answer details:", error);
             }
         });
     }
 });
-
-            // Check each .chart div and add class if textarea is present
+        // Check each .chart div and add class if textarea is present
             $('.chart').each(function() {
                 if ($(this).find('textarea').length > 0) {
                     $(this).addClass('has-textarea');

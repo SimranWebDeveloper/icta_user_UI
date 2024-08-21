@@ -221,4 +221,31 @@ class EmployeeController extends Controller
 
 
 
+public function getAnswersDetailsByQuestion($surveyId, $questionId)
+{
+    // Получение всех ответов по данному опросу и вопросу
+    $allAnswers = UsersAnswers::where('surveys_id', $surveyId)
+        ->where('surveys_questions_id', $questionId)
+        ->get();
+
+    // Группируем ответы по значению ответа
+    $answerGroups = $allAnswers->groupBy('answer');
+
+    // Формируем результат
+    $result = $answerGroups->map(function ($group, $answer) {
+        return [
+            'answer' => $answer,
+            'count' => $group->count(), // Количество пользователей, выбравших данный ответ
+            'users' => $group->pluck('users_id')->unique()->values() // Список уникальных пользователей, выбравших данный ответ
+        ];
+    });
+
+    return response()->json($result);
+}
+
+    
+
+
+
+
 }
