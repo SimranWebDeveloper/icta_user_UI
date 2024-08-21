@@ -254,11 +254,13 @@ Route::middleware(['logLastUserActivity'])->group(function () {
         Route::get('employee/brons/{bron}/edit', [EmployeeBronsController::class, 'edit'])->name('employee.brons.edit'); //bronun pop up üçün yazdim
         Route::post('/update-participation-status', [EmployeeController::class, 'updateParticipationStatus'])->name('employee-updateParticipationStatus');
         Route::get('/survey/answers/{surveyId}', [EmployeeController::class, 'getUserAnswers'])
-    ->name('survey.answers');
-    Route::get('/survey/answershr/{surveyId}/{userId}', [EmployeeController::class, 'getUserAnswersByHR'])
-    ->name('survey.answershr');
-    Route::get('/survey/answersdetails/{surveyId}/{questionId}', [EmployeeController::class, 'getAnswersDetailsByQuestion'])
-    ->name('survey.answersdetails');
+        ->name('survey.answers');
+        Route::get('/survey/answershr/{surveyId}/{userId}', [EmployeeController::class, 'getUserAnswersByHR'])
+        ->name('survey.answershr');
+        Route::get('/survey/answersdetails/{surveyId}/{questionId}', [EmployeeController::class, 'getAnswersDetailsByQuestion'])
+        ->name('survey.answersdetails');
+        Route::get('/meeting/{id}/participation-status', [EmployeeController::class, 'getMeetingParticipationStatus'])->name('employee-getParticipationStatus');
+
 
 
 
@@ -329,6 +331,3 @@ Route::prefix('hr')->name('hr.')->middleware(['auth', 'check_role:hr'])->group(f
 Route::post('/check-user-status', [LoginController::class, 'checkUserStatus'])->name('check.user.status');
 Route::post('/search-user', [\App\Http\Controllers\SearchController::class, 'search_user'])->name('search-user');
 Route::post('/update-user-notf-status', [\App\Http\Controllers\GeneralController::class, 'update_user_notf_status'])->name('update-user-notf-status');
-
-
-

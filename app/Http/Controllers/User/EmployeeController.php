@@ -223,40 +223,62 @@ class EmployeeController extends Controller
 
     public function getAnswersDetailsByQuestion($surveyId, $questionId)
     {
-        // Получение всех ответов по данному опросу и вопросу
         $allAnswers = UsersAnswers::where('surveys_id', $surveyId)
             ->where('surveys_questions_id', $questionId)
             ->get();
     
-        // Группируем ответы по значению ответа
         $answerGroups = $allAnswers->groupBy('answer');
     
-        // Получаем уникальные user_ids из всех ответов
         $userIds = $allAnswers->pluck('users_id')->unique();
     
-        // Получаем данные о пользователях
         $users = User::whereIn('id', $userIds)->pluck('name', 'id')->toArray();
     
-        // Общее количество ответов
         $totalAnswers = $allAnswers->count();
     
-        // Формируем результат
         $result = $answerGroups->map(function ($group, $answer) use ($users, $totalAnswers) {
             $count = $group->count();
             $percentage = $totalAnswers > 0 ? ($count / $totalAnswers) * 100 : 0;
             
             return [
                 'answer' => $answer,
-                'count' => $count, // Количество пользователей, выбравших данный ответ
-                'percentage' => number_format($percentage, 2), // Процент
+                'count' => $count, 
+                'percentage' => number_format($percentage, 2), 
                 'users' => $group->pluck('users_id')->unique()->map(function ($userId) use ($users) {
-                    return $users[$userId] ?? 'Unknown'; // Имя пользователя или 'Unknown', если имя не найдено
-                })->values() // Список уникальных имен пользователей, выбравших данный ответ
+                    return $users[$userId] ?? 'Unknown'; 
+                })->values() 
             ];
         });
     
         return response()->json($result);
     }
+
+    public function getMeetingParticipationStatus($meetingId)
+{
+    $statusZero = MeetingsUsers::where('meetings_id', $meetingId)
+        ->where('participation_status', 0)
+        ->with('users') 
+        ->get();
+
+    $statusOne = MeetingsUsers::where('meetings_id', $meetingId)
+        ->where('participation_status', 1)
+        ->with('users')
+        ->get();
+
+    $statusNull = MeetingsUsers::where('meetings_id', $meetingId)
+        ->whereNull('participation_status')
+        ->with('users')
+        ->get();
+
+    return response()->json([
+        'status_zero_count' => $statusZero->count(),
+        'status_zero_users' => $statusZero->pluck('users.name'),
+        'status_one_count' => $statusOne->count(),
+        'status_one_users' => $statusOne->pluck('users.name'),
+        'status_null_count' => $statusNull->count(),
+        'status_null_users' => $statusNull->pluck('users.name'),
+    ]);
+}
+
     
     
 
