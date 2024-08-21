@@ -183,7 +183,7 @@ scale: 1.25;
                                     <div class="card mb-4 chart">
                                         <div class="card-header w-100 d-flex justify-content-center align-items-center">
                                             <!-- <i class="fa-thin chartIcon cursor-pointer fa-chart-pie display-5"></i> -->
-                                            <i class="fa-duotone fa-solid fa-chart-pie chartIcon cursor-pointer" style=" font-size:25px"></i>
+                                            <i class="fa-duotone fa-solid fa-chart-pie chartIcon cursor-pointer"  data-survey-id="{{ $survey->id }}"  data-question-id="{{ $question->id }}" style=" font-size:25px"></i>
                                             <!-- <i class="fa-thin chartIcon cursor-pointer fa-chart-pie" style="color: #252bd4; font-size:25px"></i> -->
                                             <h3 class="m-0">{{ $loop->iteration }}.</h3>
                                             <h3 class="m-0">{{ $question->question }}</h3>
@@ -372,81 +372,97 @@ scale: 1.25;
         $(document).ready(function() {
 
             $(document).on("click", ".chartIcon", function() {
-    const isTextarea = $(this).closest('.card').find('.textarea-answer').length > 0;
+    const surveyId = $(this).data('survey-id');
+    const questionId = $(this).data('question-id');
 
-    if (!isTextarea) {
-        let labels = [];
-        let data = [];
-        let backgroundColors = [];
+    $.ajax({
+        url: `/employee/survey/answersdetails/${surveyId}/${questionId}`,
+        method: 'GET',
+        success: function(response) {
+            let labels = [];
+            let data = [];
+            let backgroundColors = [];
+            let userListsHtml = '';
 
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
+            function getRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
             }
-            return color;
-        }
 
-        const answers = $(this).closest('.card').find('.progress-percent').map(function () {
-            return $(this).text().replace('%', '').trim(); 
-        }).get();
+            $.each(response, function(answer, details) {
+                // Добавление процентного значения в метки диаграммы
+                labels.push(`${details.answer} (${details.count} nəfər, ${details.percentage}%)`); 
+                data.push(details.count);
+                backgroundColors.push(getRandomColor());
+              
+                const surveyIsAnonym = {{ $survey->is_anonym }};
 
+                userListsHtml += `
+                    <div>
+                        ${surveyIsAnonym === 0 ? `<h5>${details.answer} (${details.count} nəfər, ${details.percentage}%)</h5>` : ''}
+                        <ul>
+                            ${details.users.map(user => {
+                                if (surveyIsAnonym === 0) {
+                                    return `<li>${user}</li>`;
+                                } else {
+                                    return ''; // Не добавляем пользователей, если статус анонимности 1
+                                }
+                            }).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
 
-        const answerLabels = $(this).closest('.card').find('.progress-bar').map(function () {
-            console.log('s',$(this).closest('label').find('.chart-label').text().trim()); 
-            
-            return $(this).closest('label').find('.chart-label').text().trim(); 
-        }).get();
-
-        for (let i = 0; i < answers.length; i++) {
-            labels.push(answerLabels[i]); 
-            data.push(parseFloat(answers[i])); // Faizlər
-            backgroundColors.push(getRandomColor()); // Random rənglər
-
-            console.log(answerLabels);
-            
-        }
-
-        Swal.fire({
-            html: 
-    `<div class="d-flex justify-content-center"> 
-        <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
-    </div>`,
-            showCancelButton: false,
-            confirmButtonText: "Ok",
-            customClass: {
-                popup: 'swal2-chart',
-                container: 'chartModal'
-            },
-            didOpen: () => {
-                // Delay chart rendering to ensure the canvas is properly loaded
-                setTimeout(() => {
-                    // Dinamik chart yaratmaq üçün Chart.js
-                    new Chart("myChart", {
-                        type: "doughnut", // Ya da 'pie' chart istifadə edə bilərsiniz
-                        data: {
-                            labels: labels, // Dinamik cavab adları
-                            datasets: [{
-                                backgroundColor: backgroundColors, // Dinamik random rənglər
-                                data: data // Dinamik faiz dəyərləri
-                            }]
-                        },
-                        options: {
-                            title: {
-                                display: true,
-                                text: "Sualın Nəticələri"
+            Swal.fire({
+                html: `
+                    <div class="d-flex justify-content-center"> 
+                        <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        ${userListsHtml}
+                    </div>
+                `,
+                showCancelButton: false,
+                confirmButtonText: "Ok",
+                customClass: {
+                    popup: 'swal2-chart',
+                    container: 'chartModal'
+                },
+                didOpen: () => {
+                    setTimeout(() => {
+                        new Chart("myChart", {
+                            type: "doughnut", 
+                            data: {
+                                labels: labels, 
+                                datasets: [{
+                                    backgroundColor: backgroundColors, 
+                                    data: data 
+                                }]
                             },
-                            responsive: true,
-                        }
-                    });
-                }, 100); // Gecikmə vaxtı
-            }
-        });
-    }
+                            options: {
+                                title: {
+                                    display: true,
+                                    text: "Sualın nəticələri"
+                                },
+                                responsive: true,
+                            }
+                        });
+                    }, 100); 
+                }
+            });
+        },
+        error: function(error) {
+            console.error("Cavab detallarını əldə etməkdə səhv baş verdi:", error);
+        }
+    });
 });
 
-            // Check each .chart div and add class if textarea is present
+
+        // Check each .chart div and add class if textarea is present
             $('.chart').each(function() {
                 if ($(this).find('textarea').length > 0) {
                     $(this).addClass('has-textarea');
