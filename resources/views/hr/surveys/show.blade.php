@@ -399,14 +399,24 @@ scale: 1.25;
                 data.push(details.count);
                 backgroundColors.push(getRandomColor());
               
-                userListsHtml += `
-                    <div>
-                        <h5>${details.answer} (${details.count} nəfər)</h5>
-                        <ul>
-                            ${details.users.map(user => `<li>${user}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
+                const surveyIsAnonym = {{ $survey->is_anonym }};
+
+userListsHtml += `
+    <div>
+        ${surveyIsAnonym === 0 ? `<h5>${details.answer} (${details.count} nəfər)</h5>` : ''}
+        <ul>
+            ${details.users.map(user => {
+                if (surveyIsAnonym === 0) {
+                    return `<li>${user}</li>`;
+                } else {
+                    return ''; // Не добавляем пользователей, если статус анонимности 1
+                }
+            }).join('')}
+        </ul>
+    </div>
+`;
+
+
             });
 
        
