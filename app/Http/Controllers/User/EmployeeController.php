@@ -237,11 +237,18 @@ class EmployeeController extends Controller
         // Получаем данные о пользователях
         $users = User::whereIn('id', $userIds)->pluck('name', 'id')->toArray();
     
+        // Общее количество ответов
+        $totalAnswers = $allAnswers->count();
+    
         // Формируем результат
-        $result = $answerGroups->map(function ($group, $answer) use ($users) {
+        $result = $answerGroups->map(function ($group, $answer) use ($users, $totalAnswers) {
+            $count = $group->count();
+            $percentage = $totalAnswers > 0 ? ($count / $totalAnswers) * 100 : 0;
+            
             return [
                 'answer' => $answer,
-                'count' => $group->count(), // Количество пользователей, выбравших данный ответ
+                'count' => $count, // Количество пользователей, выбравших данный ответ
+                'percentage' => number_format($percentage, 2), // Процент
                 'users' => $group->pluck('users_id')->unique()->map(function ($userId) use ($users) {
                     return $users[$userId] ?? 'Unknown'; // Имя пользователя или 'Unknown', если имя не найдено
                 })->values() // Список уникальных имен пользователей, выбравших данный ответ
@@ -250,6 +257,7 @@ class EmployeeController extends Controller
     
         return response()->json($result);
     }
+    
     
 
     

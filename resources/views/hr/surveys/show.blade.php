@@ -393,33 +393,30 @@ scale: 1.25;
                 return color;
             }
 
-            
             $.each(response, function(answer, details) {
-                labels.push(`${details.answer} (${details.count} nəfər)`); 
+                // Добавление процентного значения в метки диаграммы
+                labels.push(`${details.answer} (${details.count} nəfər, ${details.percentage}%)`); 
                 data.push(details.count);
                 backgroundColors.push(getRandomColor());
               
                 const surveyIsAnonym = {{ $survey->is_anonym }};
 
-userListsHtml += `
-    <div>
-        ${surveyIsAnonym === 0 ? `<h5>${details.answer} (${details.count} nəfər)</h5>` : ''}
-        <ul>
-            ${details.users.map(user => {
-                if (surveyIsAnonym === 0) {
-                    return `<li>${user}</li>`;
-                } else {
-                    return ''; // Не добавляем пользователей, если статус анонимности 1
-                }
-            }).join('')}
-        </ul>
-    </div>
-`;
-
-
+                userListsHtml += `
+                    <div>
+                        ${surveyIsAnonym === 0 ? `<h5>${details.answer} (${details.count} nəfər, ${details.percentage}%)</h5>` : ''}
+                        <ul>
+                            ${details.users.map(user => {
+                                if (surveyIsAnonym === 0) {
+                                    return `<li>${user}</li>`;
+                                } else {
+                                    return ''; // Не добавляем пользователей, если статус анонимности 1
+                                }
+                            }).join('')}
+                        </ul>
+                    </div>
+                `;
             });
 
-       
             Swal.fire({
                 html: `
                     <div class="d-flex justify-content-center"> 
@@ -436,9 +433,7 @@ userListsHtml += `
                     container: 'chartModal'
                 },
                 didOpen: () => {
-                  
                     setTimeout(() => {
-                        
                         new Chart("myChart", {
                             type: "doughnut", 
                             data: {
