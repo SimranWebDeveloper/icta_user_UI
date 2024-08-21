@@ -257,6 +257,8 @@ Route::middleware(['logLastUserActivity'])->group(function () {
     ->name('survey.answers');
     Route::get('/survey/answershr/{surveyId}/{userId}', [EmployeeController::class, 'getUserAnswersByHR'])
     ->name('survey.answershr');
+    Route::get('/survey/answersdetails/{surveyId}/{questionId}', [EmployeeController::class, 'getAnswersDetailsByQuestion'])
+    ->name('survey.answersdetails');
 
 
 
