@@ -393,16 +393,15 @@ scale: 1.25;
                 return color;
             }
 
-            // Обработка полученных данных
+            
             $.each(response, function(answer, details) {
-                labels.push(`${details.answer} (${details.count} человек)`); // Используем имя ответа и количество пользователей
-                data.push(details.count); // Количество пользователей, выбравших данный ответ
-                backgroundColors.push(getRandomColor()); // Генерируем случайный цвет для каждого ответа
-
-                // Формируем список пользователей для каждого ответа
+                labels.push(`${details.answer} (${details.count} nəfər)`); 
+                data.push(details.count);
+                backgroundColors.push(getRandomColor());
+              
                 userListsHtml += `
                     <div>
-                        <h5>${details.answer} (${details.count} человек)</h5>
+                        <h5>${details.answer} (${details.count} nəfər)</h5>
                         <ul>
                             ${details.users.map(user => `<li>${user}</li>`).join('')}
                         </ul>
@@ -410,7 +409,7 @@ scale: 1.25;
                 `;
             });
 
-            // Отображение модального окна с диаграммой и списком пользователей
+       
             Swal.fire({
                 html: `
                     <div class="d-flex justify-content-center"> 
@@ -427,32 +426,32 @@ scale: 1.25;
                     container: 'chartModal'
                 },
                 didOpen: () => {
-                    // Задержка для корректного рендеринга canvas
+                  
                     setTimeout(() => {
-                        // Создание диаграммы с помощью Chart.js
+                        
                         new Chart("myChart", {
-                            type: "doughnut", // Можно использовать также 'pie'
+                            type: "doughnut", 
                             data: {
-                                labels: labels, // Метки ответов с количеством людей
+                                labels: labels, 
                                 datasets: [{
-                                    backgroundColor: backgroundColors, // Цвета сегментов
-                                    data: data // Количество людей
+                                    backgroundColor: backgroundColors, 
+                                    data: data 
                                 }]
                             },
                             options: {
                                 title: {
                                     display: true,
-                                    text: "Результаты вопроса"
+                                    text: "Sualın nəticələri"
                                 },
                                 responsive: true,
                             }
                         });
-                    }, 100); // Задержка
+                    }, 100); 
                 }
             });
         },
         error: function(error) {
-            console.error("Failed to fetch answer details:", error);
+            console.error("Cavab detallarını əldə etməkdə səhv baş verdi:", error);
         }
     });
 });
