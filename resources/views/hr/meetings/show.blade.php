@@ -28,6 +28,9 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
+                        <i class="fa-duotone fa-solid fa-chart-pie chartIcon cursor-pointer"
+                            style=" font-size:25px"></i>
+
                         <ul class="m-0 p-0">
                             <li id="list-item">
                                 @if ($meeting->status == 0)
@@ -162,7 +165,7 @@
                                                             <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
                                                                 @foreach($users as $index => $user)
                                                                                                 @php 
-                                                                                                                                                                                                                                                                                                                            $participant_status =
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $participant_status =
                                                                                                     $user->participation_status === 1 ? 'text-success' :
                                                                                                     ($user->participation_status === 0 ? 'text-danger' : null);
                                                                                                 @endphp
@@ -213,6 +216,49 @@
 @section('js')
 <script>
     $(document).ready(function () {
+        $(document).on("click", ".chartIcon", function () {
+
+            Swal.fire({
+                html: `
+             <div class="d-flex justify-content-center"> 
+                 <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+             </div>`,
+                showCancelButton: false,
+                confirmButtonText: "Ok",
+                customClass: {
+                    popup: 'swal2-chart',
+                    container: 'chartModal'
+                },
+                didOpen: () => {
+                    setTimeout(() => {
+                        var xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
+                        var yValues = [55, 49, 44, 24, 15];
+                        var barColors = [
+                            "#b91d47",
+                            "#00aba9",
+                            "#2b5797",
+                            "#e8c3b9",
+                            "#1e7145"
+                        ];
+                        new Chart("myChart", {
+                            type: "doughnut",
+                            data: {
+                                datasets: [{
+                                    backgroundColor: barColors,
+                                    data: yValues
+                                }]
+                            },
+                            options: {
+                                title: {
+                                    display: true,
+                                    text: "World Wide Wine Production 2018"
+                                }
+                            }
+                        });
+                    }, 100);
+                }
+            });
+        })
         $('.delete-item').on("click", function () {
             const item_id = $(this).data('id');
             Swal.fire({
