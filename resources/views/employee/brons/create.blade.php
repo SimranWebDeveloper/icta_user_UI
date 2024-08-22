@@ -180,7 +180,17 @@
     const contentTextarea = document.getElementById('content');
 
     submitBtn.addEventListener('click', function (event) {
-        
+        if (subjectInput.value.length > 125) {
+            event.preventDefault();
+            Swal.fire({
+                title: "Xəta!",
+                text: "Mövzu 125 simvoldan uzun ola bilməz",
+                icon: "warning",
+                confirmButtonText: "Tamam"
+            });
+            return;
+        }
+
         if (!contentTextarea.value) {
             contentTextarea.value = subjectInput.value;
         }
