@@ -426,12 +426,14 @@ scale: 1.25;
                 userListsHtml += `
                     <div>
                         ${surveyIsAnonym === 0 ? `<h5>${details.answer} (${details.count} nəfər, ${details.percentage}%)</h5>` : ''}
-                        <ul>
+                        <ul 
+                        style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:100px"
+                        >
                             ${details.users.map(user => {
                                 if (surveyIsAnonym === 0) {
                                     return `<li>${user}</li>`;
                                 } else {
-                                    return ''; // Не добавляем пользователей, если статус анонимности 1
+                                    return '';
                                 }
                             }).join('')}
                         </ul>

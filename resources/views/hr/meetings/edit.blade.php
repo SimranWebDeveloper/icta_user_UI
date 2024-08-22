@@ -190,12 +190,9 @@
     document.getElementById('submitBtn').addEventListener('click', function(event) {
         const subjectInput = document.getElementById('subject');
 
-        // Check if the subject exceeds 255 characters
         if (subjectInput.value.length > 125) {
-            // Prevent the form from being submitted
             event.preventDefault();
 
-            // Display the SweetAlert with an error message
             Swal.fire({
                 title: "Xəta!",
                 text: "Mövzu 125 simvoldan uzun ola bilməz",

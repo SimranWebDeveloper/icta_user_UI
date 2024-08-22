@@ -179,7 +179,8 @@
                                     <div class="separator mb-2">
                                         <i id="upload-icon"
                                             class="fa-solid fa-upload text-primary {{ $announcement->image ? 'd-none' : '' }}"></i>
-                                        <input id="files" name="image" type="file" class="file-input d-none" />
+                                        <input id="files" name="image" type="file" class="file-input d-none"
+                                            accept="image/*" />
                                     </div>
                                     <div id="actions" class="{{ $announcement->image ? '' : 'd-none' }}">
                                         <i id="trash-icon" class="fa-solid fa-trash text-danger"></i>
@@ -219,7 +220,7 @@
                 icon: "warning",
                 confirmButtonText: "Tamam"
             });
-        } 
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function () {
