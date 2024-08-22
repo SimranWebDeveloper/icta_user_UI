@@ -147,8 +147,8 @@
                                                     <div id="todo-header">
                                                     </div>
                                                         <ul id="todo-list-0" class="todo-list disabled-div">
-                                                            @foreach ($question->answers as $answer)
                                                             
+                                                            @foreach ($question->answers as $answer)
                                                             <li>                                          
 
                                                                 <p class="line-break-input disabled-div p-3 rounded border bg-gray-100"  style="width: 100%">{{ $answer->name == 'boş' ? 'Mətn daxil ediləcək' : $answer->name }} </p>
@@ -409,8 +409,13 @@ if (questionType.value === 'textarea') {
     input.removeAttribute('required');
     input.value = '';
     
-} else {
-    // list.removeChild(list.firstElementChild);
+} 
+//  eger sualin novu cox  ve ya tek  variantlidirsa  
+
+else 
+ {
+    list.innerHTML = '';    
+    // list.removeChild(list.firstElementChild);      
     todoContent.classList.remove('disabled-div');
 }
 
@@ -454,6 +459,48 @@ if (questionType.value === 'textarea') {
         }
 
     }
+
+        // --------------------------------check Answers---------------------------------
+        function answerCheck(id, newIptValue) {
+        
+        const todoList = $(`#todo-list-${id}`);
+        const answers = [];
+        const newCreateQuestionIpt= $(`#todo-input-${id}`);
+    
+        todoList.find('input').each(function() {
+            answers.push($(this).val().toLowerCase());
+        });
+    
+        if (answers.includes(newIptValue.toLowerCase())) {
+            Swal.fire({
+                        title: "Elan Detalları",
+                        html: `<div class="card-body">
+                                <div class="row announcement">
+                                    <div class="col-12">
+                                        <p>Bu cavab bu sual üçün artiq qeyd edilib</p>
+                                    </div>
+                                </div>
+                            </div>`,
+                        showConfirmButton: true,
+                        customClass: {
+                            popup: "announcement-popup",
+                            container: "announcementModal",
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // The OK button was clicked
+                            newCreateQuestionIpt.val('');
+                            // You can perform further actions here
+                        }
+                    });
+    
+            return true;
+        }
+    
+        return false;
+    }
+    
+    
 
  
 
@@ -561,6 +608,8 @@ if (questionType.value === 'textarea') {
 
         }
         else {
+            if (answerCheck(cardId,text)) { return;}
+            
             const li = document.createElement('li');
             li.innerHTML = `
                 <input type="text" name='answer_value[${cardId}][]' class="form-answer form-control" value="${text}"/>
