@@ -159,7 +159,8 @@
                                     <i id="change-icon" class="fa-solid fa-pen text-primary"></i>
                                 </div>
                             </label>
-                            <input id="files" name="image" type="file" class="file-input d-none" />
+                            <input id="files" name="image" type="file" class="file-input d-none" accept="image/*" />
+
                         </div>
                     </div>
                 </div>
@@ -177,19 +178,48 @@
 @section('js')
 <script>
 
-    function validateForm(event) {
-        const titleInput = document.getElementById('title');
+function validateForm(event) {
+    const titleInput = document.getElementById('title');
 
-        if (titleInput.value.length > 125) {
-            event.preventDefault();
-            Swal.fire({
-                title: "Xəta!",
-                 text: "Başlıq 125 simvoldan uzun ola bilməz",
-                icon: "warning",
-                confirmButtonText: "Tamam"
-            });
-        } 
+    if (titleInput.value.length > 125) {
+        event.preventDefault();
+        Swal.fire({
+            title: "Xəta!",
+            text: "Başlıq 125 simvoldan uzun ola bilməz",
+            icon: "warning",
+            confirmButtonText: "Tamam"
+        });
+    } else {
+        const inputs = document.querySelectorAll('input[required]');
+        inputs.forEach(input => {
+            if (input.value) {
+                input.setCustomValidity("");
+            } else {
+                input.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+            }
+        });
+
+        const selects = document.querySelectorAll('select[required]');
+        selects.forEach(select => {
+            if (select.value) {
+                select.setCustomValidity("");
+            } else {
+                select.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+            }
+        });
+
+        const texts = document.querySelectorAll('textarea[required]');
+        texts.forEach(text => {
+            if (text.value) {
+                text.setCustomValidity("");
+            } else {
+                text.setCustomValidity("Zəhmət olmazsa xananı doldurun");
+            }
+        });
     }
+}
+
+
     document.getElementById('files').addEventListener('change', function (event) {
         const file = event.target.files[0];
         const imagePreview = document.getElementById('image-preview');
