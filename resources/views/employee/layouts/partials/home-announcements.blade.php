@@ -27,6 +27,13 @@
         object-fit: cover;
     }
 
+    @media screen and (max-width:990px) {
+        .announcementModal .announcement-popup {
+            width: 99%;
+        }
+
+    }
+
     .announcementContent {
         white-space: nowrap;
         overflow: hidden;

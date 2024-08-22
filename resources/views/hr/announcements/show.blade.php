@@ -5,7 +5,7 @@
     }
 .textarea-show{
     overflow-y: auto;
-    height: 230px;
+    max-height: 230px;
 }
     .sticky-col {
         position: -webkit-sticky;
