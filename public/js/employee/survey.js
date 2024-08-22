@@ -12,6 +12,8 @@ $(document).ready(function () {
         const surveyId = $(button).data("survey-id");
         const surveyObj = $(button).data("survey");
         const isAnswered = $(button).data("is-answered");
+        console.log('isAnswered',isAnswered);
+        
     
         $.ajax({
             url: `/employee/survey/answers/${surveyId}`,
@@ -26,7 +28,7 @@ $(document).ready(function () {
                 console.log('showOldQuestion: ', showOldQuestion);
                 
                 
-                if (isAnswered == 2 && showOldQuestion.length) {
+                if (isAnswered == 2 && showOldQuestion.length && surveyObj.priority) {
                     showAllSurveys(response, survey.surveys_questions, surveyObj, isAnswered);
                 }
             },
