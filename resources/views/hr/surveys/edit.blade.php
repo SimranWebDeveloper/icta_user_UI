@@ -460,6 +460,48 @@ else
 
     }
 
+        // --------------------------------check Answers---------------------------------
+        function answerCheck(id, newIptValue) {
+        
+        const todoList = $(`#todo-list-${id}`);
+        const answers = [];
+        const newCreateQuestionIpt= $(`#todo-input-${id}`);
+    
+        todoList.find('input').each(function() {
+            answers.push($(this).val().toLowerCase());
+        });
+    
+        if (answers.includes(newIptValue.toLowerCase())) {
+            Swal.fire({
+                        title: "Elan Detalları",
+                        html: `<div class="card-body">
+                                <div class="row announcement">
+                                    <div class="col-12">
+                                        <p>Bu cavab bu sual üçün artiq qeyd edilib</p>
+                                    </div>
+                                </div>
+                            </div>`,
+                        showConfirmButton: true,
+                        customClass: {
+                            popup: "announcement-popup",
+                            container: "announcementModal",
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // The OK button was clicked
+                            newCreateQuestionIpt.val('');
+                            // You can perform further actions here
+                        }
+                    });
+    
+            return true;
+        }
+    
+        return false;
+    }
+    
+    
+
  
 
 
@@ -566,6 +608,8 @@ else
 
         }
         else {
+            if (answerCheck(cardId,text)) { return;}
+            
             const li = document.createElement('li');
             li.innerHTML = `
                 <input type="text" name='answer_value[${cardId}][]' class="form-answer form-control" value="${text}"/>
