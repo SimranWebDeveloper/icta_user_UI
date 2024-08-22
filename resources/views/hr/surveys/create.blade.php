@@ -31,8 +31,7 @@
                             <div class="select_label ui sub header">Anket adı <span class="text-danger">*</span></div>
                             <input title="" type="survey-name" name="name" id="name"  class="form-control" required
                                 placeholder="Anket adını daxil edin">
-                                <span id="title-error" class="text-danger d-none">Anket adı 125 simvoldan uzun ola
-                                bilməz.</span>
+                              
                             @if($errors->has('name'))
                                 <span class="text-danger">{{ $errors->first('name') }}</span>
                             @endif
@@ -101,10 +100,9 @@
                                 <div class="col-md-8 form-group mb-3">
                                     <div class="select_label ui sub header"><span></span> Sual <span
                                             class="text-danger">*</span></div>
-                                    <input type="text" name="question[0][]" required id="" class="form-control"
+                                    <input type="text" name="question[0][]" required  class="form-control"
                                         placeholder="Sual daxil edin">
-                                        <span id="title-error" class="text-danger d-none">Sual  125 simvoldan uzun ola
-                                        bilməz.</span>
+                                        
                                     @if($errors->has('question'))
                                         <span class="text-danger">{{ $errors->first('question') }}</span>
                                     @endif
@@ -258,7 +256,10 @@
     const submitBtn = document.getElementById('submitBtn');
 
     submitBtn.addEventListener('click', function (e) {
-        validateForm(e)
+
+            
+        
+
         const inputs = document.querySelectorAll('input[required]');
         const selects = document.querySelectorAll('select[required]');
 
@@ -266,13 +267,19 @@
     
         
         inputs.forEach(input => {
-            if (input.value) {                
-                input.setCustomValidity("");
-            } else {
-                input.setCustomValidity("Zəhmət olmasa xananı daxil edin");
-                requiredCondition=false
-            }
-        });
+    if (input.value) {
+        if (input.value.length > 125) {
+            input.setCustomValidity("125 simvoldan çox ola bilməz");
+            requiredCondition = false;
+        } else {
+            input.setCustomValidity("");
+        }
+    } else {
+        input.setCustomValidity("Zəhmət olmasa xananı daxil edin");
+        requiredCondition = false;
+    }
+});
+
         selects.forEach(input => {
             if (input.value) {                
                 input.setCustomValidity("");
@@ -325,19 +332,7 @@
 
     });
 
-    // -----------------------------validation--------------------------------
-    function validateForm(event) {
-        
-        const titleInput = document.getElementById('name');
-        const titleError = document.getElementById('title-error');
-        if (titleInput.value.length > 125) {
-            event.preventDefault();
-            titleError.classList.remove('d-none');
-        } else {
-            titleError.classList.add('d-none');
-        }
-    }
-    // -------------------------------date time picker--------------------------------
+// -------------------------------date time picker--------------------------------
     document.addEventListener('DOMContentLoaded', function () {
 
         flatpickr("#date-time-picker", {
@@ -366,7 +361,7 @@
     // ------------------------------ When chance question type -----------------------------
 
     function chanceQuestionType(cardId) {
-
+        
         const questionType = document.getElementById(`input_type-${cardId}`);
         const list = document.getElementById(`todo-list-${cardId}`);
         const todoContent = document.getElementById(`todo-content-${cardId}`);
@@ -507,36 +502,36 @@
     // --------------------------------todo Form---------------------------------
     function addTodo(cardId) {
 
-const todoContent = document.getElementById(`todo-content-${cardId}`);
-const list = document.getElementById(`todo-list-${cardId}`);
-const questionType = document.getElementById(`input_type-${cardId}`);
-const input = document.getElementById(`todo-input-${cardId}`);
+        const todoContent = document.getElementById(`todo-content-${cardId}`);
+        const list = document.getElementById(`todo-list-${cardId}`);
+        const questionType = document.getElementById(`input_type-${cardId}`);
+        const input = document.getElementById(`todo-input-${cardId}`);
 
-const text = input.value.trim();
+        const text = input.value.trim();
 
-if (text === '') return;
+        if (text === '') return;
 
-if (questionType.value === 'textarea') {
+        if (questionType.value === 'textarea') {
+        
+            todoContent.style.display = 'none';
+        
+        }
+        else {
+        
+            const li = document.createElement('li');
+            li.innerHTML = `
+                        <input type="text" name='answer_value[${cardId}][]' class="form-answer form-control" value="${text}"/>
+                        <button class="remove" onclick="removeSelf(this)" type="button">Delete</button>
+                    `;
+        
+            list.appendChild(li);
+            input.value = '';
+        
+        
+        }
 
-    todoContent.style.display = 'none';
-
-}
-else {
-
-    const li = document.createElement('li');
-    li.innerHTML = `
-                <input type="text" name='answer_value[${cardId}][]' class="form-answer form-control" value="${text}"/>
-                <button class="remove" onclick="removeSelf(this)" type="button">Delete</button>
-            `;
-
-    list.appendChild(li);
-    input.value = '';
-
-
-}
-
-list?.nextElementSibling?.remove()
-}
+        list?.nextElementSibling?.remove()
+    }
 
 function removeSelf(e) {
 e.parentElement.remove();

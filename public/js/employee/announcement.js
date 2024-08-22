@@ -64,7 +64,7 @@ $(document).ready(function () {
                                         <h3>Məzmun</h3>
                                     </div>
                                     <div class="card-body">
-                                        <div class="textarea" style="height:250px; overflow-y:auto;text-align:start">
+                                        <div class="textarea" style="max-height:250px; overflow-y:auto;text-align:start">
                                             ${announcement.content}
                                         </div>
                                     </div>
@@ -74,6 +74,10 @@ $(document).ready(function () {
                     </div>
                 </div>`,
             showConfirmButton: true,
+            customClass: {
+                popup: "announcement-popup",
+                container: "announcementModal",
+            },
         });
     });
 });

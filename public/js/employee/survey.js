@@ -156,14 +156,10 @@ $(document).ready(function () {
 
         // Cavabla ve Anket yenilendi olan hisse--------------------------------------------------------------------------------------------------------  
         let checkSubmit = 'Ok';
-        let questionsHtml = "";  
-            // Butun data filterlenir ve  gelen cavab arrayinin icersinide o id yoxdursa demeli bu yeni sualdi
-            console.log('allData',allData);
-            console.log('checkedAnswers',checkedAnswers);
-            console.log('keysArray',keysArray);
-            
-            
-            
+        let mandatoryScreen=true;
+        let questionsHtml = ""; 
+
+        // Butun data filterlenir ve  gelen cavab arrayinin icersinide o id yoxdursa demeli bu yeni sualdi       
         const showNewQuestion = allData.filter(question => !keysArray.includes(question.id.toString()));
 
         // cavabi gor 
@@ -208,6 +204,7 @@ $(document).ready(function () {
         //Cavabla - anket yenilendi ve yeni sual elave edildi 
         else{
             checkSubmit = 'Göndər';
+            mandatoryScreen=false;
             console.log('anket yeniləndi showNewQuestion:', showNewQuestion);
             
             let newQuestionHtml='';
@@ -286,7 +283,7 @@ $(document).ready(function () {
             
         }
         Swal.fire({
-            title: "İstifadəçi Anketi",
+            title: surveyObj.name,
             html: `
                     <div class="row">
                         ${answersHtml}                        
@@ -298,9 +295,9 @@ $(document).ready(function () {
             confirmButtonText: checkSubmit,
 
             cancelButtonText: "Cancel",
-            allowOutsideClick: true,
-            allowEscapeKey: true,
-            allowEnterKey: true,
+            allowOutsideClick: mandatoryScreen,
+            allowEscapeKey: mandatoryScreen,
+            allowEnterKey: mandatoryScreen,
             preConfirm: () => {
                 let allAnswered = true;
                 const form = document.getElementById("newSurveyForm");
