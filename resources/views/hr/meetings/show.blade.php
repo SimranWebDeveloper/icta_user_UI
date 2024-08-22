@@ -1,5 +1,26 @@
 @extends('hr.layouts.app')
 <style>
+    .chartIcon {
+        transition: .5s;
+    }
+
+    .chartIcon:hover {
+        scale: 1.25;
+    }
+
+    .chartModal .swal2-chart {
+        width: 40%;
+    }
+
+    @media screen and (max-width:900px) {
+        .chartModal .swal2-chart {
+            width: 99%;
+        }
+    }
+
+    /* popup: 'swal2-chart', */
+    /* container: 'chartModal' */
+
     #list-item {
         list-style: none;
     }
@@ -17,7 +38,7 @@
     }
 
     .meeting-content {
-        height: 200px;
+        max-height: 200px;
         overflow-y: auto;
     }
 </style>
@@ -28,9 +49,6 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
-                        <i class="fa-duotone fa-solid fa-chart-pie chartIcon cursor-pointer"
-                            style=" font-size:25px" data-meeting-id="{{ $meeting->id }}"></i>
-
                         <ul class="m-0 p-0">
                             <li id="list-item">
                                 @if ($meeting->status == 0)
@@ -46,7 +64,11 @@
                         </ul>
                         <h3 class="ml-3 mt-0 mr-0 mb-0 text-capitalize"> {{ $meeting->type == 0 ? 'İclas' : 'Tədbir' }}
                         </h3>
+                        <i class="fa-duotone fa-solid fa-chart-pie chartIcon cursor-pointer ml-2"
+                            style=" font-size:25px" data-meeting-id="{{ $meeting->id }}"></i>
+
                     </div>
+
                     <a href="{{route('hr.meetings.index')}}">
                         <button class="btn btn-danger">
                             <span class="me-2">
@@ -165,7 +187,7 @@
                                                             <div class="col-xl-8 d-flex align-items-start flex-wrap mt-2 mb-0 mt-md-0">
                                                                 @foreach($users as $index => $user)
                                                                                                 @php 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $participant_status =
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            $participant_status =
                                                                                                     $user->participation_status === 1 ? 'text-success' :
                                                                                                     ($user->participation_status === 0 ? 'text-danger' : null);
                                                                                                 @endphp
@@ -188,7 +210,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
             <div class="card-footer">
                 <a href="{{ route('hr.meetings.edit', $meeting->id) }}">
@@ -217,64 +238,68 @@
 <script>
     $(document).ready(function () {
         $(document).on("click", ".chartIcon", function () {
-    var meetingId = $(this).data('meeting-id');
+            var meetingId = $(this).data('meeting-id');
 
-    $.ajax({
-        url: '/employee/meeting/' + meetingId + '/participation-status',
-        method: 'GET',
-        success: function(response) {
-            Swal.fire({
-                html: `
-                    <div class="d-flex justify-content-center"> 
-                        <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
-                    </div>
-                    <div class="mt-4">
-                        <h5>İştirak edəcək:</h5>
-                        <ul>${response.status_one_users.map(user => `<li>${user}</li>`).join('')}</ul>
-                        <h5>İştirak etməyəcək:</h5>
-                        <ul>${response.status_zero_users.map(user => `<li>${user}</li>`).join('')}</ul>
-                        <h5>Cavab yoxdur:</h5>
-                        <ul>${response.status_null_users.map(user => `<li>${user}</li>`).join('')}</ul>
-                    </div>
-                `,
-                showCancelButton: false,
-                confirmButtonText: "Ok",
-                customClass: {
-                    popup: 'swal2-chart',
-                    container: 'chartModal'
-                },
-                didOpen: () => {
-                    // AJAX cavabından gələn dinamik məlumatları chart üçün istifadə edirik
-                    var labels = ["İştirak edəcək", "İştirak etməyəcək", "Cavab yoxdur"];
-                    var yValues = [response.status_one_count, response.status_zero_count, response.status_null_count];
-                    var barColors = [
-                        "#4CAF50", 
-                        "#FF5252", 
-                        "#808080"  
-                    ];
-
-                    // Chart-ı yaratmaq
-                    new Chart("myChart", {
-                        type: "doughnut",
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                backgroundColor: barColors,
-                                data: yValues
-                            }]
+            $.ajax({
+                url: '/employee/meeting/' + meetingId + '/participation-status',
+                method: 'GET',
+                success: function (response) {
+                    Swal.fire({
+                        html: `
+        <div class="d-flex justify-content-center"> 
+            <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+        </div>
+        <div class="mt-4">
+            ${response.status_one_count > 0 ? `
+                <h3>İştirak edəcək:</h3>
+                <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:100px">${response.status_one_users.map(user => `<span>${user}</span>`).join('')}</div>
+            ` : ''}
+            ${response.status_zero_count > 0 ? `
+                <h3>İştirak etməyəcək:</h3>
+                <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:100px">${response.status_zero_users.map(user => `<span>${user}</span>`).join('')}</div>
+            ` : ''}
+            ${response.status_null_count > 0 ? `
+                <h3>Cavab yoxdur:</h3>
+                <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:100px">${response.status_null_users.map(user => `<span>${user}</span>`).join('')}</div>
+            ` : ''}
+        </div>
+    `,
+                        showCancelButton: false,
+                        confirmButtonText: "Ok",
+                        customClass: {
+                            popup: 'swal2-chart',
+                            container: 'chartModal'
                         },
-                        options: {
-                            title: {
-                                display: true,
-                                text: "Görüş İştirak Statusu"
-                            }
+                        didOpen: () => {
+                            var labels = ["İştirak edəcək", "İştirak etməyəcək", "Cavab yoxdur"];
+                            var yValues = [response.status_one_count, response.status_zero_count, response.status_null_count];
+                            var barColors = [
+                                "green",
+                                "red",
+                                "#808080"
+                            ];
+
+                            new Chart("myChart", {
+                                type: "doughnut",
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        backgroundColor: barColors,
+                                        data: yValues
+                                    }]
+                                },
+                                options: {
+                                    title: {
+                                        display: true,
+                                        text: "Görüş İştirak Statusu"
+                                    }
+                                }
+                            });
                         }
                     });
                 }
             });
-        }
-    });
-});
+        });
 
         $('.delete-item').on("click", function () {
             const item_id = $(this).data('id');
