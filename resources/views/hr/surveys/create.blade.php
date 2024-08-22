@@ -380,7 +380,8 @@
             input.value = '';
             
         } else {
-            list.removeChild(list.firstElementChild);
+            list.innerHTML = '';            
+            // list.removeChild(list.firstElementChild);      
             todoContent.classList.remove('disabled-div');
         }
 

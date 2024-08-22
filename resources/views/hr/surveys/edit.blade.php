@@ -147,8 +147,8 @@
                                                     <div id="todo-header">
                                                     </div>
                                                         <ul id="todo-list-0" class="todo-list disabled-div">
-                                                            @foreach ($question->answers as $answer)
                                                             
+                                                            @foreach ($question->answers as $answer)
                                                             <li>                                          
 
                                                                 <p class="line-break-input disabled-div p-3 rounded border bg-gray-100"  style="width: 100%">{{ $answer->name == 'boş' ? 'Mətn daxil ediləcək' : $answer->name }} </p>
@@ -409,8 +409,13 @@ if (questionType.value === 'textarea') {
     input.removeAttribute('required');
     input.value = '';
     
-} else {
-    // list.removeChild(list.firstElementChild);
+} 
+//  eger sualin novu cox  ve ya tek  variantlidirsa  
+
+else 
+ {
+    list.innerHTML = '';    
+    // list.removeChild(list.firstElementChild);      
     todoContent.classList.remove('disabled-div');
 }
 
