@@ -84,7 +84,6 @@
                                 <option value="" selected disabled>Status seçin</option>
                                 <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Deaktiv</option>
                                 <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Aktiv</option>
-                                <option value="2" {{ old('status') == '2' ? 'selected' : '' }}>Gözləmə</option>
                             </select>
                             @error('status')
                                 <span class="text-danger">{{ $message }}</span>

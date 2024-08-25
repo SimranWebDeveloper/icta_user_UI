@@ -88,8 +88,6 @@
                                 </option>
                                 <option value="0" {{ old('status', $meeting->status) == '0' ? 'selected' : '' }}>Deaktiv
                                 </option>
-                                <option value="2" {{ old('status', $meeting->status) == '2' ? 'selected' : '' }}>Gözləmə
-                                </option>
                             </select>
                             @error('status')
                                 <span class="text-danger">{{ $message }}</span>
